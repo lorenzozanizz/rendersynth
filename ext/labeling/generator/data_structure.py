@@ -17,24 +17,20 @@ class Label:
     Represents a labeled object or entity with its geometric representation
     (bounding box or polygon), semantic class, visibility estimate, and
     optional segmentation data.
+
+    :param obj_or_entity_name: Identifier string for the object or entity.
+    :param cls: Semantic label class, or None if unclassified.
+    :param annotation_type: Type of geometric annotation ("bbox" or "polygon").
+    :param is_entity: Whether this label represents a multi-mesh entity (True)
+        or a single object (False).
+    :param visibility: Visibility ratio in [0, 1]. Defaults to 0.0.
+    :param is_crowd: Whether the annotation represents a crowd region. Defaults to False.
+    :param ideal_bbox: 2D bounding box in ideal/canonical space as (x, y, w, h), or None.
+    :param bbox: 2D bounding box in camera/image space as (x, y, w, h), or None.
+    :param polygon: List of (x, y) vertices defining a 2D convex hull or mask polygon, or None.
+    :param segmentation: Run-length encoded segmentation mask, or None.
+    :param attributes: Dictionary of format-specific attributes (e.g., for CVAT), or None.
     """
-
-    def __init__(self, ...):
-        """Initialize a label annotation.
-
-        :param obj_or_entity_name: Identifier string for the object or entity.
-        :param cls: Semantic label class, or None if unclassified.
-        :param annotation_type: Type of geometric annotation ("bbox" or "polygon").
-        :param is_entity: Whether this label represents a multi-mesh entity (True)
-            or a single object (False).
-        :param visibility: Visibility ratio in [0, 1]. Defaults to 0.0.
-        :param is_crowd: Whether the annotation represents a crowd region. Defaults to False.
-        :param ideal_bbox: 2D bounding box in ideal/canonical space as (x, y, w, h), or None.
-        :param bbox: 2D bounding box in camera/image space as (x, y, w, h), or None.
-        :param polygon: List of (x, y) vertices defining a 2D convex hull or mask polygon, or None.
-        :param segmentation: Run-length encoded segmentation mask, or None.
-        :param attributes: Dictionary of format-specific attributes (e.g., for CVAT), or None.
-        """
 
     obj_or_entity_name: str
     cls: Optional[LabelClass]

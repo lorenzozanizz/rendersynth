@@ -45,6 +45,7 @@ pipe_to_ico_mapping = {
     PipeNames.LINE: "IPO_BACK",
     PipeNames.BASE_COLOR: "COLOR",
 
+    PipeNames.FOCAL_LEN: "CAMERA_STEREO",
     PipeNames.BEZIER_LOCK: "IPO_BACK",
     PipeNames.SPHERE_LOCK: "MATSPHERE"
 
