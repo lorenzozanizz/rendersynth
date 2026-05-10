@@ -1,5 +1,8 @@
 name: Deploy Docs & Tutorials
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
