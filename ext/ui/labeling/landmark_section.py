@@ -6,19 +6,20 @@ from bpy.props import (
 )
 
 class KeypointItem(PropertyGroup):
-    bone_name: StringProperty(name="Bone")                  # type: ignore
-    label: StringProperty(name="Label")                     # type: ignore
-    index: IntProperty(name="Index", min=0)                 # type: ignore
-    include: BoolProperty(name="Include", default=True)     # type: ignore
+    bone_name: StringProperty(name="Bone")                                  # type: ignore
+    label: StringProperty(name="Label")                                     # type: ignore
+    index: IntProperty(name="Index", min=0)                                 # type: ignore
+    include: BoolProperty(name="Include", default=True)                     # type: ignore
 
 
 class SkeletonConnectionItem(PropertyGroup):
-    index_a: IntProperty(name="From", min=0)                # type: ignore
-    index_b: IntProperty(name="To", min=0)                  # type: ignore
+    index_a: IntProperty(name="From", min=0)                                # type: ignore
+    index_b: IntProperty(name="To", min=0)                                  # type: ignore
 
 
 class PoseLabelSettings(PropertyGroup):
-    armature: PointerProperty(                              # type: ignore
+
+    armature: PointerProperty(                                              # type: ignore
         name="Armature",
         type=bpy.types.Object,
         poll=lambda self, obj: obj.type == 'ARMATURE'
@@ -168,9 +169,9 @@ class LandmarkSection:
         layout.separator()
 
         # Bone → keypoint mapping
-        layout.label(text="Bone → Keypoint Mapping")
+        layout.label(text="Bone/Keypoint Mapping")
         layout.template_list(
-            "RENDERSYNTH_UL_KeypointList", "",
+            KeypointList.__name__, "keypoint_list",
             settings, "keypoints",
             settings, "keypoints_index",
             rows=5
@@ -184,7 +185,7 @@ class LandmarkSection:
         # Skeleton connections
         layout.label(text="Skeleton Connections")
         layout.template_list(
-            "RENDERSYNTH_UL_ConnectionList", "",
+            ConnectionList.__name__, "connection_list",
             settings, "connections",
             settings, "connections_index",
             rows=3

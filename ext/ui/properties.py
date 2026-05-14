@@ -14,6 +14,7 @@ from bpy.props import (
 )
 
 from .formatting_config import LabelConfigDataProperty
+from .labeling import PoseLabelSettings
 from .pipe_editor import ImagePath, ObjectPosition, MaterialListItem, ObjectName, TypedNodeProperty, PaletteItem
 from ..distribution.computation import ONE_D_DISTRIBUTIONS, UPPER_D_DISTRIBUTIONS
 from ..distribution.color import ColorDistribution
@@ -167,6 +168,7 @@ operation_properties = {
     "typed_object": PointerProperty(type=ObjectName),
 
     "labeling_config": PointerProperty(type=LabelConfigDataProperty),
+    "pose_label_settings": PointerProperty(type=PoseLabelSettings)
 
 }
 

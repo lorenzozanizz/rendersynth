@@ -180,3 +180,10 @@ class ApplyLogPathOperator(Operator):
         else:
             self.report({'ERROR'}, "Failed to update logger")
             return { 'CANCELLED' }
+
+class VisualizeLandmarkConstellationOperator(Operator):
+    
+    pass
+
+class InterruptConstellationOperator(Operator):
+    pass

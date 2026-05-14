@@ -130,10 +130,10 @@ class LabelingPanel(Panel):
 
         layout = self.layout
 
+        layout.label(text="Labeling mode", icon="INFO")
         row = layout.row()
         active = context.window_manager.get('labeling_tab', 'class_tab')
 
-        layout.label(text="Labeling mode", icon="INFO")
         for tab_id, tab_label in [('class_tab', 'Classes'), ('landmark_tab', 'Landmarks')]:
             row.operator(Labels.SWITCH_LABEL_SECTION.value,
                 text=tab_label,
