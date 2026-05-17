@@ -96,6 +96,12 @@ class PixelMapExtractor(Extractor):
     def ray_casting_needs(self):
         pass
 
+    # A development note:
+    # generating programmatically compositing nodes is very undocumented in BPY.
+    # https://imoverclocked.blogspot.com/2011/08/blender-25-compositing-from-python.html
+    # was very helpful in the basics, and Blender's console was used to infer the
+    # nodes IDs.
+    # ! This code is very brittle to breaking changes in the Blender architecture !
     class CompositorNodesContext:
 
         def __init__(self, context, datatype: str):

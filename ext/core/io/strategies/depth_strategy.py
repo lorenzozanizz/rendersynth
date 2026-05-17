@@ -5,7 +5,12 @@ from . import IOStrategy
 from ... import file_type, StorageSpec, extension, BatchMetadata, RenderConfig, FormatSpecification
 
 
-class NPZDepthStrategy(IOStrategy):
+class DepthStrategyPNG(IOStrategy):
+
+    pass
+
+
+class DepthStrategyNPZ(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:
         pass
