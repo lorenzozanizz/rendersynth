@@ -98,7 +98,7 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def extract(context) -> dict:
-        pass
+        return {}
 
 
 

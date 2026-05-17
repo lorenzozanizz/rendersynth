@@ -141,7 +141,9 @@ def get_minimal_bounding_box_fast(points: List[Tuple]):
     x_min = x_max = points[0][0]
     y_min = y_max = points[0][1]
 
-    for x, y in points[1:]:
+    for p in points[1:]:
+        x = p[0]
+        y = p[1]
         if x < x_min:
             x_min = x
         elif x > x_max:

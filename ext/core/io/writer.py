@@ -50,6 +50,8 @@ class OutputWriter:
         render_config: RenderConfig
     ) -> None:
         """Called per-shot. May not write immediately (e.g., COCO batches)"""
+
+        self.io_strategy.signal_begin_shot()
         # Transform annotations to format-specific representation
         transformed = [
             self.io_strategy.transform_annotation(ann, self.shot_idx, render_config)

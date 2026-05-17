@@ -2,7 +2,6 @@ from typing import Callable
 import bpy
 from pathlib import Path
 
-from jedi.inference.context import AbstractContext
 
 from .data_structure import *
 

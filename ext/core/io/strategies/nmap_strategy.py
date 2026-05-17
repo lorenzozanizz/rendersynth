@@ -2,7 +2,11 @@ from typing import Union, Literal, Any, Collection
 
 from ext.labeling import Label
 from . import IOStrategy
-from ... import file_type, StorageSpec, extension, BatchMetadata, RenderConfig, FormatSpecification
+from ... import StorageSpec, BatchMetadata, RenderConfig, FormatSpecification
+
+
+file_type = str
+extension = str
 
 class NormalMapStrategy(IOStrategy):
 

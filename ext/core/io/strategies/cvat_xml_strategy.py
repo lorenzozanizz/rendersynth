@@ -11,13 +11,17 @@ from os.path import join
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
 
-from .. import file_type, StorageSpec, extension
+from .. import StorageSpec
 from ....labeling.conversions import convert_camera_centered_to_coco
 from ....labeling.generator.data_structure import *
 from ...configurations import RenderConfig, WritingConfig, BatchMetadata
 from ..io_strategy import IOStrategy, FormatSpecification
 from ..registry import LabelingFormatRegistry
 from . import SupportedFormats
+
+file_type = str
+extension = str
+
 
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.CVAT_XML_IMAGES.value)

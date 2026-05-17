@@ -4,13 +4,17 @@
 from os.path import join
 from typing import Any, Collection
 
-from .. import file_type, StorageSpec, extension
+from .. import StorageSpec
 from ....labeling.conversions import convert_camera_centered_to_yolo
 from ....labeling.generator.data_structure import *
 from ...configurations import RenderConfig, WritingConfig
 from ..io_strategy import IOStrategy, FormatSpecification
 from ..registry import LabelingFormatRegistry
 from . import SupportedFormats
+
+
+file_type = str
+extension = str
 
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.ULTRALYTICS_YOLO.value)

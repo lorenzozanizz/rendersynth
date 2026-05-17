@@ -132,3 +132,11 @@ class IOStrategy(metaclass=ABCMeta):
         # If a particular strategy has to change the blender context, it must implement a
         # side effect free context manager.
         return nullcontext()
+
+    @staticmethod
+    def signal_begin_shot():
+        """
+
+        :return:
+        """
+        return

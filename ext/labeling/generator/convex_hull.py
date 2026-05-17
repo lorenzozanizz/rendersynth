@@ -39,7 +39,10 @@ class PolygonExtractor(Extractor):
         classifier: ClassificationEngine,
         entity_data,
         camera,
-        estimate_visibility: bool = True, merge_angle: float = 3.0
+        estimate_visibility: bool = True,
+        rendered_shot_data = None,
+        merge_angle: float = 3.0,
+        **kwargs
     ) -> LabelData:
         """ Extract polygon labels from visible objects and entities in the scene.
         Computes convex hull polygons for each visible object and groups them into
@@ -48,6 +51,7 @@ class PolygonExtractor(Extractor):
         NOTE: Convex hulls, unlike alpha shapes, do not compute the smallest simple shape comprising
         the data, rather a convex shape.!
 
+        :param rendered_shot_data:
         :param visible_objects: Mapping from objects to their 3D point cloud representations.
         :param classifier: Classification engine for mapping objects and entities to semantic labels.
         :param entity_data: Dictionary defining multi-object entities as collections of component names.

@@ -8,7 +8,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from os.path import join
 import xml.dom.minidom
 
-from .. import file_type, StorageSpec, extension
+from .. import StorageSpec
 from ....labeling.conversions import convert_camera_centered_to_pascal_voc
 from ....labeling.generator.data_structure import *
 from ...configurations import RenderConfig, WritingConfig, BatchMetadata
@@ -16,6 +16,9 @@ from ..io_strategy import IOStrategy, FormatSpecification
 from ..registry import LabelingFormatRegistry
 from . import SupportedFormats
 
+
+file_type = str
+extension = str
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.PASCAL_VOC.value)
 class PascalVOCFormatter(IOStrategy):

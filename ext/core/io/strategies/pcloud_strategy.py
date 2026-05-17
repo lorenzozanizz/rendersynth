@@ -6,15 +6,18 @@ from os.path import join
 from typing import Collection
 import json
 
-from .. import file_type, StorageSpec, extension
+from .. import StorageSpec
 from ....labeling.generator.data_structure import *
 from ...configurations import RenderConfig, WritingConfig
 from ..io_strategy import IOStrategy, FormatSpecification
 from ..registry import LabelingFormatRegistry
 from . import SupportedFormats
 
+file_type = str
+extension = str
 
-@LabelingFormatRegistry.register_strategy(SupportedFormats.PCD.value)
+
+@LabelingFormatRegistry.register_strategy(SupportedFormats.PCD_CLASS_COLOR.value)
 class PCDFormatter(IOStrategy):
     """ Point Cloud Data (PCD) format writer.
 
@@ -31,6 +34,8 @@ class PCDFormatter(IOStrategy):
         self.tracked_annotations = []
         self.class_registry = {}
 
+        self.cloud_id = 0
+
     def ensure_directories(self) -> None:
         """ Create directory structure for PCD output """
         pcd_dir = join(self.write_cfg.save_path, "point_clouds/")
@@ -44,7 +49,7 @@ class PCDFormatter(IOStrategy):
             single_file_per_image=True,
             global_metadata_required=True,
             # Annotation grouping
-            aggregation_strategy="per_batch",  # Need batch processing for metadata
+            aggregation_strategy="per_image",  # Need batch processing for metadata
             # Hooks
             requires_class_declaration=True,
             supports_image_metadata=True,
@@ -107,14 +112,14 @@ class PCDFormatter(IOStrategy):
         # PCD Header
         point_count = len(point_cloud)
         lines = [
-            "# .PCD v.7 - Point Cloud Data file format",
-            f"# Generated from Blender annotation system",
-            f"# Class: {class_name} (ID: {class_id})",
-            "VERSION .7", "FIELDS x y z r g b class",
-            "SIZE 4 4 4 1 1 1 4", "TYPE f f f u u u u", f"COUNT {point_count}",
-            f"WIDTH {point_count}", "HEIGHT 1",
-            "VIEWPOINT 0 0 0 1 0 0 0", f"POINTS {point_count}",
-            "DATA ascii"
+            "# .PCD v.7 - Point Cloud Data file format\n",
+            f"# Generated from Blender annotation system with Rendersynth\n",
+            f"# Class: {class_name} (ID: {class_id})\n",
+            "VERSION .7\n", "FIELDS x y z r g b class\n",
+            "SIZE 4 4 4 1 1 1 4\n", "TYPE f f f u u u u\n", f"COUNT {point_count}\n",
+            f"WIDTH {point_count}\n", "HEIGHT 1\n",
+            "VIEWPOINT 0 0 0 1 0 0 0\n", f"POINTS {point_count}\n",
+            "DATA ascii\n"
         ]
 
         # Define fields: x, y, z (position) + r, g, b (color) + class (label)
@@ -153,6 +158,9 @@ class PCDFormatter(IOStrategy):
 
         return "".join(lines)
 
+    def signal_begin_shot(self):
+        self.cloud_id = 0
+
     def transform_annotation(
             self,
             label: Label,
@@ -170,7 +178,7 @@ class PCDFormatter(IOStrategy):
         return {
             'shot_idx': shot_idx,
             'class_id': label.cls.class_id,
-            'class_name': label.cls.class_name,
+            'class_name': label.cls.name,
             'point_cloud': label.point_cloud,
             'visibility': label.visibility,
             'bbox': label.bbox,
@@ -178,9 +186,9 @@ class PCDFormatter(IOStrategy):
         }
 
     def aggregate_batch(
-            self,
-            annotations: list[dict[str, Any]],
-            batch_metadata: Any
+        self,
+        annotations: list[dict[str, Any]],
+        batch_metadata: Any
     ) -> dict[str, Any]:
         """
         Aggregate batch annotations.
@@ -236,7 +244,7 @@ class PCDFormatter(IOStrategy):
             return "images/"
         elif f_type == "point_cloud":
             return "point_clouds/"
-        elif "metadata" in f_type or "classes" in f_type or "annotations" in f_type:
+        elif "README" in f_type or  "metadata" in f_type or "classes" in f_type or "annotations" in f_type:
             return "metadata/"
         else:
             return "data/"
@@ -254,7 +262,9 @@ class PCDFormatter(IOStrategy):
         elif f_type == "README":
             return "README"
         else:  # point_cloud
-            return f"{prefix}_{shot_id}"
+            n = f"{prefix}_{shot_id}_{self.cloud_id}"
+            self.cloud_id += 1
+            return n
 
     README_CONTENT = """# Point Cloud Dataset (PCD Format)
     ## Structure

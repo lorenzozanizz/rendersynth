@@ -245,7 +245,7 @@ class PreviewGenerator:
                             # Flags which are used to conditionally draw various elements in the object info
                             show_geometry: bool = True, show_obj_name: bool = True,
                             show_class_name_or_id: str = "id", show_visibility: bool = True,
-                            show_unoccluded_bbox: bool = True) -> None:
+                            show_unoccluded_bbox: bool = False) -> None:
         """ Renders information (geometry, object name, class id, estimated visibility) ù
         for a single object starting from its PreviewRanderData
 
@@ -277,7 +277,7 @@ class PreviewGenerator:
         geometry_width = int(abs(x_max-x_min))
         # Draw the bounding box first, so that the text is visible in all cases, hopefully.
         if show_geometry:
-            self._render_geometry(img, color, line_width=4, pixel_space_geometry=pixel_geo)
+            self._render_geometry(img, color, line_width=7, pixel_space_geometry=pixel_geo)
         if show_unoccluded_bbox:
             unoccluded_pixel_geo = convert_camera_centered_to_absolute_pixels(data.ideal_bbox, width, height)
             self._render_geometry(img, color, line_width=2, pixel_space_geometry=unoccluded_pixel_geo)
@@ -364,7 +364,7 @@ class PreviewGenerator:
         for label in label_data:
             geometry = None
             if label.annotation_type.startswith("polygon"):
-                geometry = label.geometry
+                geometry = label.polygon
             elif label.annotation_type.startswith("bbox"):
                 geometry = label.bbox
 

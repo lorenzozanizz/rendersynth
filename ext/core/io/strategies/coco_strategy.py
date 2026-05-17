@@ -8,7 +8,7 @@ from typing import Any, Collection, Literal
 from datetime import datetime
 from os.path import join
 
-from .. import file_type, StorageSpec, extension
+from .. import StorageSpec
 from ....labeling.conversions import convert_camera_centered_to_coco
 from ....labeling.conversions import convert_camera_point_list_absolute_pixels_y_inverted
 from ....labeling.generator.data_structure import *
@@ -17,6 +17,9 @@ from ..io_strategy import IOStrategy, FormatSpecification
 from ..registry import LabelingFormatRegistry
 from . import SupportedFormats
 
+
+file_type = str
+extension = str
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.COCO.value)
 class COCOFormatter(IOStrategy):
