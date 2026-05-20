@@ -1,16 +1,12 @@
 from contextlib import AbstractContextManager
-from typing import Iterable, Any, Union, Callable
-
-import bpy
-
+from typing import Callable
+from pathlib import Path
 
 from ..compositing_utils import NodeCompositor
-from .. import Extractor, LabelData
-from ..class_engine import ClassificationEngine
+
+from ..writing_folder_structure import FolderStructure
 from ...utils.timer import TimingContext
 
-from ..ray_casting import (union_bounding_boxes, compute_camera_space_boxes, get_minimal_bounding_box_fast,
-                           estimate_visibility_3d, compute_bbox_area, compute_area_ratio)
 from ..class_engine import ClassificationEngine
 
 from .extractor import Extractor
@@ -34,6 +30,9 @@ class PixelMapExtractor(Extractor):
         self.black_near = black_near
         self.datatype = datatype
         self.normalized_depth = normalize_depth
+
+        self.declared_strategy: Optional[FolderStructure] = None
+        self.active_output_context_node = None
 
     def extract(self,
         visible_objects: dict[Any, list],
@@ -200,7 +199,7 @@ class PixelMapExtractor(Extractor):
                 (1, 2, 0.5),
             ),
             'file_output': (
-                ('base_path', 'C:/Users/picul/Documents/Generations/'),
+                ('base_path', ''),
             )
         }
 
@@ -243,12 +242,40 @@ class PixelMapExtractor(Extractor):
             self.compositor.delete_node_group('normal')
             self.compositor.unregister_group('normal')
 
+        def set_write_path(self, path: Union[str, Path]) -> None:
+            node = self.compositor.get_node('file_output')
+            if node is None:
+                return
+            node.base_path = path
+
     def get_context(self) -> AbstractContextManager:
         config = {
             'normalize_depth': self.normalized_depth,
             'black_near': self.black_near,
         }
         if self.datatype == 'depth':
-            return PixelMapExtractor.CompositorDepthContext(self.ctx, config)
+            self.active_output_context_node = PixelMapExtractor.CompositorDepthContext(self.ctx, config)
+            return self.active_output_context_node
         else:
-            return PixelMapExtractor.CompositorNormalContext(self.ctx, config)
+            self.active_output_context_node =  PixelMapExtractor.CompositorNormalContext(self.ctx, config)
+            return self.active_output_context_node
+
+    def prepare_for_shot(self, shot_idx: int) -> None:
+        # For the default implementation, simply ignore the preparation: nothing needs
+        # to be set up.
+        if self.declared_strategy is None:
+            pass
+        else:
+            map_path = self.declared_strategy.get_filename_for(shot_idx, "map")
+            self.active_output_context_node.set_write_path(map_path)
+        return
+
+    def declare_folder_structure(self, folder_strategy: FolderStructure) -> None:
+        """
+
+        :param folder_strategy:
+        :return:
+        """
+        # The default implementation ignores the folder structure as it does not
+        # require it.
+        self.declared_strategy = folder_strategy

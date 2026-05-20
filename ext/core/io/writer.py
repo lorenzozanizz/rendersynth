@@ -37,6 +37,10 @@ class OutputWriter:
     def set_shot_index(self, idx: int) -> None:
         self.shot_idx = idx
 
+    def get_strategy(self) -> IOStrategy:
+        """ Get the current writing strategy for the output writer. """
+        return self.io_strategy
+
     def begin_batch(self, batch_metadata: BatchMetadata) -> None:
         """Called once before rendering begins"""
         # Store the batch metadata for the end of generation callback.

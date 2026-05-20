@@ -77,7 +77,7 @@ class Executor:
                 # Hint the labeling orchestrator that generation is commencing
                 labeling_context = self.labeling_orchestrator.begin_generation(self.parameters)
                 full_context = self.compile_contexts()
-                # And join the two contextes together
+                # And join the two contexts together
                 with MultiContext(labeling_context, full_context):
 
                     for shot_idx in range(start_idx, start_idx + amount):

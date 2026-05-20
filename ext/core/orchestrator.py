@@ -46,6 +46,7 @@ class LabelingOrchestrator:
         self.extractor: Extractor = self._create_extractor()
 
         self.writer: OutputWriter = writer
+        self.extractor.declare_folder_structure(writer.get_strategy())
 
         self.label_data = None
 
@@ -168,5 +169,5 @@ class LabelingOrchestrator:
         """ """
         pass
 
-    def prepare_for_shot(self, shot_idx):
-        pass
+    def prepare_for_shot(self, shot_idx: int) -> None:
+        self.extractor.prepare_for_shot(shot_idx=shot_idx)

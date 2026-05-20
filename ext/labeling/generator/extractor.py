@@ -11,6 +11,7 @@ from typing import Any, Dict, Callable
 from contextlib import nullcontext
 
 from .data_structure import *
+from ..writing_folder_structure import FolderStructure
 
 class Extractor(metaclass=ABCMeta):
     """
@@ -79,6 +80,17 @@ class Extractor(metaclass=ABCMeta):
         pass
 
     @staticmethod
+    def declare_folder_structure(folder_strategy: FolderStructure) -> None:
+        """
+
+        :param folder_strategy:
+        :return:
+        """
+        # The default implementation ignores the folder structure as it does not
+        # require it.
+        return
+
+    @staticmethod
     def ray_casting_needs() -> dict[str, Any]:
         return {}
 
@@ -87,3 +99,8 @@ class Extractor(metaclass=ABCMeta):
         # Default implementation
         return nullcontext()
 
+    @staticmethod
+    def prepare_for_shot(self, shot_idx: int) -> None:
+        # For the default implementation, simply ignore the preparation: nothing needs
+        # to be set up.
+        return
