@@ -14,6 +14,8 @@ from .core_ops import GenerateOperator, PreviewOperator
 from .labeling_ops import (AddLabelRuleOperator, RemoveLabelRuleOperator, AddLabelClassOperator, RemoveObjectLabelOperator,
                            AddObjectLabelOperator, RemoveLabelClassOperator, TargetObjectsLabelOperator,
                            AddEntityOperator, RemoveEntityOperator, SelectEntityOperator, TargetObjectsEntityOperator)
+from .landmarks_operator import (AutoDetectBonesOperator, AddKeypointOperator, RemoveKeypointOperator,
+    AddConnectionOperator, RemoveConnectionOperator, SavePoseConfigOperator)
 
 operators = (
 
@@ -39,6 +41,9 @@ operators = (
     #
     AddLabelRuleOperator, RemoveLabelRuleOperator, AddLabelClassOperator, RemoveObjectLabelOperator,
                            AddObjectLabelOperator, RemoveLabelClassOperator, TargetObjectsLabelOperator,
-    AddEntityOperator, RemoveEntityOperator, SelectEntityOperator, TargetObjectsEntityOperator
+    AddEntityOperator, RemoveEntityOperator, SelectEntityOperator, TargetObjectsEntityOperator,
+    #
+    AutoDetectBonesOperator, AddKeypointOperator,   RemoveKeypointOperator,
+        AddConnectionOperator, RemoveConnectionOperator, SavePoseConfigOperator,
 
 )

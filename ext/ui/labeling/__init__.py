@@ -8,6 +8,5 @@ classes = (
 
     # Landmarks (rigs, faces)
     KeypointItem, SkeletonConnectionItem, PoseLabelSettings, KeypointList,
-    ConnectionList, AutoDetectBonesOperator, AddKeypointOperator,   RemoveKeypointOperator,
-    AddConnectionOperator, RemoveConnectionOperator, SavePoseConfigOperator,
+    ConnectionList
 )

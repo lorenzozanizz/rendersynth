@@ -116,7 +116,7 @@ class WidgetSerializationKeys(Enum):
     VALUE_MATERIAL              = "material"
     VALUE_LABEL                 = "label"
 
-    POSITION                    = "positions"       # Parent name
+    POSITION                    = "positions"       # ^ Parent name
     POSITION_LIST               = "positions"
 
     SIMPLE                      = "distribution"    # ^ Parent name
@@ -157,4 +157,5 @@ class StageDescriptions(Enum):
 
     ROTATION = """ Randomly rotate an object in 3d space.
     The rotation is applied to the Euler rotate of the target object(s). """
+
 

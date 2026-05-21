@@ -46,7 +46,7 @@ class FormatSpecification:
 file_type = str
 extension = str
 
-class IOStrategy(metaclass=ABCMeta, FolderStructure):
+class IOStrategy(FolderStructure, metaclass=ABCMeta):
     """Define what a format needs; don't directly write files"""
 
     def __init__(self, write_config: WritingConfig, format_config: dict) -> None:
