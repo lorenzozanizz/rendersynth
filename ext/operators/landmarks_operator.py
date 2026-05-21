@@ -1,7 +1,9 @@
 from bpy.types import Operator
 
+from .names import Labels
+
 class AutoDetectBonesOperator(Operator):
-    bl_idname = "rendersynth.auto_detect_bones"
+    bl_idname = Labels.DETECT_BONES.value
     bl_label = "Auto-detect"
     bl_description = "Populate keypoint list from the selected armature"
 
@@ -30,7 +32,7 @@ class AutoDetectBonesOperator(Operator):
 
 
 class AddKeypointOperator(Operator):
-    bl_idname = "rendersynth.add_keypoint"
+    bl_idname = Labels.ADD_KEYPOINT.value
     bl_label = "Add"
 
     def execute(self, context):
@@ -42,7 +44,7 @@ class AddKeypointOperator(Operator):
 
 
 class RemoveKeypointOperator(Operator):
-    bl_idname = "rendersynth.remove_keypoint"
+    bl_idname = Labels.REMOVE_KEYPOINT.value
     bl_label = "Remove"
 
     def execute(self, context):
@@ -55,7 +57,7 @@ class RemoveKeypointOperator(Operator):
 
 
 class AddConnectionOperator(Operator):
-    bl_idname = "rendersynth.add_connection"
+    bl_idname = Labels.ADD_CONNECTION.value
     bl_label = "Add"
 
     def execute(self, context):
@@ -66,7 +68,7 @@ class AddConnectionOperator(Operator):
 
 
 class RemoveConnectionOperator(Operator):
-    bl_idname = "rendersynth.remove_connection"
+    bl_idname = Labels.REMOVE_CONNECTION.value
     bl_label = "Remove"
 
     def execute(self, context):
@@ -78,32 +80,36 @@ class RemoveConnectionOperator(Operator):
         return {'FINISHED'}
 
 
-class SavePoseConfigOperator(Operator):
-    bl_idname = "rendersynth.save_pose_config"
-    bl_label = "Save Configuration"
+class VisualizeSkeletonOperator(Operator):
+    bl_idname = Labels.VISUALIZE_SKELETON.value
+    bl_label = "Visualize Bones Configuration"
     bl_description = "Serialize keypoint mapping and skeleton connections to the pipeline JSON"
+
+    def execute(self, context):
+
+        pass
+
+
+class StopVisualizeSkeletonOperator(Operator):
+    bl_idname = Labels.STOP_VISUALIZE_SKELETON.value
+    bl_label = "Stop Viewing Bones Configuration"
+    bl_description = "Serialize keypoint mapping and skeleton connections to the pipeline JSON"
+
+    def execute(self, context):
+
+
+        pass
+
+class AddRigOperator(Operator):
+    bl_idname = Labels.ADD_RIG.value
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
 
-        keypoints = [
-            {
-                "bone": kp.bone_name,
-                "label": kp.label,
-                "index": kp.index,
-                "include": kp.include,
-            }
-            for kp in settings.keypoints
-        ]
 
-        connections = [
-            [c.index_a, c.index_b]
-            for c in settings.connections
-        ]
+class RemoveRigOperator(Operator):
+    bl_idname = Labels.REMOVE_RIG.value
 
-        # Hook this into your existing pipeline serialization instead of printing
-        print("Keypoints:", keypoints)
-        print("Skeleton:", connections)
-
-        self.report({'INFO'}, "Pose configuration saved")
-        return {'FINISHED'}
+    def execute(self, context):
+        settings = context.scene.pose_label_settings
+        # access the skeleton collection

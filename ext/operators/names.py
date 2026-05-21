@@ -146,6 +146,26 @@ class Labels(Enum):
     # ( Remove a gradient item to teh random spectrum of colors )
     REMOVE_GRADIENT_ITEM    = "randomizer.remove_gradient_item"
 
+    # ------------- Names inside distribution_ops.py ---------------
+    # |
+    # ( )
+    VISUALIZE_SKELETON      = "randomizer.visualize_skeleton"
+    #
+    STOP_VISUALIZE_SKELETON = "randomizer.stop_skeleton"
+    #
+    ADD_RIG                 = "randomizer.add_rig"
+
+    REMOVE_RIG              = "randomizer.remove_rig"
+
+    ADD_CONNECTION          = "randomizer.add_connection"
+
+    REMOVE_CONNECTION       = "randomizer.remove_connection"
+
+    DETECT_BONES            = "randomizer.detect_bones"
+
+    ADD_KEYPOINT            = "randomizer.add_keypoint"
+
+    REMOVE_KEYPOINT         = "randomizer.remove_keypoint"
 
     # ------------- Default namespace names ---------------
     # |

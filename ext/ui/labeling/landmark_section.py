@@ -16,8 +16,14 @@ class SkeletonConnectionItem(PropertyGroup):
     index_a: IntProperty(name="From", min=0)                                # type: ignore
     index_b: IntProperty(name="To", min=0)                                  # type: ignore
 
+class RigItem(PropertyGroup):
+
+    rig_name: StringProperty(name="")                                       # type: ignore
+    enabled: BoolProperty(name="Enabled", default=True)                     # type: ignore
 
 class PoseLabelSettings(PropertyGroup):
+
+    # There can be multiple armatures.
 
     armature: PointerProperty(                                              # type: ignore
         name="Armature",
@@ -28,6 +34,7 @@ class PoseLabelSettings(PropertyGroup):
     keypoints_index: IntProperty(name="Active Keypoint", default=0)         # type: ignore
     connections: CollectionProperty(type=SkeletonConnectionItem)            # type: ignore
     connections_index: IntProperty(name="Active Connection", default=0)     # type: ignore
+
 
 
 class KeypointList(UIList):
@@ -43,6 +50,10 @@ class ConnectionList(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         row = layout.row(align=True)
         row.label(text=f"[{item.index_a}, {item.index_b}]")
+
+class RegisteredSkeletonsList(UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+        row = layout.row(align=True)
 
 
 class LandmarkSection:
