@@ -15,7 +15,8 @@ from .labeling_ops import (AddLabelRuleOperator, RemoveLabelRuleOperator, AddLab
                            AddObjectLabelOperator, RemoveLabelClassOperator, TargetObjectsLabelOperator,
                            AddEntityOperator, RemoveEntityOperator, SelectEntityOperator, TargetObjectsEntityOperator)
 from .landmarks_operator import (AutoDetectBonesOperator, AddKeypointOperator, RemoveKeypointOperator,
-    AddConnectionOperator, RemoveConnectionOperator, SavePoseConfigOperator)
+                                 AddConnectionOperator, RemoveConnectionOperator,
+                                 AddRigOperator, RemoveRigOperator)
 
 operators = (
 
@@ -44,6 +45,6 @@ operators = (
     AddEntityOperator, RemoveEntityOperator, SelectEntityOperator, TargetObjectsEntityOperator,
     #
     AutoDetectBonesOperator, AddKeypointOperator,   RemoveKeypointOperator,
-        AddConnectionOperator, RemoveConnectionOperator, SavePoseConfigOperator,
+        AddConnectionOperator, RemoveConnectionOperator, AddRigOperator, RemoveRigOperator,
 
 )

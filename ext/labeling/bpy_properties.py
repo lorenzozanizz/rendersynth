@@ -126,6 +126,9 @@ class LabelingPropData(PropertyGroup):
     entities_active_index: IntProperty(default=0)               # type: ignore
 
 
+# Landmarks labeling
+
+
 label_properties = {
     "labeling_data": PointerProperty(
         type=LabelingPropData

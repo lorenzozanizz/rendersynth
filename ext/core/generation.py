@@ -101,6 +101,8 @@ class Executor:
                             # require to sample the pixel colors directly from the rendered scene!
                             write_path = self.writer.get_image_write_path()
 
+                            # The orchestrator may need to prepare some things before acting. e.g.
+                            # change compositor nodes.
                             self.labeling_orchestrator.prepare_for_shot(shot_idx=shot_idx)
 
                             # Renders

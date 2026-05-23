@@ -1,4 +1,5 @@
 from bpy.types import Operator
+import bpy
 
 from .names import Labels
 
@@ -101,10 +102,33 @@ class StopVisualizeSkeletonOperator(Operator):
         pass
 
 class AddRigOperator(Operator):
+    """Add selected material to list"""
+
     bl_idname = Labels.ADD_RIG.value
+    bl_label = "Add Material"
+
+    # Used for modal selection of a new armature
+    armature: PointerProperty(                                              # type: ignore
+        name="Armature",
+        type=bpy.types.Object,
+        poll=lambda self, obj: obj.type == 'ARMATURE'
+    )
 
     def execute(self, context):
+        scene = context.scene
         settings = context.scene.pose_label_settings
+
+        selected_armature = settings.armature
+        if not selected_armature:
+            self.report({'WARNING'}, "You must selected a Blender armature object!")
+            return { 'CANCELLED' }
+
+
+
+        return {'FINISHED'}
+
+    def invoke(self, context, _event):
+        return context.window_manager.invoke_props_dialog(self)
 
 
 class RemoveRigOperator(Operator):

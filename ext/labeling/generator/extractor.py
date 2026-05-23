@@ -100,7 +100,7 @@ class Extractor(metaclass=ABCMeta):
         return nullcontext()
 
     @staticmethod
-    def prepare_for_shot(self, shot_idx: int) -> None:
+    def prepare_for_shot(shot_idx: int) -> None:
         # For the default implementation, simply ignore the preparation: nothing needs
         # to be set up.
         return

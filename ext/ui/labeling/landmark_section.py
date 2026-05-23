@@ -5,6 +5,8 @@ from bpy.props import (
     CollectionProperty, PointerProperty
 )
 
+from ...operators.names import Labels
+
 class KeypointItem(PropertyGroup):
     bone_name: StringProperty(name="Bone")                                  # type: ignore
     label: StringProperty(name="Label")                                     # type: ignore
@@ -20,18 +22,19 @@ class RigItem(PropertyGroup):
 
     rig_name: StringProperty(name="")                                       # type: ignore
     enabled: BoolProperty(name="Enabled", default=True)                     # type: ignore
+    identity: IntProperty(name="Identity", default=0)                       # type: ignore
+    is_blender_rig: BoolProperty(name="Blender Rig", default=False)         # type: ignore
+
 
 class PoseLabelSettings(PropertyGroup):
 
     # There can be multiple armatures.
+    labeled_rigs: CollectionProperty(type=RigItem)                          # type: ignore
+    selected_rig: IntProperty(name="Selected", default=0)                   # type: ignore
 
-    armature: PointerProperty(                                              # type: ignore
-        name="Armature",
-        type=bpy.types.Object,
-        poll=lambda self, obj: obj.type == 'ARMATURE'
-    )
     keypoints: CollectionProperty(type=KeypointItem)                        # type: ignore
     keypoints_index: IntProperty(name="Active Keypoint", default=0)         # type: ignore
+
     connections: CollectionProperty(type=SkeletonConnectionItem)            # type: ignore
     connections_index: IntProperty(name="Active Connection", default=0)     # type: ignore
 
@@ -62,12 +65,28 @@ class LandmarkSection:
     def draw(layout, context):
         settings = context.scene.pose_label_settings
 
+        row = layout.row(align=True)
         # Armature selector
-        layout.label(text="Armature", icon='ARMATURE_DATA')
+        # Add armatures, the add button is modal and allows to select the armature
+        # separately.
+
+        layout.label(text="Registered Armatures", icon='ARMATURE_DATA')
+        row.template_list(
+            RegisteredSkeletonsList.__name__, "rig_list",
+            settings, "labeled_rigs",
+            settings, "selected_rig",
+            rows=5
+        )
+        row.separator()
+        col = row.column(align=True)
+        col.operator(Labels.ADD_RIG.value, icon='ADD', text='')
+        col.operator(Labels.REMOVE_RIG.value, icon='REMOVE', text='')
+
+        col.operator(Labels.DETECT_BONES.value, icon='BONE_DATA', text='')
+        col.separator()
+
         row = layout.row(align=True)
         row.prop(settings, "armature", text="")
-        row.operator("rendersynth.auto_detect_bones", text="Auto-detect")
-
         layout.separator()
 
         # Bone → keypoint mapping

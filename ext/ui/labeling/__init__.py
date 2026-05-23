@@ -8,5 +8,5 @@ classes = (
 
     # Landmarks (rigs, faces)
     KeypointItem, SkeletonConnectionItem, PoseLabelSettings, KeypointList,
-    ConnectionList
+    ConnectionList, RigItem, RegisteredSkeletonsList
 )
