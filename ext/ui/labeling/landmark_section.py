@@ -8,11 +8,17 @@ from bpy.props import (
 from ...operators.names import Labels
 
 class KeypointItem(PropertyGroup):
+
     bone_name: StringProperty(name="Bone")                                  # type: ignore
     label: StringProperty(name="Label")                                     # type: ignore
     index: IntProperty(name="Index", min=0)                                 # type: ignore
-    include: BoolProperty(name="Include", default=True)                     # type: ignore
+    enabled: BoolProperty(name="Include", default=True)                     # type: ignore
+    tail_or_head: BoolProperty(name="Include", default=True)                # type: ignore
 
+class BoneMappedObject(PropertyGroup):
+    label: StringProperty(name="Label")  # type: ignore
+    index: IntProperty(name="Index", min=0)  # type: ignore
+    enabled: BoolProperty(name="Include", default=True)  # type: ignore
 
 class SkeletonConnectionItem(PropertyGroup):
     index_a: IntProperty(name="From", min=0)                                # type: ignore
@@ -94,8 +100,15 @@ class LandmarkSection:
 
         # Get the current armature to print either the bone keypoint mapping or
         # general object to keypoint mapping.
+        rigs = settings.labeled_rigs
+        rig_index = settings.selected_rig
+        selected_rig = None if rig_index < 0 or rig_index >= len(rigs) else rigs[rig_index]
+        if selected_rig is None:
+            # If no rig is available, just return
+            return
 
-        if True:
+        if selected_rig.is_blender_rig:
+
             # Bone → keypoint mapping
             layout.label(text="Bone/Keypoint Mapping")
             row = layout.row(align=True)

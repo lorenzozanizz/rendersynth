@@ -28,7 +28,7 @@ class AutoDetectBonesOperator(Operator):
             item.bone_name = bone.name
             item.label = bone.name
             item.index = i
-            item.include = True
+            item.enabled = True
 
         return {'FINISHED'}
 
@@ -159,4 +159,12 @@ class RemoveRigOperator(Operator):
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
-        # access the skeleton collection
+        idx = settings.selected_rig
+
+        if 0 <= idx < len(settings.labeled_rigs):
+            settings.labeled_rigs.remove(idx)
+            settings.selected_rig = min(idx, len(settings.labeled_rigs) - 1)
+            return {'FINISHED'}
+
+        self.report({'WARNING'}, "No rig selected")
+        return {'CANCELLED'}
