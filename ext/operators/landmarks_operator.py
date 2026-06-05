@@ -38,24 +38,37 @@ class AddKeypointOperator(Operator):
     bl_label = "Add"
 
     def execute(self, context):
+        """ Add a keypoint to the skeleton of the currently selected rig. Note that a mapped keypoint
+        can either be a real bone or a mapped object. """
         settings = context.scene.pose_label_settings
-        item = settings.keypoints.add()
-        item.index = len(settings.keypoints) - 1
-        settings.keypoints_index = len(settings.keypoints) - 1
-        return {'FINISHED'}
+        # Get the currently selected skeleton. If no skeleton is available, just give up.
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            return { 'CANCELED' }
+
+        item = rig.keypoints.add()
+        item.index = len(rig.keypoints) - 1
+        return { 'FINISHED' }
 
 
 class RemoveKeypointOperator(Operator):
+
     bl_idname = Labels.REMOVE_KEYPOINT.value
     bl_label = "Remove"
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
-        idx = settings.keypoints_index
-        if idx < len(settings.keypoints):
-            settings.keypoints.remove(idx)
-            settings.keypoints_index = max(0, idx - 1)
-        return {'FINISHED'}
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            return { 'CANCELED' }
+
+        idx = rig.keypoints_index
+        if idx < len(rig.keypoints):
+            rig.keypoints.remove(idx)
+            rig.keypoints_index = max(0, idx - 1)
+        return { 'FINISHED' }
 
 
 class AddConnectionOperator(Operator):

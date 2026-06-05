@@ -101,6 +101,43 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
         return {}
 
 
+@LabelingConfigRegistry.register(SupportedFormats.CVAT_XML_IMAGES.value)
+class PCDClassColorConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+
+@LabelingConfigRegistry.register(SupportedFormats.PASCAL_VOC.value)
+class PCDClassColorConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+
+@LabelingConfigRegistry.register(SupportedFormats.COCO.value)
+class PCDClassColorConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
 
 class LabelConfigDataProperty(PropertyGroup):
     """

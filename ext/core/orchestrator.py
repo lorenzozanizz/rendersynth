@@ -46,7 +46,8 @@ class LabelingOrchestrator:
         self.extractor: Extractor = self._create_extractor()
 
         self.writer: OutputWriter = writer
-        self.extractor.declare_folder_structure(writer.get_strategy())
+        if self.writer:
+            self.extractor.declare_folder_structure(writer.get_strategy())
 
         self.label_data = None
 

@@ -1,4 +1,7 @@
 import bpy
+
+from typing import Optional
+
 from bpy.types import Panel, Operator, PropertyGroup, UIList, Object
 from bpy.props import (
     StringProperty, IntProperty, BoolProperty,
@@ -60,6 +63,13 @@ class PoseLabelSettings(PropertyGroup):
         type=Object,
         poll=lambda self, obj: obj.type == 'ARMATURE'
     )
+
+    def get_current_rig(self) -> Optional[None]:
+
+        rigs = self.labeled_rigs
+        rig_index = self.selected_rig
+        selected_rig = None if rig_index < 0 or rig_index >= len(rigs) else rigs[rig_index]
+        return selected_rig
 
 class KeypointList(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
