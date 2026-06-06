@@ -9,6 +9,7 @@ from bpy.props import (
 )
 
 from ...operators.names import Labels
+from ..description import UILegendWidget as Legend
 
 class KeypointItem(PropertyGroup):
 
@@ -29,6 +30,10 @@ class KeypointItem(PropertyGroup):
     )
 
 class SkeletonConnectionItem(PropertyGroup):
+    """
+
+    """
+
     index_a: IntProperty(name="From", min=0)                                # type: ignore
     index_b: IntProperty(name="To", min=0)                                  # type: ignore
 
@@ -51,6 +56,8 @@ class RigItem(PropertyGroup):
     keypoints: CollectionProperty(type=KeypointItem)                        # type: ignore
     keypoints_index: IntProperty(name="Active Keypoint", default=0)         # type: ignore
 
+    # If the skeleton is currently being visualized
+    is_being_visualized: BoolProperty(default=False)                        # type: ignore
 
 class PoseLabelSettings(PropertyGroup):
 
@@ -74,6 +81,7 @@ class PoseLabelSettings(PropertyGroup):
         return selected_rig
 
 class KeypointList(UIList):
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
 
         # Use the current context to view if the current rig is a real
@@ -87,9 +95,12 @@ class KeypointList(UIList):
 
 
 class ConnectionList(UIList):
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         row = layout.row(align=True)
-        row.label(text=f"[{item.index_a}, {item.index_b}]")
+        # Just show the starting index and end index.
+        row.prop(item, 'index_a')
+        row.prop(item, 'index_b')
 
 class RegisteredSkeletonsList(UIList):
 
@@ -104,7 +115,6 @@ class RegisteredSkeletonsList(UIList):
         # Bone name, enabled, identity, etc... are shared between real bones and mappings.
         row = layout.row(align=True)
 
-
         if selected_rig.is_blender_rig:
             row.prop(item, 'b_obj', text='')
         else:
@@ -112,6 +122,10 @@ class RegisteredSkeletonsList(UIList):
 
 
 class LandmarkSection:
+    """
+
+    """
+
 
     @staticmethod
     def draw(layout, context):
@@ -166,7 +180,9 @@ class LandmarkSection:
         layout.separator()
         layout.label(text="Skeleton Connections")
         row = layout.row(align=True)
+
         # Skeleton connections
+        Legend.draw(layout, context, ["From", "To"])
         row.template_list(
             ConnectionList.__name__, "connection_list",
             selected_rig, "connections",

@@ -78,3 +78,22 @@ class DescriptionWidget:
                 else:
                     row.label(text=chunk)
         layout.separator()
+
+class UILegendWidget:
+    """
+
+    """
+
+    @staticmethod
+    def draw(col_layout, context, labels: list[str]):
+        """
+        :param col_layout:
+        :param context:
+        :param message:
+        :return:
+        """
+        legend = col_layout.row(align=True)  # ensure same number of columns
+        for lab in labels:
+            legend.label(text=lab)
+        legend.enabled = False
+

@@ -114,7 +114,10 @@ class VisualizeSkeletonOperator(Operator):
 
         # Get the current visualization state.
         settings = context.scene.pose_label_settings
-
+        is_visualizing = settings.currently_visualizing
+        if  is_visualizing:
+            self.report({'INFO'}, f"The skeleton is already being visualized.")
+            return { 'CANCELED' }
         pass
 
 
@@ -127,8 +130,12 @@ class StopVisualizeSkeletonOperator(Operator):
 
         # Get the current visualization state
         settings = context.scene.pose_label_settings
+        is_visualizing = settings.currently_visualizing
 
-        pass
+        if not is_visualizing:
+            self.report({'INFO'}, f"No skeleton is being visualized currently .")
+            return { 'CANCELED' }
+
 
 class AddRigOperator(Operator):
     """Add rig (Blender armature or custom) to list"""
