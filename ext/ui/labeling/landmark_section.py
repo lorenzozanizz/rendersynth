@@ -64,6 +64,8 @@ class PoseLabelSettings(PropertyGroup):
         poll=lambda self, obj: obj.type == 'ARMATURE'
     )
 
+    currently_visualizing: BoolProperty(default=False)                      # type: ignore
+
     def get_current_rig(self) -> Optional[None]:
 
         rigs = self.labeled_rigs
@@ -107,20 +109,6 @@ class RegisteredSkeletonsList(UIList):
             row.prop(item, 'b_obj', text='')
         else:
             row.prop(item, 'tail_or_head', text='')
-"""    bone_name: StringProperty(name="Bone")                                  # type: ignore
-
-    label: StringProperty(name="Label")                                     # type: ignore
-    index: IntProperty(name="Index", min=0)                                 # type: ignore
-    enabled: BoolProperty(name="Include", default=True)                     # type: ignore
-    tail_or_head: BoolProperty(name="Include", default=True)                # type: ignore
-
-    # Conditionally active if this is a mapped (virtual)
-    b_obj: PointerProperty(name="Mapped Object", type=Object)               # type: ignore
-"""
-
-
-
-
 
 
 class LandmarkSection:
@@ -187,7 +175,14 @@ class LandmarkSection:
         )
         row.separator()
         col = row.column(align=True)
+
         col.operator(Labels.ADD_CONNECTION.value, icon='ADD', text='')
         col.operator(Labels.REMOVE_CONNECTION.value, icon='REMOVE', text='')
         col.separator()
 
+        # Based on the current visualization setting, display either the remove or add
+        # skeleton visualization.
+        if settings.currently_visualizing:
+            col.operator(Labels.STOP_VISUALIZE_SKELETON.value, icon='HIDE_ON', text='')
+        else:
+            col.operator(Labels.VISUALIZE_SKELETON.value, icon='HIDE_OFF', text='')

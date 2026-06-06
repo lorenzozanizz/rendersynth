@@ -77,8 +77,13 @@ class AddConnectionOperator(Operator):
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
-        settings.connections.add()
-        settings.connections_index = len(settings.connections) - 1
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            return { 'CANCELED' }
+
+        rig.connections.add()
+        rig.connections_index = len(rig.connections) - 1
         return {'FINISHED'}
 
 
@@ -88,10 +93,15 @@ class RemoveConnectionOperator(Operator):
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
-        idx = settings.connections_index
-        if idx < len(settings.connections):
-            settings.connections.remove(idx)
-            settings.connections_index = max(0, idx - 1)
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            return { 'CANCELED' }
+
+        idx = rig.connections_index
+        if idx < len(rig.connections):
+            rig.connections.remove(idx)
+            rig.connections_index = max(0, idx - 1)
         return {'FINISHED'}
 
 
@@ -101,6 +111,9 @@ class VisualizeSkeletonOperator(Operator):
     bl_description = "Serialize keypoint mapping and skeleton connections to the pipeline JSON"
 
     def execute(self, context):
+
+        # Get the current visualization state.
+        settings = context.scene.pose_label_settings
 
         pass
 
@@ -112,6 +125,8 @@ class StopVisualizeSkeletonOperator(Operator):
 
     def execute(self, context):
 
+        # Get the current visualization state
+        settings = context.scene.pose_label_settings
 
         pass
 
