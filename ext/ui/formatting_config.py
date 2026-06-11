@@ -1,3 +1,12 @@
+"""
+Registry-based labeling configuration handlers and Blender property definitions.
+
+This module provides a plugin-style registry for label configuration handlers,
+allowing label format specific UI drawing and configuration extraction logic
+to be registered and retrieved dynamically. It also defines abstract handler
+interfaces and Blender property groups used for label export configuration.
+"""
+
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
@@ -7,12 +16,27 @@ from ..core.io import SupportedFormats
 
 
 class LabelingConfigRegistry:
-    """Registry for storing and retrieving label configuration handler classes."""
+    """
+    Registry for storing and retrieving label configuration handler classes.
+
+    This registry enables dynamic registration and lookup of
+    :class:`LabelConfigHandler` implementations based on a unique
+    label format identifier.
+    """
 
     _registry: dict[str, type['LabelConfigHandler']] = {}
 
     @classmethod
     def register(cls, name: str):
+        """ Register a label configuration handler class.
+
+        This method is intended to be used as a decorator for LabelConfigHandle subclasses.
+
+        :param name: Unique identifier associated with the handler.
+        :type name: str
+        :return: Decorator that registers the handler class.
+        :rtype: Callable[[type[LabelConfigHandler]], type[LabelConfigHandler]]
+        """
         def decorator(handler_class: type['LabelConfigHandler']) -> type['LabelConfigHandler']:
             if name in cls._registry:
                 raise ValueError(f"Handler with name '{name}' is already registered")
@@ -27,6 +51,11 @@ class LabelingConfigRegistry:
 
     @classmethod
     def get_or_raise(cls, name: str) -> type['LabelConfigHandler']:
+        """ Retrieve a registered handler by name.
+
+        :param name: Name of the registered handler.
+        :type name: str
+        """
         if name not in cls._registry:
             raise KeyError(f"No handler registered with name '{name}'. Available: {list(cls._registry.keys())}")
         return cls._registry[name]

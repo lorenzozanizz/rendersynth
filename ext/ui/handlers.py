@@ -1,7 +1,11 @@
 import bpy
 
 def sync_distribution_handler(scene):
-    """Synchronizes scene.available_distributions with actual bpy.data.node_groups."""
+    """ Synchronizes scene.available_distributions with actual bpy.data.node_groups.
+    Whenever a new distribution is created, the distribution panel is updated and made available
+    when using custom distribution mode.
+
+    """
 
     # Get all actual DistributionNodeTree instances
     actual_trees = [

@@ -137,6 +137,7 @@ class StopVisualizeSkeletonOperator(Operator):
             return { 'CANCELED' }
 
 
+
 class AddRigOperator(Operator):
     """Add rig (Blender armature or custom) to list"""
     bl_idname = Labels.ADD_RIG.value
