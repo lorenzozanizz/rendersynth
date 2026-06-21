@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Optional
 
 from bpy.types import PropertyGroup
-from bpy.props import StringProperty, BoolProperty, IntProperty, CollectionProperty
+from bpy.props import StringProperty, BoolProperty, IntProperty
 from ..core.io import SupportedFormats
 
 
@@ -79,6 +79,7 @@ class LabelingConfigRegistry:
 
 
 class LabelConfigHandler(metaclass=ABCMeta):
+
     @staticmethod
     @abstractmethod
     def draw(context, layout) -> None:
@@ -92,11 +93,14 @@ class LabelConfigHandler(metaclass=ABCMeta):
 
 class LabelConfigDrawer:
 
-
     @staticmethod
     def draw(context, layout, label_type: str) -> None:
-        serializing_subclass = LabelingConfigRegistry.get(label_type)
-        return serializing_subclass.draw(context, layout)
+        drawer = LabelingConfigRegistry.get(label_type)
+        if drawer is not None:
+            # Wrap the drawing into a box:
+            box = layout.box()
+            box.label(text="Labeling Settings", icon='SETTINGS')
+            drawer.draw(context, box)
 
     @staticmethod
     def extract(context, label_type: str) -> dict:
@@ -111,11 +115,17 @@ class UltralyticsYoloConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
+
+        layout.label(text="Aio")
         pass
 
     @staticmethod
     def extract(context) -> dict:
-        pass
+        properties = context.scene.labeling_config
+
+        return {
+
+        }
 
 
 @LabelingConfigRegistry.register(SupportedFormats.PCD_CLASS_COLOR.value)
@@ -131,7 +141,7 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
 
 
 @LabelingConfigRegistry.register(SupportedFormats.CVAT_XML_IMAGES.value)
-class PCDClassColorConfigHandler(LabelConfigHandler):
+class CVATXMLConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
@@ -144,7 +154,7 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
 
 
 @LabelingConfigRegistry.register(SupportedFormats.PASCAL_VOC.value)
-class PCDClassColorConfigHandler(LabelConfigHandler):
+class PascalVOCConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
@@ -157,7 +167,18 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
 
 
 @LabelingConfigRegistry.register(SupportedFormats.COCO.value)
-class PCDClassColorConfigHandler(LabelConfigHandler):
+class COCOConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+@LabelingConfigRegistry.register(SupportedFormats.COCO_SEGMENTATION.value)
+class COCOSegmentationConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
@@ -168,14 +189,52 @@ class PCDClassColorConfigHandler(LabelConfigHandler):
         return {}
 
 
+@LabelingConfigRegistry.register(SupportedFormats.COCO_KEYPOINTS.value)
+class COCOKeypointsConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+@LabelingConfigRegistry.register(SupportedFormats.PCD_CLASS.value)
+class PCDClassConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+@LabelingConfigRegistry.register(SupportedFormats.PCD.value)
+class PCDConfigHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
 class LabelConfigDataProperty(PropertyGroup):
     """
 
 
     """
 
+    # used in []
     zero_padding: BoolProperty(default=True)    # type: ignore
+    # used in []
     split: StringProperty(default="train")      # type: ignore
 
-
+    # used in: [YOLO]
+    float_precision: IntProperty(default=3)     # type: ignore
 

@@ -30,8 +30,8 @@ class YoloFormatter(IOStrategy):
 
     def __init__(self, write_config: WritingConfig, config: dict):
         super().__init__(write_config, config)
-        self.bbox_precision = config.get('bbox_precision') or 3
-        self.split = config.get('split') or ''
+        self.bbox_precision = config.get('bbox_precision', 3)
+        self.split = config.get('split', '')
 
         self.marked_img_ids = set()
 

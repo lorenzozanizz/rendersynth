@@ -1,4 +1,4 @@
-from .formatting_config import LabelingConfigRegistry
+from .formatting_config import LabelConfigDrawer
 from ..operators.names import Labels
 from ..constants import *
 
@@ -41,10 +41,7 @@ class RandomizerPanel(Panel):
         layout.prop(scene, "randomizer_label_format")
 
         # Now render the labeling properties, different for each format.
-        format = scene.randomizer_label_format
-        drawer = LabelingConfigRegistry.get(format)
-        if drawer is not None:
-            drawer.draw(context, layout)
+        LabelConfigDrawer.draw(context, layout, scene.randomizer_label_format)
 
         layout.prop(scene, "randomizer_append_checkbox")
 

@@ -142,6 +142,7 @@ class Executor:
         strat = LabelingFormatRegistry.get_strategy(lbl_type)
         if strat is None:
             raise RuntimeError(f"No I/O strategy found for {lbl_type}, the generation could not happen.")
+        print("> Labeling strategies adopted: ", strat)
         strat_instance = strat(self.write_params, label_params.format_cfg)
         return strat_instance
 
