@@ -38,12 +38,12 @@ class RandomizerPanel(Panel):
 
         layout.separator()  # Adds vertical space
         layout.prop(scene, "randomizer_do_labelize")
+        layout.prop(scene, "randomizer_append_checkbox")
+
         layout.prop(scene, "randomizer_label_format")
 
         # Now render the labeling properties, different for each format.
         LabelConfigDrawer.draw(context, layout, scene.randomizer_label_format)
-
-        layout.prop(scene, "randomizer_append_checkbox")
 
         layout.separator()  # Adds vertical space
         row = layout.row()

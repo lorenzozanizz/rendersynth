@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Optional
 
 from bpy.types import PropertyGroup
-from bpy.props import StringProperty, BoolProperty, IntProperty
+from bpy.props import StringProperty, BoolProperty, IntProperty, EnumProperty, FloatProperty
 from ..core.io import SupportedFormats
 
 
@@ -90,6 +90,17 @@ class LabelConfigHandler(metaclass=ABCMeta):
     def extract(context) -> dict:
         pass
 
+    @staticmethod
+    def _draw_props(layout, source, props) -> None:
+        """
+
+        :param layout:
+        :param source:
+        :param props:
+        :return:
+        """
+        for prop in props:
+            layout.prop(source, prop)
 
 class LabelConfigDrawer:
 
@@ -115,9 +126,10 @@ class UltralyticsYoloConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
-
-        layout.label(text="Aio")
-        pass
+        source = context.scene.labeling_config
+        LabelConfigHandler._draw_props(layout, source,
+           ('zero_padding', 'split', 'ray_casting_precision', 'precision')
+       )
 
     @staticmethod
     def extract(context) -> dict:
@@ -231,10 +243,18 @@ class LabelConfigDataProperty(PropertyGroup):
     """
 
     # used in []
-    zero_padding: BoolProperty(default=True)    # type: ignore
+    zero_padding: BoolProperty(default=True)                # type: ignore
     # used in []
-    split: StringProperty(default="train")      # type: ignore
+    split: StringProperty(default="train")                  # type: ignore
 
     # used in: [YOLO]
-    float_precision: IntProperty(default=3)     # type: ignore
+    precision: IntProperty(default=3)                       # type: ignore
+    # used in [YOLO, COCO*, CVAT]
+    ray_casting_precision: FloatProperty(default=0.1)       # type: ignore
 
+    # used in [PCD, PCD Class, PCD Class Color]
+    sampling_type: EnumProperty(                            # type: ignore
+        items=[("Uniform", "Uniform", "Uniform"),]
+    )
+
+    generate_info: BoolProperty(default=False)              # type: ignore

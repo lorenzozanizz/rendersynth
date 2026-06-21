@@ -29,7 +29,6 @@ class PCDFormatter(IOStrategy):
 
     def __init__(self, write_config: WritingConfig, config: dict):
         super().__init__(write_config, config)
-        self.color_precision = config.get('color_precision', 'u8')  # 'u8' or 'f' for float
         self.coordinate_precision = config.get('coordinate_precision', 6)
         self.tracked_annotations = []
         self.class_registry = {}
@@ -109,10 +108,10 @@ class PCDFormatter(IOStrategy):
         Point cloud format: set of tuples (point_xyz, rgb_color)
         where point_xyz = (x, y, z) and rgb_color = (r, g, b) [0-255]
         """
-        # PCD Header
+        # Header
         point_count = len(point_cloud)
         lines = [
-            "# .PCD v.7 - Point Cloud Data file format\n",
+            "# .PCD - Point Cloud Data file format\n",
             f"# Generated from Blender annotation system with Rendersynth\n",
             f"# Class: {class_name} (ID: {class_id})\n",
             "VERSION .7\n", "FIELDS x y z r g b class\n",
@@ -143,9 +142,7 @@ class PCDFormatter(IOStrategy):
                 r = g = b = int(rgb_color)
 
             # Clamp color values to valid range
-            r = max(0, min(255, r))
-            g = max(0, min(255, g))
-            b = max(0, min(255, b))
+            r = max(0, min(255, r)); g = max(0, min(255, g)); b = max(0, min(255, b))
 
             # Format: x y z r g b class_id
             line = (
@@ -224,7 +221,7 @@ class PCDFormatter(IOStrategy):
         annotations_content = json.dumps({
             'annotations': aggregated['annotations'],
             'batch_info': aggregated['batch_metadata'],
-            'format': 'PCD v0.7',
+            'format': 'PCD',
             'total_annotations': len(aggregated['annotations']),
         }, indent=2, default=str)  # default=str handles non-serializable types
         output_files.append(('annotations', '.json', annotations_content))
@@ -318,3 +315,4 @@ class PCDFormatter(IOStrategy):
     - Colors are pre-extracted from rendered images
     - Each annotation is independent (entities may share points)
     """.replace('    ', '')
+    # note: we remove the beginning tabs to avoid an ugly indentation in the README

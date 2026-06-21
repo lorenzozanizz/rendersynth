@@ -34,8 +34,8 @@ class SkeletonConnectionItem(PropertyGroup):
 
     """
 
-    index_a: IntProperty(name="From", min=0)                                # type: ignore
-    index_b: IntProperty(name="To", min=0)                                  # type: ignore
+    index_a: IntProperty(min=0)                                             # type: ignore
+    index_b: IntProperty(min=0)                                             # type: ignore
 
 class RigItem(PropertyGroup):
 
@@ -99,8 +99,8 @@ class ConnectionList(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         row = layout.row(align=True)
         # Just show the starting index and end index.
-        row.prop(item, 'index_a')
-        row.prop(item, 'index_b')
+        row.prop(item, 'index_a', text="From")
+        row.prop(item, 'index_b', text="To")
 
 class RegisteredSkeletonsList(UIList):
 

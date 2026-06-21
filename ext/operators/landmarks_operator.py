@@ -118,7 +118,7 @@ class VisualizeSkeletonOperator(Operator):
         if  is_visualizing:
             self.report({'INFO'}, f"The skeleton is already being visualized.")
             return { 'CANCELED' }
-        pass
+        return {'FINISHED'}
 
 
 class StopVisualizeSkeletonOperator(Operator):
@@ -135,6 +135,7 @@ class StopVisualizeSkeletonOperator(Operator):
         if not is_visualizing:
             self.report({'INFO'}, f"No skeleton is being visualized currently .")
             return { 'CANCELED' }
+        return { 'FINISHED' }
 
 
 
