@@ -83,11 +83,22 @@ class LabelConfigHandler(metaclass=ABCMeta):
     @staticmethod
     @abstractmethod
     def draw(context, layout) -> None:
+        """
+
+        :param context:
+        :param layout:
+        :return:
+        """
         pass
 
     @staticmethod
     @abstractmethod
     def extract(context) -> dict:
+        """
+
+        :param context:
+        :return:
+        """
         pass
 
     @staticmethod
@@ -128,13 +139,12 @@ class UltralyticsYoloConfigHandler(LabelConfigHandler):
     def draw(context, layout) -> None:
         source = context.scene.labeling_config
         LabelConfigHandler._draw_props(layout, source,
-           ('zero_padding', 'split', 'ray_casting_precision', 'precision')
+            ('zero_padding', 'split', 'ray_casting_precision', 'precision')
        )
 
     @staticmethod
     def extract(context) -> dict:
         properties = context.scene.labeling_config
-
         return {
 
         }
@@ -243,18 +253,25 @@ class LabelConfigDataProperty(PropertyGroup):
     """
 
     # used in []
-    zero_padding: BoolProperty(default=True)                # type: ignore
+    zero_padding: BoolProperty(default=True, name="Zero-pad result names")          # type: ignore
     # used in []
-    split: StringProperty(default="train")                  # type: ignore
+    split: StringProperty(default="train", name="Folder split")                     # type: ignore
 
     # used in: [YOLO]
-    precision: IntProperty(default=3)                       # type: ignore
+    precision: IntProperty(name="BBox float precision", default=3,                  # type: ignore
+        min=1
+    )
     # used in [YOLO, COCO*, CVAT]
-    ray_casting_precision: FloatProperty(default=0.1)       # type: ignore
-
-    # used in [PCD, PCD Class, PCD Class Color]
-    sampling_type: EnumProperty(                            # type: ignore
-        items=[("Uniform", "Uniform", "Uniform"),]
+    ray_casting_precision: FloatProperty(name="Ray-casting precision", default=0.1,  # type: ignore
+        min = 0.0,
+        max = 1.0
     )
 
-    generate_info: BoolProperty(default=False)              # type: ignore
+    # used in [PCD*]
+    sampling_type: EnumProperty(                                                    # type: ignore
+        items=[("Uniform", "Uniform", "Uniform"),],
+        name="Sampling Type"
+    )
+
+    # used in [PCD*]
+    generate_info: BoolProperty(default=False, name="Generate metadata")            # type: ignore
