@@ -76,7 +76,7 @@ class CompiledSampler(metaclass=ABCMeta):
 
 class SphereDistribution(CompiledSampler):
 
-    def __init__(self, params: dict, dim: int = 3) -> None:
+    def __init__(self, params: dict, _dim: int = 3) -> None:
         """ """
         self.center = params['center']
         self.radius = params['radius']
@@ -187,6 +187,8 @@ class PresetSampler(CompiledSampler):
 
     @staticmethod
     def _sample_multivariate_gaussian(params: Dict[str, Any], dim: int):
+        # Currently a stub: the problem is expressing all 9 covariate
+        # coefficients in the UI.
         return [0 for _ in range(dim)]
 
     @staticmethod
@@ -339,23 +341,14 @@ class SamplerCompiler:
 
     @staticmethod
     def make_distribution(op_type: str, dim: int, **kwargs):
-        # n
-        """
-                try:
-            self.type = Distribution[self.config['preset']]
-        except KeyError:
-            self.type = None
-            return
-        self.discretize = self.config.get("do_discretize")
-        if self.config.get("do_clamp"):
-            self.clamp = tuple(self.config["clamping_factors"])
+        """ Generate a distribution given its type and its parameters. This is to be
+         used to access the capabilities offered by the distribution interface in
+         other sections of the code. The distribution type must be one recognized.
 
-        self.params = self.config.get("parameters")
-
-        :param dim:
-        :param op_type:
-        :param kwargs:
-        :return:
+        :param dim: The dimension of the distribution
+        :param op_type: the type of operation to perform
+        :param kwargs: additional arguments
+        :return: a Sampler object for the distribution.
         """
         return PresetSampler({
             'preset': op_type,
