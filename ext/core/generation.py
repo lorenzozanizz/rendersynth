@@ -1,6 +1,3 @@
-import random
-import bpy
-
 from ..pipeline.bpy_properties import PipelineData
 from ..pipeline.context import NestedPipelineContext
 
@@ -11,6 +8,9 @@ from .io import OutputWriter, IOStrategy
 from .io import LabelingFormatRegistry
 from ..utils.other import MultiContext
 
+import random
+import bpy
+import numpy as np
 
 class Executor:
     """Compiled, reusable pipeline executor"""
@@ -59,6 +59,7 @@ class Executor:
 
         # Seed the random library with the user requested seed.
         random.seed(seed)
+        np.random.seed(seed)
 
         start_idx   = self.writer.compute_starting_index()
 
