@@ -1,0 +1,1867 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../00_landing/">
+      
+      
+        <link rel="next" href="../02_create_pipeline/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>1 - Classes & Entities - Rendersynth Documentation & Tutorials</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tutorial-classes-entities-and-object-classification" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-header__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rendersynth Documentation & Tutorials
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              1 - Classes & Entities
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../setup/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/architecture_overview/" class="md-tabs__link">
+          
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../00_landing/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../examples/00_landing/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-nav__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Rendersynth Documentation & Tutorials
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/architecture_overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/reference_sheet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/label_gen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Label Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/pipeline_serialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Serialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/operators/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operators
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/pipeline_execution/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline Execution
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/ui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    User Interface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/context_restoring/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Non-destructiveness
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    1 - Classes & Entities
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    1 - Classes & Entities
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-1-creating-test-objects-in-the-scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      Section 1: Creating Test Objects in the Scene
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section 1: Creating Test Objects in the Scene">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-11-set-up-your-scene" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1.1: Set Up Your Scene
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-12-add-three-cubes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1.2: Add Three Cubes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-13-optional-add-materials-to-differentiate-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1.3: (Optional) Add Materials to Differentiate Objects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-2-creating-and-managing-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Section 2: Creating and Managing Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section 2: Creating and Managing Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-21-open-the-labeling-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2.1: Open the Labeling Panel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-22-create-your-first-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2.2: Create Your First Class
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-23-create-additional-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2.3: Create Additional Classes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-24-customize-a-class-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2.4: Customize a Class (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-3-creating-multi-object-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Section 3: Creating Multi-Object Entities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section 3: Creating Multi-Object Entities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-are-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Are Entities?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-31-create-an-entity-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3.1: Create an Entity (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-32-assign-objects-to-an-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3.2: Assign Objects to an Entity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-33-understanding-object-entity-classification" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3.3: Understanding Object + Entity Classification
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-4-assigning-classes-to-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Section 4: Assigning Classes to Objects
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section 4: Assigning Classes to Objects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#approach-a-direct-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Approach A: Direct Assignment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approach A: Direct Assignment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-41-open-the-class-assignment-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.1: Open the Class Assignment Panel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-42-manually-assign-a-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.2: Manually Assign a Class
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-43-assign-the-remaining-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.3: Assign the Remaining Objects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#approach-b-rule-based-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Approach B: Rule-Based Assignment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approach B: Rule-Based Assignment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-44-open-the-rules-section" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.4: Open the Rules Section
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-45-create-a-material-based-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.5: Create a Material-Based Rule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-46-create-a-name-based-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.6: Create a Name-Based Rule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-47-create-a-collection-based-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.7: Create a Collection-Based Rule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-48-rule-priority-and-conflicts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4.8: Rule Priority and Conflicts
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-5-previewing-labels-and-bounding-boxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Section 5: Previewing Labels and Bounding Boxes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section 5: Previewing Labels and Bounding Boxes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-51-locate-the-preview-button" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5.1: Locate the Preview Button
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-52-activate-the-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5.2: Activate the Preview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-54-debug-your-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5.4: Debug Your Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-55-adjust-and-re-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5.5: Adjust and Re-Preview
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-tasks-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Tasks &amp; Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Tasks & Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#task-rename-a-class-after-assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task: Rename a Class After Assignment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#task-remove-an-object-from-an-entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Task: Remove an Object from an Entity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting-object-not-appearing-in-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting: Object Not Appearing in Preview
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting-rule-not-matching-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting: Rule Not Matching Objects
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_create_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2 - Create Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_labeling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3 - Labeling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    4 - Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_new_label_format/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    5 - Create Labeling Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_shader_randomize/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    6 - Shader Randomization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_common_pitfalls.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    7 - Common Pitfalls
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_matching_labeling_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    8 - Matching Labeling and Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_batch_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    9 - Batch Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    10 - Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11_import_export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    11 - Importing and Exporting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12_labeling_rigs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    12 - Labeling Rigs and Key
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/01_prod_classification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Product Classification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/02_image_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Image Segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/03_pose_estimation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pose Estimation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="tutorial-classes-entities-and-object-classification">Tutorial: Classes, Entities, and Object Classification</h1>
+<h2 id="overview">Overview</h2>
+<p>In this tutorial, you'll learn how to set up a complete labeling workflow for synthetic data generation:
+- Create test objects in your Blender scene
+- Define custom classes for object categorization
+- Organize objects into multi-object entities (optional)
+- Assign classes to objects using manual rules and automated matching
+- Preview the generated labels and bounding boxes</p>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>Blender 3.0+ with the extension installed</li>
+<li>Basic familiarity with Blender's viewport and UI
+If one isn't familiar with the Blender basics, a good tutorial can be found at https://www.blenderguru.com/</li>
+</ul>
+<hr />
+<h2 id="section-1-creating-test-objects-in-the-scene">Section 1: Creating Test Objects in the Scene</h2>
+<h3 id="step-11-set-up-your-scene">Step 1.1: Set Up Your Scene</h3>
+<ol>
+<li>Open Blender and create a new General project</li>
+<li>Delete the default cube (if present): Select it and press <strong>X</strong> → <strong>Delete</strong></li>
+<li>You now have an empty scene ready for setup</li>
+</ol>
+<h3 id="step-12-add-three-cubes">Step 1.2: Add Three Cubes</h3>
+<ol>
+<li>Add the first cube:</li>
+<li>Press <strong>Shift+A</strong> → <strong>Mesh</strong> → <strong>Cube</strong></li>
+<li>In the top-left, confirm placement with default settings</li>
+<li>Press <strong>G</strong> to grab/move it along the X-axis (press <strong>X</strong>, then type <strong>-3</strong>, then <strong>Enter</strong>)</li>
+<li>
+<p>Rename it in the Outliner to <code>dog</code> (double-click the name)</p>
+</li>
+<li>
+<p>Add the second cube:</p>
+</li>
+<li>Press <strong>Shift+A</strong> → <strong>Mesh</strong> → <strong>Cube</strong></li>
+<li>Press <strong>G</strong>, then <strong>X</strong>, then <strong>0</strong>, then <strong>Enter</strong> (place at origin)</li>
+<li>
+<p>Rename to <code>pig</code></p>
+</li>
+<li>
+<p>Add the third cube:</p>
+</li>
+<li>Press <strong>Shift+A</strong> → <strong>Mesh</strong> → <strong>Cube</strong></li>
+<li>Press <strong>G</strong>, then <strong>X</strong>, then <strong>3</strong>, then <strong>Enter</strong></li>
+<li>Rename to <code>cat</code></li>
+</ol>
+<p><strong>Result:</strong> Your scene now has three cubes arranged along the X-axis with distinct names.
+You can now move the camera around and press Numpad 0 to inspect the current camera view. 
+This is important: the preview will use the default scene camera. </p>
+<h3 id="step-13-optional-add-materials-to-differentiate-objects">Step 1.3: (Optional) Add Materials to Differentiate Objects</h3>
+<p>To prepare for rule-based classification in Section 4, you can assign materials:</p>
+<ol>
+<li>Select each of the three cubes</li>
+<li>In the Shader Editor (or Material Properties panel), create a new material and pick a different color from the palette</li>
+</ol>
+<p>This will be useful when we set up material-based classification rules later.</p>
+<hr />
+<h2 id="section-2-creating-and-managing-classes">Section 2: Creating and Managing Classes</h2>
+<h3 id="step-21-open-the-labeling-panel">Step 2.1: Open the Labeling Panel</h3>
+<p><img alt="Classes" src="../../examples/resources/1_classes.png" />
+1. In Blender, locate the <strong>Labeling</strong> panel (usually in the Properties sidebar on the right)
+2. Find the <strong>Classes</strong> section
+3. You should see an empty list of classes</p>
+<h3 id="step-22-create-your-first-class">Step 2.2: Create Your First Class</h3>
+<p><img alt="First class" src="../../examples/resources/1_one_clas.png" />
+1. Click the <strong>+</strong> button to add a new class
+2. A new class entry appears with default values:
+   - <strong>Name:</strong> (editable text field)
+   - <strong>Color:</strong> (color picker)
+   - <strong>ID:</strong> (numeric identifier)</p>
+<ol>
+<li>Set up the first class:</li>
+<li>Change the name to <code>Dog</code></li>
+<li>Click the color swatch and choose a brown/tan color (if you want)</li>
+<li>Set ID to <code>0</code> (or leave as auto-assigned)</li>
+</ol>
+<h3 id="step-23-create-additional-classes">Step 2.3: Create Additional Classes</h3>
+<p>Repeat Step 2.2 to create two more classes:</p>
+<ul>
+<li><strong>Class 2:</strong></li>
+<li>Name: <code>Cat</code></li>
+<li>Color: Gray or silver (if you want)</li>
+<li>
+<p>ID: <code>1</code></p>
+</li>
+<li>
+<p><strong>Class 3:</strong></p>
+</li>
+<li>Name: <code>Pig</code></li>
+<li>Color: Bright blue or similar (if you want)</li>
+<li>ID: <code>2</code></li>
+</ul>
+<h3 id="step-24-customize-a-class-optional">Step 2.4: Customize a Class (Optional)</h3>
+<ol>
+<li>Select a class</li>
+<li>You can change its color by clicking the color swatch</li>
+<li>You can change its ID by clicking the ID field and typing a new number</li>
+<li>Press away or <strong>Enter</strong> to confirm</li>
+</ol>
+<p><strong>Note:</strong> You can delete a class by clicking the <strong>–</strong> button, but ensure there are no "dangling" class references.</p>
+<hr />
+<h2 id="section-3-creating-multi-object-entities">Section 3: Creating Multi-Object Entities</h2>
+<h3 id="what-are-entities">What Are Entities?</h3>
+<p>An <strong>entity</strong> is a logical grouping of multiple Blender objects that represent a single conceptual object. For example:
+- A human character made of: body mesh + clothes mesh + shoes mesh → single "human" entity
+- A car made of: body + wheels + windows → single "car" entity</p>
+<h3 id="step-31-create-an-entity-optional">Step 3.1: Create an Entity (Optional)</h3>
+<p><img alt="Entity" src="../../examples/resources/1_entities.png" />
+In this tutorial, we'll create a simple entity grouping two of our cubes:
+Firstly, we must enable the entity creation by checking the "Define multi-object entities" checkbox. Then: 
+1. Open the <strong>Entities</strong> section in the Labeling panel (below Classes)
+2. Click the <strong>+</strong> button to add a new entity
+3. Name it <code>Mega Cube</code></p>
+<h3 id="step-32-assign-objects-to-an-entity">Step 3.2: Assign Objects to an Entity</h3>
+<ol>
+<li>In the new entity row you should see an <strong>eyedropper</strong> icon. This icon is a button that allows to select currently selected objects in the scene.</li>
+<li>Select the two sub-cubes and then click the eyedropper icon.</li>
+</ol>
+<p><strong>Result:</strong> You've created an entity containing two cubes. These objects can now be classified together as a single entity, or individually as separate objects.</p>
+<p><img alt="Result of entity" src="../../examples/resources/1_mega_cube.png" /></p>
+<h3 id="step-33-understanding-object-entity-classification">Step 3.3: Understanding Object + Entity Classification</h3>
+<p>An important feature: <strong>objects can belong to an entity AND have individual classifications</strong>.</p>
+<p>For example:
+- Assign <code>Collective</code> the class <code>Pig</code> (representing the whole composite)
+- Assign to one of the sub-cubes the class <code>Dog</code> (detecting it individually)
+- Both labels will be generated in the output</p>
+<p>This is useful for hierarchical detection tasks.</p>
+<hr />
+<h2 id="section-4-assigning-classes-to-objects">Section 4: Assigning Classes to Objects</h2>
+<p>There are two approaches to assign classes: <strong>direct assignment</strong> and <strong>rule-based assignment</strong>.</p>
+<h3 id="approach-a-direct-assignment">Approach A: Direct Assignment</h3>
+<p><img alt="Assignment" src="../../examples/resources/1_assignment.png" /></p>
+<h4 id="step-41-open-the-class-assignment-panel">Step 4.1: Open the Class Assignment Panel</h4>
+<ol>
+<li>In the Labeling panel, locate the <strong>Class Assignment</strong> section</li>
+<li>You should see fields for:</li>
+<li><strong>Object/Entity Selection</strong></li>
+<li><strong>Assigned Class</strong></li>
+</ol>
+<h4 id="step-42-manually-assign-a-class">Step 4.2: Manually Assign a Class</h4>
+<ol>
+<li>Click <strong>Create New Assignment</strong></li>
+<li>In the <strong>Object</strong> field, click to select a cube from the scene or dropdown</li>
+<li>In the <strong>Class</strong> field, select <code>Pig</code> from the class list</li>
+<li>Click <strong>Confirm</strong> or press <strong>Enter</strong></li>
+</ol>
+<p><strong>Result:</strong> The cube is now directly assigned to the <code>Pig</code> class.</p>
+<h4 id="step-43-assign-the-remaining-objects">Step 4.3: Assign the Remaining Objects</h4>
+<p>You are free to assign the remaining object any way you wish. </p>
+<hr />
+<h3 id="approach-b-rule-based-assignment">Approach B: Rule-Based Assignment</h3>
+<p><img alt="Rules" src="../../examples/resources/1_rules.png" />
+Rules allow the system to automatically classify objects based on properties without manual assignment. You can use multiple rules simultaneously.</p>
+<h4 id="step-44-open-the-rules-section">Step 4.4: Open the Rules Section</h4>
+<ol>
+<li>In the Labeling panel, find the <strong>Classification Rules</strong> section</li>
+<li>You should see buttons for different rule types: <strong>Material</strong>, <strong>Name</strong>, <strong>Collection</strong></li>
+</ol>
+<h4 id="step-45-create-a-material-based-rule">Step 4.5: Create a Material-Based Rule</h4>
+<p>This rule classifies objects by the materials they have:</p>
+<ol>
+<li>Click <strong>+ Add Material Rule</strong></li>
+<li>A new rule entry appears with:</li>
+<li><strong>Material Name:</strong> (text field)</li>
+<li>
+<p><strong>Target Class:</strong> (dropdown)</p>
+</li>
+<li>
+<p>Fill in the rule:</p>
+</li>
+<li><strong>Material Name:</strong> Create a new material <code>Classifier</code> , and assign it to some cube. </li>
+<li><strong>Target Class:</strong> <code>Pig</code></li>
+<li>Click <strong>Confirm</strong></li>
+</ol>
+<p><strong>Effect:</strong> Any object in the scene with the <code>Classifier</code> will automatically be classified as <code>Pig</code>.</p>
+<h4 id="step-46-create-a-name-based-rule">Step 4.6: Create a Name-Based Rule</h4>
+<p>This rule classifies objects by substring matching in their names:</p>
+<ol>
+<li>Click <strong>+ Add Name Rule</strong></li>
+<li>Fill in:</li>
+<li><strong>Substring:</strong> A substring which will be contained in the object's name</li>
+<li><strong>Target Class:</strong> <code>Dog</code></li>
+<li>Click <strong>Confirm</strong></li>
+</ol>
+<p><strong>Effect:</strong> Any object with the substring in its name will be classified as <code>Dog</code>.</p>
+<h4 id="step-47-create-a-collection-based-rule">Step 4.7: Create a Collection-Based Rule</h4>
+<p>If you've organized objects into Blender collections, you can classify all objects in a collection:</p>
+<ol>
+<li>In the Outliner (left side), create a new collection named <code>New collection</code></li>
+<li>Move a cube into this collection</li>
+<li>In the Labeling panel, click <strong>+ Add Collection Rule</strong></li>
+<li>Fill in:</li>
+<li><strong>Collection Name:</strong> <code>New collection</code></li>
+<li><strong>Target Class:</strong> <code>Dog</code></li>
+<li>Click <strong>Confirm</strong></li>
+</ol>
+<p><strong>Effect:</strong> All objects in the <code>New collection</code> collection are classified as <code>Dog</code>.</p>
+<h4 id="step-48-rule-priority-and-conflicts">Step 4.8: Rule Priority and Conflicts</h4>
+<p>If an object matches multiple rules, the extension uses this priority:
+1. <strong>Direct assignments</strong> (highest priority)
+2. <strong>Material rules</strong>
+3. <strong>Name rules</strong>
+4. <strong>Collection rules</strong> (lowest priority)</p>
+<hr />
+<h2 id="section-5-previewing-labels-and-bounding-boxes">Section 5: Previewing Labels and Bounding Boxes</h2>
+<h3 id="step-51-locate-the-preview-button">Step 5.1: Locate the Preview Button</h3>
+<ol>
+<li>In the Labeling panel, find the <strong>Generator</strong> section</li>
+<li>Look for the <strong>Preview</strong> button, typically represented by an <strong>eye icon</strong> (👁)</li>
+</ol>
+<h3 id="step-52-activate-the-preview">Step 5.2: Activate the Preview</h3>
+<p><img alt="Preview" src="../../examples/resources/1_preview.png" />
+1. Click the <strong>eye icon</strong> button
+2. The viewport will update to show:
+   - <strong>Bounding boxes</strong> around labeled objects (if bbox is your labeling type)
+   - <strong>Color overlays</strong> matching your class colors
+   - <strong>Visibility estimates</strong> (opacity or transparency levels)
+   - <strong>Object labels</strong> with class names and IDs
+   - <strong>Statistics</strong> related to timing 
+   - </p>
+<h3 id="step-54-debug-your-setup">Step 5.4: Debug Your Setup</h3>
+<p>If an object doesn't appear in the preview:
+- Check that it has a class assigned (either direct or via a rule)
+- Ensure it's visible in the viewport (not hidden or on a hidden layer)
+- Check the camera view—the object may be outside the camera's frustum</p>
+<h3 id="step-55-adjust-and-re-preview">Step 5.5: Adjust and Re-Preview</h3>
+<ol>
+<li>Modify class assignments, add/remove rules, or move objects in the scene</li>
+<li>Click the <strong>eye icon</strong> again to refresh the preview</li>
+<li>Iterate until you're satisfied with the labeling</li>
+</ol>
+<hr />
+<h2 id="common-tasks-troubleshooting">Common Tasks &amp; Troubleshooting</h2>
+<h3 id="task-rename-a-class-after-assignment">Task: Rename a Class After Assignment</h3>
+<ol>
+<li>In the <strong>Classes</strong> section, click on a class to select it</li>
+<li>Change its name in the text field</li>
+<li>Press <strong>Enter</strong> to confirm</li>
+<li>All assignments referencing that class will automatically update</li>
+</ol>
+<h3 id="task-remove-an-object-from-an-entity">Task: Remove an Object from an Entity</h3>
+<ol>
+<li>Select the entity in the <strong>Entities</strong> section</li>
+<li>Find the sub-object list and click the <strong>–</strong> button next to the object</li>
+<li>The object remains in the scene but is no longer part of the entity</li>
+</ol>
+<h3 id="troubleshooting-object-not-appearing-in-preview">Troubleshooting: Object Not Appearing in Preview</h3>
+<ul>
+<li><strong>Check visibility:</strong> Is the object visible in the viewport? (Check outliner icons)</li>
+<li><strong>Check camera:</strong> Is the object within the camera's view? (Use <strong>Numpad 0</strong> to enter camera view)</li>
+<li><strong>Check assignment:</strong> Does the object have a class? Add a direct assignment if rules aren't matching</li>
+<li><strong>Check labeling type:</strong> Is the preview set to show the same labeling type as your objects? (e.g., bounding box vs. polygon)</li>
+</ul>
+<h3 id="troubleshooting-rule-not-matching-objects">Troubleshooting: Rule Not Matching Objects</h3>
+<ul>
+<li><strong>Material rule:</strong> Verify the exact material name (case-sensitive). Select the object and check the Shader Editor</li>
+<li><strong>Name rule:</strong> The substring must match. For <code>cube_plastic</code>, substring <code>plastic</code> works; <code>Plastic</code> (capital P) may not</li>
+<li><strong>Collection rule:</strong> Ensure the object is actually in the collection (drag it in the Outliner)</li>
+</ul>
+<hr />
+<h2 id="next-steps">Next Steps</h2>
+<p>Now that you've created classes and assigned them to objects, you can:</p>
+<ol>
+<li><strong>Generate synthetic data:</strong> Use the <strong>Render</strong> button to create labeled images and annotations</li>
+<li><strong>Configure output format:</strong> Choose between YOLO, COCO, or other formats in the extension settings</li>
+<li><strong>Add randomization:</strong> Vary materials, lighting, and camera angles for diverse datasets</li>
+<li><strong>Scale up:</strong> Add more objects, use collection-based rules for larger scenes</li>
+</ol>
+<p>--</p>
+<h2 id="summary">Summary</h2>
+<p>You've learned how to:
+- ✓ Create test objects in Blender
+- ✓ Define custom classes with colors and IDs
+- ✓ Create multi-object entities (optional feature)
+- ✓ Assign classes via direct assignment
+- ✓ Assign classes via material, name, and collection rules
+- ✓ Preview labeled objects and bounding boxes</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
