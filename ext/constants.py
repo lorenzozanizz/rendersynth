@@ -20,7 +20,7 @@ PANEL_CATEGORY  = "Rendersynth"
 REPO_URL = "https://github.com/lorenzozanizz/rendersynth"
 DOCU_URL = "https://lorenzozanizz.github.io/rendersynth/"
 
-VERSION        = "1.0.0"
+VERSION        = "0.9.2"
 TARGET_VERSION = "4.5.0"
 
 # Names of the internal distribution tree for arbitrary distributions
