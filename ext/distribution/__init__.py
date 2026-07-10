@@ -1,17 +1,12 @@
 import sys
 
+from .tree_constants import *
+
 # Only register classes when not testing.
-
-PRIMITIVE_CAT_NAME = 'DIST_PRIMITIVES'
-COMBINATORS_CAT_NAME = 'DIST_COMBINATORS'
-MATH_CAT_NAME = 'DIST_MATH'
-SINK_CAT_NAME = 'DIST_SINK'
-
 if 'pytest' not in sys.modules:
 
     from .nodes import *
     from nodeitems_utils import NodeItem
-
 
     node_categories = [
         # We use the __name__ dunder method to avoid writing strings which would break down

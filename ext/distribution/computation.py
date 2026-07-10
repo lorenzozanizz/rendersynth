@@ -5,14 +5,15 @@ extraction of data can happen without interrogating the bpy data component every
 
 """
 
-from .tree_writing import NodeDistributionSerializer
+from .tree_io import NodeDistributionSerializer
+from .tree_compilation import CompiledNodeTreeSampler
+from .sampler import CompiledSampler
 from ..constants import WidgetSerializationKeys, DISTRO_EDITOR_NAME
 from ..utils.logger import UniqueLogger
 from ..utils.math_funcs import geometric, pick_k_from_n
 
 from enum import Enum
 from math import pi, sqrt, cos, sin
-from abc import abstractmethod, ABCMeta
 from typing import List, Dict, Any, Callable
 
 import random
@@ -58,20 +59,6 @@ ONE_D_DISTRIBUTIONS = (
 UPPER_D_DISTRIBUTIONS = (
     Distribution.MULTIVARIATE_UNIFORM, Distribution.MULTIVARIATE_GAUSSIAN, Distribution.MULTIVARIATE_ISOTROPIC_GAUSSIAN
 )
-
-class CompiledSampler(metaclass=ABCMeta):
-    """Base sampler interface"""
-
-    @property
-    @abstractmethod
-    def dimension(self) -> int:
-        """Return dimensionality of samples"""
-        pass
-
-    @abstractmethod
-    def sample(self) -> List[float]:
-        """Sample a vector of shape (dimension,)"""
-        pass
 
 
 class SphereDistribution(CompiledSampler):
@@ -363,69 +350,26 @@ class SamplerCompiler:
 
     @staticmethod
     def _compile_node_config(config: Dict[str, Any], dim: int = 1) -> CompiledSampler:
-        """Compile node-graph format"""
-
-        # Extract the relevant node from bpy.data node tree for the
-        # given distribution name
+        """Compile a node-graph distribution by name into an executable sampler."""
         name = config['distribution']
         tree = next(
             (ng for ng in bpy.data.node_groups
              if ng.bl_idname == DISTRO_EDITOR_NAME and ng.name == name),
             None
         )
-        root_config = NodeDistributionSerializer.serialize(tree)
-        compiled_nodes = {}  # node_id -> Sampler
+        if tree is None:
+            raise ValueError(f"Distribution tree '{name}' not found in bpy.data.node_groups")
 
-        # First pass: topological sort by traversing backwards from root
-        visit_order = []
-        visited = set()
+        # We initially get a json from the blender tree representation for better bpy-agnostic
+        # parsing and compilation of the distribution
+        data = NodeDistributionSerializer.serialize(tree)
 
-        def visit(cfg):
-            n_id = id(cfg)
-            if n_id in visited:
-                return
-            visited.add(n_id)
-
-            # Visit inputs first
-            if 'inputs' in cfg:
-                for input_config in cfg['inputs']:
-                    visit(input_config)
-
-            visit_order.append(cfg)
-
-        visit(root_config)
-
-        # Second pass: compile in dependency order
-        for config in visit_order:
-            node_type = config.get('type')
-            node_id = id(config)
-
-            if node_type == 'constant':
-                compiled_nodes[node_id] = ConstantSampler(config['value'])
-
-            elif node_type == 'preset':
-                dist_name = config['preset']
-                dimension = 1
-                compiled_nodes[node_id] = SamplerCompiler._compile_simple_config(dist_name, dimension)
-
-            elif node_type == 'selector':
-                # Inputs already compiled
-                input_samplers = [
-                    compiled_nodes[id(input_cfg)]
-                    for input_cfg in config['inputs']
-                ]
-                weights = config['weights']
-                compiled_nodes[node_id] = SelectorSampler(input_samplers, weights)
-
-            elif node_type == 'vector_assemble':
-                # Inputs already compiled
-                input_samplers = [
-                    compiled_nodes[id(input_cfg)]
-                    for input_cfg in config['inputs']
-                ]
-                compiled_nodes[node_id] = VectorSampler(input_samplers)
-
-            else:
-                raise ValueError(f"Unknown node type: {node_type}")
-
-        return compiled_nodes[id(root_config)]
+        # Inject the leaf samplers so node_serialization never imports this module.
+        # This kit will be used by the compiler to create nodes on the fly when compiling
+        # the first time only
+        kit = {
+            'constant': ConstantSampler,
+            'preset':   PresetSampler,
+            'selector': SelectorSampler,
+        }
+        return CompiledNodeTreeSampler(data, kit)

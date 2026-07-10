@@ -279,7 +279,6 @@ class DistributionRootNode(DistNode, Node):
     def draw_buttons(self, _context, layout):
         layout.prop(self, 'dimension', text='Dim')
 
-
 class DistributionContinuousNode(DistNode, Node):
     bl_idname = 'DistributionContinuousNode'
     bl_label = 'Continuous'
@@ -484,7 +483,7 @@ class DistributionSwapNode(DistNode, Node):
         self.outputs.new('DistributionSocket', 'Out')
 
     def propagate_dims(self):
-        dim = _first_input_dim(self)
+        dim = _first_input_dim(self) # type: ignore
         # Keep the input socket's declared dimension in step so links read clearly.
         if self.inputs:
             self.inputs[0].dimension = dim
