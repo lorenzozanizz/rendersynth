@@ -1,30 +1,46 @@
 from bpy.types import Operator, Object
-from bpy.props import PointerProperty, EnumProperty, StringProperty
-import bpy
+from bpy.props import EnumProperty, StringProperty
 
 from .names import Labels
+from ..labeling.keypoint_resolver import KeypointPositionResolver
+from ..labeling.skeleton_viewport import skeleton_viewport_drawer
 
 class AutoDetectBonesOperator(Operator):
     bl_idname = Labels.DETECT_BONES.value
     bl_label = "Auto-detect"
-    bl_description = "Populate keypoint list from the selected armature"
+    bl_description = "Populate keypoint list from the current rig's armature"
 
     def execute(self, context):
         settings = context.scene.pose_label_settings
-        arm = settings.armature
 
-        if arm is None or arm.type != 'ARMATURE':
-            self.report({'WARNING'}, "Select an armature first")
+        rig = settings.get_current_rig()
+        if rig is None:
+            self.report({'WARNING'}, "Select a rig first")
             return {'CANCELLED'}
 
-        settings.keypoints.clear()
+        # Auto-detection can only work on blender rigs, because the information about
+        # the bone hierarchy is already only present in blender rigs. a skeleton
+        # composed of arbitrary objects cannot be automatically composed
+        if not rig.is_blender_rig:
+            self.report({'WARNING'}, "Auto-detect only applies to Blender rigs")
+            return {'CANCELLED'}
+
+        arm = rig.armature_ptr
+        if arm is None or arm.type != 'ARMATURE':
+            self.report({'WARNING'}, "Assign an armature to this rig first")
+            return {'CANCELLED'}
+
+        rig.keypoints.clear()
 
         # Deform bones are the ones that actually drive mesh deformation.
         # Decide here whether to filter to use_deform only or expose all bones.
         bones = [b for b in arm.data.bones if b.use_deform]
 
+        # Note: This does not create CONNECTIONS between bones, only sets up the
+        # bone names. This is because the hierarchy of bones is unreliable for
+        # connections due to convenience/utility bones for inverse kinematics.
         for i, bone in enumerate(bones):
-            item = settings.keypoints.add()
+            item = rig.keypoints.add()
             item.bone_name = bone.name
             item.label = bone.name
             item.index = i
@@ -45,7 +61,7 @@ class AddKeypointOperator(Operator):
 
         rig = settings.get_current_rig()
         if rig is None:
-            return { 'CANCELED' }
+            return {'CANCELLED'}
 
         item = rig.keypoints.add()
         item.index = len(rig.keypoints) - 1
@@ -62,7 +78,7 @@ class RemoveKeypointOperator(Operator):
 
         rig = settings.get_current_rig()
         if rig is None:
-            return { 'CANCELED' }
+            return {'CANCELLED'}
 
         idx = rig.keypoints_index
         if idx < len(rig.keypoints):
@@ -80,7 +96,7 @@ class AddConnectionOperator(Operator):
 
         rig = settings.get_current_rig()
         if rig is None:
-            return { 'CANCELED' }
+            return {'CANCELLED'}
 
         rig.connections.add()
         rig.connections_index = len(rig.connections) - 1
@@ -96,7 +112,7 @@ class RemoveConnectionOperator(Operator):
 
         rig = settings.get_current_rig()
         if rig is None:
-            return { 'CANCELED' }
+            return {'CANCELLED'}
 
         idx = rig.connections_index
         if idx < len(rig.connections):
@@ -108,34 +124,50 @@ class RemoveConnectionOperator(Operator):
 class VisualizeSkeletonOperator(Operator):
     bl_idname = Labels.VISUALIZE_SKELETON.value
     bl_label = "Visualize Bones Configuration"
-    bl_description = "Serialize keypoint mapping and skeleton connections to the pipeline JSON"
+    bl_description = "Draw the current rig's keypoints and connections in the viewport"
 
     def execute(self, context):
 
-        # Get the current visualization state.
         settings = context.scene.pose_label_settings
-        is_visualizing = settings.currently_visualizing
-        if  is_visualizing:
-            self.report({'INFO'}, f"The skeleton is already being visualized.")
-            return { 'CANCELED' }
+        if settings.currently_visualizing:
+            self.report({'INFO'}, "The skeleton is already being visualized.")
+            return {'CANCELLED'}
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            self.report({'WARNING'}, "Select a rig first")
+            return {'CANCELLED'}
+
+        # start visualizing and set the visualization active flag for the
+        # skeleton settings.
+        skeleton_viewport_drawer.start()
+        settings.currently_visualizing = True
+        rig.is_being_visualized = True
+
         return {'FINISHED'}
 
 
 class StopVisualizeSkeletonOperator(Operator):
     bl_idname = Labels.STOP_VISUALIZE_SKELETON.value
     bl_label = "Stop Viewing Bones Configuration"
-    bl_description = "Serialize keypoint mapping and skeleton connections to the pipeline JSON"
+    bl_description = "Stop drawing the current rig's keypoints and connections in the viewport"
 
     def execute(self, context):
 
-        # Get the current visualization state
         settings = context.scene.pose_label_settings
-        is_visualizing = settings.currently_visualizing
+        if not settings.currently_visualizing:
+            self.report({'INFO'}, "No skeleton is being visualized currently.")
+            return {'CANCELLED'}
 
-        if not is_visualizing:
-            self.report({'INFO'}, f"No skeleton is being visualized currently .")
-            return { 'CANCELED' }
-        return { 'FINISHED' }
+        # stop visualizing
+        skeleton_viewport_drawer.stop()
+        settings.currently_visualizing = False
+        # mark the interrupted visualization in the per-skeleton visualization flag
+        rig = settings.get_current_rig()
+        if rig is not None:
+            rig.is_being_visualized = False
+
+        return {'FINISHED'}
 
 
 
@@ -182,6 +214,8 @@ class AddRigOperator(Operator):
         rig = settings.labeled_rigs.add()
         rig.rig_name = rig_name
         rig.is_blender_rig = is_blender
+        if is_blender:
+            rig.armature_ptr = armature
         settings.selected_rig = len(settings.labeled_rigs) - 1
 
         return {'FINISHED'}
@@ -209,6 +243,31 @@ class RemoveRigOperator(Operator):
 class SanitizeBoneMappingOperator(Operator):
     bl_idname = Labels.SANITIZE_BONE_MAPPING.value
     bl_label = "Sanitize Bone Mapping Rig"
+    bl_description = "Drop keypoints whose mapped bone or object no longer exists"
 
     def execute(self, context):
-        return {'CANCELLED'}
+        settings = context.scene.pose_label_settings
+
+        rig = settings.get_current_rig()
+        if rig is None:
+            self.report({'WARNING'}, "Select a rig first")
+            return {'CANCELLED'}
+
+        # Collect indices back to front, so removal does not shift the
+        # indices of keypoints still to be checked.
+        stale_positions = [
+            position for position, keypoint in enumerate(rig.keypoints)
+            if KeypointPositionResolver.resolve_location(rig, keypoint) is None
+        ]
+
+        for position in reversed(stale_positions):
+            rig.keypoints.remove(position)
+
+        rig.keypoints_index = min(rig.keypoints_index, max(0, len(rig.keypoints) - 1))
+
+        if stale_positions:
+            self.report({'INFO'}, f"Removed {len(stale_positions)} stale keypoint(s)")
+        else:
+            self.report({'INFO'}, "No stale keypoints found")
+
+        return {'FINISHED'}

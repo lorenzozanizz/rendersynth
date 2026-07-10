@@ -10,6 +10,7 @@ from .formatting_config import LabelConfigDataProperty
 from .labeling import classes as labeling_classes
 
 from .handlers import sync_distribution_handler
+from ..labeling.skeleton_viewport import skeleton_viewport_drawer
 
 
 import bpy
@@ -23,6 +24,11 @@ def unregister_handlers():
     """Unregister all scene handlers."""
     if sync_distribution_handler in bpy.app.handlers.depsgraph_update_post:
         bpy.app.handlers.depsgraph_update_post.remove(sync_distribution_handler)
+
+    # A skeleton visualization active at disable-time would otherwise leave
+    # its draw handler registered forever, with no way left to remove it. if the extension
+    # is the extension is uninstalled mid-visualization, stop visualization
+    skeleton_viewport_drawer.stop()
 
 
 classes = (

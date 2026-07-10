@@ -21,7 +21,7 @@ class LabelingFormats(Enum):
 
 
 def get_label_classes_enum(_, context):
-    """Generate enum items from label_classes"""
+    """ Generate enum items from label_classes """
     labeling_data = context.scene.labeling_data
     items = [("None", "None", "")]
 
