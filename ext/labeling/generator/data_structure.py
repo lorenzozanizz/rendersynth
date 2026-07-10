@@ -11,16 +11,41 @@ from ..bpy_properties import LabelClass
 
 
 @dataclass
+class KeypointAnnotation:
+    """ Single named point of a skeleton/landmark annotation.
+
+    Represents one resolved keypoint of a rig instance, already projected
+    into camera-centered [-1, 1] space, together with its identity within
+    the rig and its estimated visibility state.
+
+    :param name: Display label of the keypoint, as configured by the user.
+    :param index: Stable index of the keypoint within its rig, used to resolve skeleton
+        connections and to keep a consistent ordering across formats.
+    :param x: Camera-centered x coordinate in [-1, 1].
+    :param y: Camera-centered y coordinate in [-1, 1].
+    :param visibility: Visibility state of the keypoint. Follows the COCO
+        convention: 0 not labeled, 1 labeled but occluded, 2 labeled and visible.
+        Formats that do not need this granularity may ignore this value it.
+    """
+
+    name: str
+    index: int
+    x: float
+    y: float
+    visibility: int = 2
+
+
+@dataclass
 class Label:
     """Single entity annotation with geometry and metadata.
 
     Represents a labeled object or entity with its geometric representation
-    (bounding box or polygon), semantic class, visibility estimate, and
-    optional segmentation data.
+    (bounding box, polygon or keypoints), semantic class, visibility estimate,
+    and optional segmentation data.
 
     :param obj_or_entity_name: Identifier string for the object or entity.
     :param cls: Semantic label class, or None if unclassified.
-    :param annotation_type: Type of geometric annotation ("bbox" or "polygon").
+    :param annotation_type: Type of geometric annotation ("bbox", "polygon" or "keypoints").
     :param is_entity: Whether this label represents a multi-mesh entity (True)
         or a single object (False).
     :param visibility: Visibility ratio in [0, 1]. Defaults to 0.0.
@@ -29,13 +54,18 @@ class Label:
     :param bbox: 2D bounding box in camera/image space as (x, y, w, h), or None.
     :param polygon: List of (x, y) vertices defining a 2D convex hull or mask polygon, or None.
     :param segmentation: Run-length encoded segmentation mask, or None.
+    :param keypoints: List of KeypointAnnotation composing a skeleton/landmark
+        annotation, or None. Only meaningful when annotation_type is "keypoints".
+    :param identity: Persistent tracking identity of the annotated instance
+        across shots (e.g. a rig instance), or None when the annotation type
+        does not require identity tracking.
     :param attributes: Dictionary of format-specific attributes (e.g., for CVAT), or None.
     """
 
     obj_or_entity_name: str
     cls: Optional[LabelClass]
 
-    annotation_type: Literal["bbox", "polygon"]  # "bbox", "polygon", "depth"
+    annotation_type: Literal["bbox", "polygon", "keypoints"]  # "bbox", "polygon", "keypoints", "depth"
 
     # Whether a label belongs to a single object or to a composite multi-mesh entity
     is_entity: bool
@@ -47,10 +77,18 @@ class Label:
     ideal_bbox: tuple[float, float, float, float] = None
     bbox: tuple[float, float, float, float] = None
     polygon: list[tuple[float, float]] = None
+
+    # Skeleton/landmark geometry, used when annotation_type == "keypoints"
+    keypoints: list[KeypointAnnotation] = None
+
     segmentation: list[int] = None # run length encoding
     point_cloud: Iterable = None
     # depth maps, normal maps, etc... (numpy arrays usually)
     per_pixel_map = None
+
+
+    # Persistent identity of the annotated instance, used for tracking subjects across shots
+    identity: Optional[int] = None
 
     # e.g. for CVAT formats
     attributes: dict[str, Any] =  None
