@@ -50,6 +50,7 @@ class ExtractorRepository:
         # For the point clouds format, the same extractor can be used for all, but
         # must be configured differently if capturing the color of corresponding pixels
         # is required
+
         if matches(labeling_format, (
             SupportedFormats.PCD.value, SupportedFormats.PCD_CLASS.value,
             SupportedFormats.PCD_CLASS_COLOR.value
@@ -64,14 +65,14 @@ class ExtractorRepository:
         # For the keypoints format extraction, the landmarks extractor is necessary to
         # collect points and estimate the visibility as required by the settings.
         elif matches(labeling_format, (
-            SupportedFormats.COCO_KEYPOINTS.value
+            SupportedFormats.COCO_KEYPOINTS.value,
         )): return LandmarksExtractor(data)
         # For segmentation, the polygon extractor computes the convex hull of points (not
         # the alpha shape, importantly, to avoid adding dependencies to the build which
         # are not strictly required.
         # This is not a problem for convex shapes.
         elif matches(labeling_format, (
-            SupportedFormats.COCO_SEGMENTATION.value
+            SupportedFormats.COCO_SEGMENTATION.value,
         )): return PolygonExtractor(data)
 
         return None
