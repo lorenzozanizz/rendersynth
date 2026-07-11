@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 import bpy
 from pathlib import Path
 

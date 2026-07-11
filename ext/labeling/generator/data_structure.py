@@ -5,27 +5,28 @@ for managing collections of labels within a frame.
 """
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Optional, Literal, Union, Dict, Any
+from typing import Optional, Literal, Dict, Any
 
 from ..bpy_properties import LabelClass
 
 
 @dataclass
 class KeypointAnnotation:
-    """ Single named point of a skeleton/landmark annotation.
+    """Single named point of a skeleton/landmark annotation.
 
     Represents one resolved keypoint of a rig instance, already projected
     into camera-centered [-1, 1] space, together with its identity within
     the rig and its estimated visibility state.
 
     :param name: Display label of the keypoint, as configured by the user.
-    :param index: Stable index of the keypoint within its rig, used to resolve skeleton
-        connections and to keep a consistent ordering across formats.
+    :param index: Stable index of the keypoint within its rig, used to
+        resolve skeleton connections and to keep a consistent ordering
+        across formats.
     :param x: Camera-centered x coordinate in [-1, 1].
     :param y: Camera-centered y coordinate in [-1, 1].
     :param visibility: Visibility state of the keypoint. Follows the COCO
-        convention: 0 not labeled, 1 labeled but occluded, 2 labeled and visible.
-        Formats that do not need this granularity may ignore this value it.
+        convention: 0 not labeled, 1 labeled but occluded, 2 labeled and
+        visible. Formats that do not need this granularity may ignore it.
     """
 
     name: str
@@ -56,6 +57,9 @@ class Label:
     :param segmentation: Run-length encoded segmentation mask, or None.
     :param keypoints: List of KeypointAnnotation composing a skeleton/landmark
         annotation, or None. Only meaningful when annotation_type is "keypoints".
+    :param skeleton_edges: List of (KeypointItem.index, KeypointItem.index) pairs
+        describing the rig's skeleton topology, or None. Only meaningful when
+        annotation_type is "keypoints".
     :param identity: Persistent tracking identity of the annotated instance
         across shots (e.g. a rig instance), or None when the annotation type
         does not require identity tracking.
@@ -77,17 +81,16 @@ class Label:
     ideal_bbox: tuple[float, float, float, float] = None
     bbox: tuple[float, float, float, float] = None
     polygon: list[tuple[float, float]] = None
-
-    # Skeleton/landmark geometry, used when annotation_type == "keypoints"
-    keypoints: list[KeypointAnnotation] = None
-
     segmentation: list[int] = None # run length encoding
     point_cloud: Iterable = None
     # depth maps, normal maps, etc... (numpy arrays usually)
     per_pixel_map = None
 
-
-    # Persistent identity of the annotated instance, used for tracking subjects across shots
+    # Skeleton/landmark geometry, used when annotation_type == "keypoints"
+    keypoints: list[KeypointAnnotation] = None
+    # Skeleton topology: pairs of KeypointItem.index, used when annotation_type == "keypoints"
+    skeleton_edges: list[tuple[int, int]] = None
+    # Persistent identity of the annotated instance, used for tracking across shots
     identity: Optional[int] = None
 
     # e.g. for CVAT formats

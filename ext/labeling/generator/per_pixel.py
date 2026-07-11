@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from typing import Callable
+from typing import Callable, Union
 from pathlib import Path
 
 from ..compositing_utils import NodeCompositor

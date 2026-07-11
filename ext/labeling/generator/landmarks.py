@@ -18,15 +18,17 @@ from .data_structure import *
 class LandmarksExtractor(Extractor):
     """ Encapsulates skeleton/landmark keypoint extraction logic.
 
-    Unlike BoundingBoxExtractor/PolygonExtractor, keypoints are exact, known 3D
-    points (a bone head/tail or a mapped object's origin), not something approximated
-    from a ray-cast point cloud. visible_objects is therefore unused here:
-    rig configuration is read directly from context.scene.pose_label_settings,
-    the same way ClassificationEngine reads context.scene.labeling_data.
+    Unlike BoundingBoxExtractor/PolygonExtractor, keypoints are exact, known
+    3D points (a bone head/tail or a mapped object's origin), not something
+    approximated from a ray-cast point cloud. visible_objects is therefore
+    unused here: rig configuration is read directly from
+    context.scene.pose_label_settings, the same way ClassificationEngine
+    reads context.scene.labeling_data.
 
-    Stays strictly format-agnostic: it only ever produces canonical Label objects
-    carrying KeypointAnnotation lists, with no format-specific ordering or
-    encoding. That responsibility belongs to the IOStrategy consuming the resulting LabelData.
+    Stays strictly format-agnostic: it only ever produces canonical Label
+    objects carrying KeypointAnnotation lists, with no format-specific
+    ordering or encoding. That responsibility belongs to the IOStrategy
+    consuming the resulting LabelData.
     """
 
     # Minimum distance, in Blender units, kept between the occlusion test ray
@@ -50,10 +52,7 @@ class LandmarksExtractor(Extractor):
         estimate_visibility: bool = True,
         rendered_shot_data: Any = None, **kwargs
     ) -> LabelData:
-        """ Extract the keypoints from the scene and conditionally estimate
-        visibility with a single traced ray per keypoint. This does not make
-        use of the visible objects, which is the reason why the extractor
-        declares a very coarse resolution for the initial ray tracing pass.
+        """
 
         :param visible_objects: Unused: keypoint positions are resolved
             directly rather than derived from a ray-cast point cloud.
@@ -64,7 +63,8 @@ class LandmarksExtractor(Extractor):
         :param estimate_visibility: If true, an occlusion ray cast is
             performed per enabled keypoint to determine its visibility state.
         :param rendered_shot_data: Unused by this extractor.
-        :param kwargs: extra key arguments, ignored here.
+        :param kwargs:
+        :return:
         """
         ret_data = LabelData()
         self.visible_rigs = dict()
@@ -117,7 +117,6 @@ class LandmarksExtractor(Extractor):
         projected_points = []
 
         for keypoint in rig.keypoints:
-
             world_point = world_positions.get(keypoint.index)
             # If the keypoint is disabled, no position is computed for him.
             if world_point is None:
@@ -150,6 +149,7 @@ class LandmarksExtractor(Extractor):
 
         # Get a box (not a convex hull or alpha shape!)
         bbox = get_minimal_bounding_box_fast(projected_points)
+        skeleton_edges = self._extract_skeleton_edges(rig)
 
         return Label(
             rig.rig_name, cls,
@@ -158,8 +158,27 @@ class LandmarksExtractor(Extractor):
             visibility=visibility_ratio if visibility_ratio is not None else 0.0,
             bbox=bbox,
             keypoints=keypoints,
+            skeleton_edges=skeleton_edges,
             identity=rig.identity,
         )
+
+    @staticmethod
+    def _extract_skeleton_edges(rig) -> list:
+        """ Build the rig's skeleton topology as a list of keypoint index
+        pairs, from its configured connections.
+
+        :param rig: RigItem whose connections should be read.
+        :return: List of (index_a, index_b) tuples. Connections with an
+            unresolved endpoint (e.g. left on the 'NONE' sentinel) are skipped.
+        """
+        edges = []
+        for connection in rig.connections:
+            index_a = KeypointPositionResolver.parse_keypoint_index(connection.index_a)
+            index_b = KeypointPositionResolver.parse_keypoint_index(connection.index_b)
+            if index_a is not None and index_b is not None:
+                edges.append((index_a, index_b))
+
+        return edges
 
     def _estimate_keypoint_visibility(self, world_point: Vector, camera, depsgraph) -> int:
         """ Determine whether a keypoint is occluded from the camera's point

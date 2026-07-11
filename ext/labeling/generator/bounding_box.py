@@ -2,7 +2,7 @@
 
 """
 
-from typing import Dict, Any, List, Iterable, Callable
+from typing import Dict, Any, List, Iterable, Callable, Union
 
 from ...utils.timer import TimingContext
 from ..ray_casting import (union_bounding_boxes, compute_camera_space_boxes, get_minimal_bounding_box_fast,
