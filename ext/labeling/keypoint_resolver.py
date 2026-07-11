@@ -81,6 +81,8 @@ class KeypointPositionResolver:
 
         positions = {}
         for keypoint in rig.keypoints:
+            # If the keypoint is disabled, we do not compute its world position which will later
+            # be ignored by the user.
             if only_enabled and not keypoint.enabled:
                 continue
             location = KeypointPositionResolver.resolve_location(rig, keypoint)

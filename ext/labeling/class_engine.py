@@ -32,10 +32,9 @@ class ClassificationEngine:
         return ret_data
 
     def extract_class_labels_data(self) -> Dict[str, Any]:
+        """ Fully serializes the labeling configuration into JSON-compatible format.
+            See extract_labels.py for implementation details.
         """
-                Fully serializes the labeling configuration into JSON-compatible format.
-                See extract_labels.py for implementation details.
-                """
         label_data = self.ctx.scene.labeling_data
         labels = label_data.direct_labels
         classes = label_data.label_classes
@@ -126,7 +125,7 @@ class ClassificationEngine:
 
             names = label.obj_names
             label_cls = label.class_id
-            target_class: Optional[LabelClass] = next((cls for cls in classes if str(cls.class_id) == str(label_cls)), None)
+            target_class: Optional[LabelClass] = self.resolve_class_by_id(label_cls)
             if target_class is None:
                 # There is a dangling reference. ignore (and report, maybe?)
                 continue
@@ -187,6 +186,19 @@ class ClassificationEngine:
     def get_classes(self) -> List[LabelClass]:
         label_data = self.ctx.scene.labeling_data
         return label_data.label_classes
+
+    def resolve_class_by_id(self, class_id: Union[str, int]) -> Optional[LabelClass]:
+        """ Resolve a LabelClass from a raw class_id, as stored e.g. on ObjectLabel,
+        LabelRule, or RigItem.class_id. Comparison is done on the string
+        representation, since class_id may come from an EnumProperty (str)
+        while LabelClass.class_id may be stored as an int.
+
+        :param class_id: The class_id to resolve.
+        :return: The matching LabelClass, or None if class_id does not match
+            any currently registered class.
+        """
+        classes = self.ctx.scene.labeling_data.label_classes
+        return next((cls for cls in classes if str(cls.class_id) == str(class_id)), None)
 
     def ignore_default_class(self) -> bool:
         pass
@@ -254,5 +266,3 @@ class ClassificationEngine:
 
     def get_mapping(self) -> Dict[str, LabelClass]:
         return self.labels_mappings
-
-
