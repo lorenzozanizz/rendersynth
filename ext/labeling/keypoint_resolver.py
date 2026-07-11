@@ -11,7 +11,7 @@ from mathutils import Vector
 
 
 class KeypointPositionResolver:
-    """ Resolves KeypointItem/RigItem pairs to world-space positions.
+    """Resolves KeypointItem/RigItem pairs to world-space positions.
 
     A keypoint resolves differently depending on the owning rig:
 
@@ -24,7 +24,7 @@ class KeypointPositionResolver:
 
     @staticmethod
     def resolve_location(rig, keypoint) -> Optional[Vector]:
-        """ Resolve a single keypoint to a world-space location.
+        """Resolve a single keypoint to a world-space location.
 
         :param rig: RigItem owning the keypoint.
         :param keypoint: KeypointItem to resolve.
@@ -90,3 +90,21 @@ class KeypointPositionResolver:
                 positions[keypoint.index] = location
 
         return positions
+
+    @staticmethod
+    def parse_keypoint_index(endpoint_id) -> Optional[int]:
+        """Parse a SkeletonConnectionItem endpoint (index_a/index_b) back to
+        a plain keypoint index.
+
+        Connection endpoints are stored as the string identifier of a
+        dynamic EnumProperty (see get_rig_keypoints_enum), with 'NONE' as
+        the no-keypoints sentinel value.
+
+        :param endpoint_id: Raw index_a/index_b value.
+        :return: The parsed keypoint index, or None if it does not refer
+            to an actual keypoint.
+        """
+        try:
+            return int(endpoint_id)
+        except (TypeError, ValueError):
+            return None

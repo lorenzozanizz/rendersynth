@@ -172,8 +172,8 @@ class COCOFormatter(IOStrategy):
         }
 
     def serialize_image_labels(
-            self,
-            transformed: list[dict]
+        self,
+        transformed: list[dict]
     ) -> Collection[tuple[file_type, extension, str]]:
         """
         Not used for COCO (global format).
@@ -329,4 +329,199 @@ class COCOSegmentation(IOStrategy):
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.COCO_KEYPOINTS.value)
 class COCOLandmarks(IOStrategy):
-    pass
+    """ COCO format implementation for keypoint/skeleton detection.
+    Produces a single annotations JSON per batch: one COCO "category" per
+    distinct rig class (topology: keypoint names + skeleton edges), and one "annotation"
+    per rig instance per image, following the COCO keypoints spec at (https://cocodataset.org/#format-data).
+
+    Unlike COCOFormatter/COCOSegmentation, categories cannot be built purely from BatchMetadata.classes:
+    a category's keypoint names and skeleton edges are only known from an actual rig instance.
+    The first rig instance seen for a given class therefore defines that class' topology; every
+    other instance of the same class is expected to share it.
+    """
+
+    def ensure_directories(self) -> None:
+        image_dir = join(self.write_cfg.save_path, (self.split + "/" if self.split else "") + "images/")
+        self._make_dirs([image_dir])
+
+    def __init__(self, write_config: WritingConfig, config: dict):
+        super().__init__(write_config, config)
+        self.split = config.get('split') or ''
+        self.bbox_precision = config.get('bbox_precision') or 2
+
+        self.coco_data = {
+            "info": {
+                "description": "Synthetically generated dataset using the Blendersynth extension",
+                "version": "1.0",
+                "year": datetime.now().year,
+            },
+            "images": [],
+            "annotations": [],
+            "categories": []
+        }
+        self.annotation_id_counter = 1
+        self.marked_img_ids = set()
+        # Keypoint name ordering and skeleton edges, keyed by category id,
+        # captured from the first rig instance seen for that class.
+        self.category_topology: dict[Any, dict[str, Any]] = {}
+
+    def get_specification(self) -> FormatSpecification:
+        return FormatSpecification(
+            single_file_per_image=False,
+            global_metadata_required=True,
+            # All files are generated at the end of processing due to COCO requiring a
+            # single file.
+            aggregation_strategy="global",
+            requires_class_declaration=True,
+            supports_image_metadata=True,
+            requires_keypoints=True,
+        )
+
+    def get_storage_spec(self) -> StorageSpec:
+        return StorageSpec(single_file_per_image=False)
+
+    def get_subdir_for(self, shot_id: int, f_type: file_type | Literal["image"]) -> str:
+        if f_type == "image":
+            return (self.split + "/" if self.split else "") + "images/"
+        return self.split + "/" if self.split else ""
+
+    def get_filename_for(self, shot_id: int, f_type: file_type | Literal["image"]) -> str:
+        if f_type == "image":
+            return f"{self.write_cfg.prefix}_{shot_id}"
+        return "instances_keypoints"
+
+    def transform_annotation(
+        self,
+        label: Label,
+        shot_idx: int,
+        shot_config: RenderConfig
+    ) -> dict[str, Any]:
+        """ Transform a single rig instance to COCO format.
+        Does NOT create the annotation entry yet because that happens in aggregate_batch where
+        files are finalized.
+        """
+
+        if label.annotation_type != "keypoints" or not label.keypoints:
+            raise RuntimeError(
+                f"COCOLandmarks requires keypoints annotations, got '{label.annotation_type}' "
+                f"for object '{label.obj_or_entity_name}'."
+            )
+
+        if shot_idx not in self.marked_img_ids:
+            self.coco_data["images"].append({
+                "id": shot_idx,
+                "file_name": f"{self.get_filename_for(shot_idx, 'image')}.{self.write_cfg.image_extension.lower()}",
+                "height": shot_config.height,
+                "width": shot_config.width,
+            })
+            self.marked_img_ids.add(shot_idx)
+
+        # Keep a stable order (by KeypointItem.index): this same order defines the category's
+        # "keypoints" name list and the "skeleton" edge positions built in _register_category_topology.
+        ordered_keypoints = sorted(label.keypoints, key=lambda kp: kp.index)
+
+        camera_points = [(kp.x, kp.y) for kp in ordered_keypoints]
+        pixel_points = convert_camera_point_list_absolute_pixels_y_inverted(
+            camera_points, shot_config.width, shot_config.height
+        )
+
+        flat_keypoints = []
+        num_labeled = 0
+        for (x_px, y_px), keypoint in zip(pixel_points, ordered_keypoints):
+            flat_keypoints.extend([x_px, y_px, keypoint.visibility])
+            if keypoint.visibility > 0:
+                num_labeled += 1
+
+        class_id = label.cls.class_id if label.cls is not None else -1
+        self._register_category_topology(class_id, label.cls, ordered_keypoints, label.skeleton_edges)
+
+        coco_bbox = convert_camera_centered_to_coco(label.bbox, shot_config.width, shot_config.height) \
+            if label.bbox is not None else (0, 0, 0, 0)
+        coco_bbox = [round(v, self.bbox_precision) for v in coco_bbox]
+
+        return {
+            'image_id': shot_idx,
+            'class_id': class_id,
+            'identity': label.identity,
+            'keypoints': flat_keypoints,
+            'num_keypoints': num_labeled,
+            'bbox': coco_bbox,
+            'area': round(coco_bbox[2] * coco_bbox[3], self.bbox_precision),
+        }
+
+    def _register_category_topology(self, class_id, cls, ordered_keypoints, skeleton_edges) -> None:
+        """ Remember the keypoint name ordering and skeleton edges for a class, the first
+        time an instance of that class is encountered.
+
+        :param class_id: Resolved COCO category id for this instance.
+        :param cls: The instance's LabelClass, or None if unclassified.
+        :param ordered_keypoints: This instance's KeypointAnnotation list already sorted
+            by KeypointItem.index.
+        :param skeleton_edges: This instance's Label.skeleton_edges.
+        """
+        if class_id in self.category_topology:
+            return
+
+        # Maps a KeypointItem.index to its 1-based position in the ordered
+        # keypoint name list, as required by the COCO "skeleton" field.
+        keypoint_position = {
+            keypoint.index: position + 1 for position, keypoint in enumerate(ordered_keypoints)
+        }
+
+        skeleton = []
+        for index_a, index_b in (skeleton_edges or []):
+            position_a = keypoint_position.get(index_a)
+            position_b = keypoint_position.get(index_b)
+            if position_a is not None and position_b is not None:
+                skeleton.append([position_a, position_b])
+
+        self.category_topology[class_id] = {
+            "id": class_id,
+            "name": cls.name if cls is not None else "unclassified",
+            "supercategory": "object",
+            "keypoints": [keypoint.name or f"keypoint_{keypoint.index}" for keypoint in ordered_keypoints],
+            "skeleton": skeleton,
+        }
+
+    def serialize_image_labels(self, transformed: list[dict]) -> Collection[tuple[file_type, extension, str]]:
+        # This call should never happen
+        raise NotImplementedError("COCOLandmarks uses global aggregation via finalize().")
+
+    def aggregate_batch(
+        self,
+        annotations: list[dict[str, Any]],
+        batch_metadata: BatchMetadata
+    ) -> dict[str, Any]:
+        """ Aggregate all rig-instance annotations for a batch. Categories come from the
+        topology captured in transform_annotation, not from batch_metadata.classes:
+        a category also needs the keypoint names/skeleton, which only a rig instance carries.
+        """
+        coco_annotations = []
+        for ann in annotations:
+            coco_annotations.append({
+                "id": self.annotation_id_counter,
+                "image_id": ann['image_id'],
+                "category_id": ann['class_id'],
+                "identity": ann['identity'],
+                "keypoints": ann['keypoints'],
+                "num_keypoints": ann['num_keypoints'],
+                "bbox": ann['bbox'],
+                "area": ann['area'],
+                # NO "Entity" crowding is supported for landmarks, as segments of the skeleton
+                # e.g. "legs" can simply be identified by joining the corresponding landmarks.
+                "iscrowd": 0,
+            })
+            self.annotation_id_counter += 1
+
+        return {
+            "categories": list(self.category_topology.values()),
+            "annotations": coco_annotations,
+        }
+
+    def finalize(self, aggregated: dict[str, Any]) -> Collection[tuple[file_type, extension, str]]:
+        """ Final pass: build complete COCO JSON structure.
+        """
+        self.coco_data["categories"] = aggregated["categories"]
+        self.coco_data["annotations"] = aggregated["annotations"]
+
+        return (("instances_keypoints", ".json", json.dumps(self.coco_data, indent=2)),)

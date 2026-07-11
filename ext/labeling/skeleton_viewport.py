@@ -6,6 +6,7 @@ operators package and the ui package can import it directly without
 introducing an import cycle (ui.panels already imports from operators.names
 while ui's own __init__ is still executing, so anything operators imports
 back from ui would be fragile).
+
 """
 
 import bpy
@@ -16,7 +17,7 @@ from .keypoint_resolver import KeypointPositionResolver
 
 
 class SkeletonViewportDrawer:
-    """ Owns the SpaceView3D draw handler used to visualize a rig's skeleton.
+    """Owns the SpaceView3D draw handler used to visualize a rig's skeleton.
 
     Registering a gpu draw handler requires keeping a reference to the handle
     returned by draw_handler_add around, in order to remove it later. This class is the
@@ -36,7 +37,7 @@ class SkeletonViewportDrawer:
         return self._handle is not None
 
     def start(self) -> None:
-        """ Start drawing the currently selected rig's skeleton every frame. """
+        """Start drawing the currently selected rig's skeleton every frame."""
 
         if self.is_running:
             # Never stack handlers: tear down the previous one first, or every
@@ -52,7 +53,7 @@ class SkeletonViewportDrawer:
         )
 
     def stop(self) -> None:
-        """ Stop drawing and release the draw handler. Safe to call when not running. """
+        """Stop drawing and release the draw handler. Safe to call when not running."""
 
         if self._handle is not None:
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
@@ -125,12 +126,10 @@ class SkeletonViewportDrawer:
         # Connection endpoints are stored as the string keypoint index
         # (see get_rig_keypoints_enum), with 'NONE' as the no-keypoints
         # sentinel value.
-        try:
-            return positions.get(int(endpoint_id))
-        except (TypeError, ValueError):
+        index = KeypointPositionResolver.parse_keypoint_index(endpoint_id)
+        if index is None:
             return None
-        # Note for the implementation: this could've been made more easily with just
-        # positions.get(., None) but was expanded for possible future changes
+        return positions.get(index)
 
 
 # Single shared drawer instance: there is only ever one viewport overlay to
