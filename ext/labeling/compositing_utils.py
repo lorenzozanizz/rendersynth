@@ -19,9 +19,22 @@ class NodeCompositor:
     def __init__(self, context):
 
         self.ctx = context
+        scene = self.ctx.scene
         self.nodes: dict = {}
+
+        # If node compositing is disabled, enable it programmaticaly
+        # with bpy
+        if not scene.use_nodes:
+            # Enable compositing.
+            scene.use_nodes = True
+
         # extract the scene node_tree which is the composite tree.
-        self.tree = self.ctx.scene.node_tree
+        # self.tree = self.ctx.scene.node_tree
+        self.tree = getattr(scene, "node_tree", None)
+        print("Scene of the compositor", self.ctx.scene)
+        print("Context of the compositor", self.tree)
+        if self.tree is None:
+            self.tree = getattr(scene, "compositing_node_group", None)
 
         self.groups: dict = {}
 

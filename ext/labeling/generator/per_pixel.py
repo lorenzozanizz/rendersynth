@@ -13,8 +13,9 @@ from .extractor import Extractor
 from .data_structure import *
 
 class PixelMapExtractor(Extractor):
+    """
 
-
+    """
 
     def __init__(
         self, context, datatype: Literal['depth', 'normal'] ='depth', normalize_depth: bool = True,
@@ -93,9 +94,6 @@ class PixelMapExtractor(Extractor):
         """ Get the mappings from object to bounding boxes """
         return {}
 
-    def ray_casting_needs(self):
-        pass
-
     # A development note:
     # generating programmatically compositing nodes is very undocumented in BPY.
     # https://imoverclocked.blogspot.com/2011/08/blender-25-compositing-from-python.html
@@ -162,6 +160,12 @@ class PixelMapExtractor(Extractor):
             # Remove the composite nodes
             self.compositor.delete_node_group('depth_tree')
             self.compositor.unregister_group('depth_tree')
+
+        def set_write_path(self, path: Union[str, Path]) -> None:
+            node = self.compositor.get_node('file_output')
+            if node is None:
+                return
+            node.base_path = path
 
 
     class CompositorNormalContext:

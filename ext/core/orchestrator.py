@@ -12,7 +12,7 @@ from pathlib import Path
 from .configurations import LabelExtractionConfig, RenderConfig, GenerationConfig, BatchMetadata
 
 from .io import OutputWriter
-from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor
+from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor, PixelMapExtractor
 
 from ..labeling.generator import LabelData
 from ..labeling.class_engine import ClassificationEngine
@@ -55,6 +55,7 @@ class ExtractorRepository:
             SupportedFormats.PCD.value, SupportedFormats.PCD_CLASS.value,
             SupportedFormats.PCD_CLASS_COLOR.value
         )): return PointCloudExtractor(data)
+
         # For classical "bounding boxes" labeling formats, the bbox extractor generates
         # the required labeling data and allows the freedom of implementation that
         # IOStrategy uses to distinguish the three formats
@@ -62,11 +63,13 @@ class ExtractorRepository:
             SupportedFormats.COCO.value, SupportedFormats.PASCAL_VOC.value,
             SupportedFormats.CVAT_XML_IMAGES.value
         )): return BoundingBoxExtractor(data)
+
         # For the keypoints format extraction, the landmarks extractor is necessary to
         # collect points and estimate the visibility as required by the settings.
         elif matches(labeling_format, (
             SupportedFormats.COCO_KEYPOINTS.value,
         )): return LandmarksExtractor(data)
+
         # For segmentation, the polygon extractor computes the convex hull of points (not
         # the alpha shape, importantly, to avoid adding dependencies to the build which
         # are not strictly required.
@@ -74,6 +77,21 @@ class ExtractorRepository:
         elif matches(labeling_format, (
             SupportedFormats.COCO_SEGMENTATION.value,
         )): return PolygonExtractor(data)
+
+        #
+        elif matches(
+            labeling_format, (SupportedFormats.NORMAL.value,)
+        ): return PixelMapExtractor(data, datatype="normal")
+
+        #
+        elif matches(
+            labeling_format, (SupportedFormats.DEPTH_PNG.value,)
+        ): return PixelMapExtractor(data, datatype="depth")
+
+        #
+        elif matches(
+            labeling_format, (SupportedFormats.THERMAL.value,)
+        ): return None
 
         return None
 

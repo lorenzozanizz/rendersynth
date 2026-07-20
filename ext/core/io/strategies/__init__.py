@@ -9,6 +9,10 @@ class SupportedFormats(Enum):
 
     """
 
+    #
+    IMAGE_ONLY = "Media Only"
+
+    #
     ULTRALYTICS_YOLO = "Ultralytics YOLO"
     COCO = "COCO"
     COCO_SEGMENTATION = "COCO Segmentation"
@@ -23,7 +27,7 @@ class SupportedFormats(Enum):
 
     #
     THERMAL = "Thermal"
-    DEPTH = "Depth"
+    DEPTH_PNG = "Depth"
     NORMAL = "Normal"
 
 from .coco_strategy import *
@@ -31,3 +35,5 @@ from .yolo_strategy import *
 from .pascal_strategy import *
 from .cvat_xml_strategy import *
 from .pcloud_strategy import *
+from .depth_strategy import *
+# from .nmap_strategy import *

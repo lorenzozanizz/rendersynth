@@ -258,7 +258,7 @@ class ThermalHandler(LabelConfigHandler):
         return {}
 
 
-@LabelingConfigRegistry.register(SupportedFormats.DEPTH.value)
+@LabelingConfigRegistry.register(SupportedFormats.DEPTH_PNG.value)
 class DepthHandler(LabelConfigHandler):
 
     @staticmethod

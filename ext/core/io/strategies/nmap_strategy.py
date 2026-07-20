@@ -1,13 +1,14 @@
 from typing import Union, Literal, Any, Collection
 
-from ext.labeling import Label
 from . import IOStrategy
-from ... import StorageSpec, BatchMetadata, RenderConfig, FormatSpecification
-
+from . import SupportedFormats
+from ... import StorageSpec, BatchMetadata, RenderConfig, FormatSpecification, LabelingFormatRegistry
+from ....labeling import Label
 
 file_type = str
 extension = str
 
+@LabelingFormatRegistry.register_strategy(SupportedFormats.NORMAL.value)
 class NormalMapStrategy(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:

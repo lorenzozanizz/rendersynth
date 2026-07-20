@@ -1,24 +1,37 @@
 from typing import Union, Literal, Any, Collection
+from os.path import join
 
-from ext.labeling import Label
-from . import IOStrategy
-from ... import StorageSpec, BatchMetadata, RenderConfig, FormatSpecification
+from ..io_strategy import IOStrategy, FormatSpecification
+from ..registry import LabelingFormatRegistry
+from . import SupportedFormats
+from .. import StorageSpec
+from ....labeling.generator.data_structure import *
+from ...configurations import RenderConfig, BatchMetadata
+
 
 file_type = str
 extension = str
 
 class DepthStrategyPNG(IOStrategy):
-
     pass
 
-
+@LabelingFormatRegistry.register_strategy(SupportedFormats.DEPTH_PNG.value)
 class DepthStrategyNPZ(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:
-        pass
+        return FormatSpecification(
+            # Data structure
+            single_file_per_image=True,
+            global_metadata_required=False,
+            # Annotation grouping
+            aggregation_strategy="per_image",  # Per-image style
+            requires_class_declaration=False,
+            supports_image_metadata=True,  # Can store image size, depth, etc.
+            requires_bbox=False
+        )
 
     def serialize_image_labels(self, transformed: list[dict]) -> Collection[tuple[file_type, extension, str]]:
-        pass
+        return ()
 
     def transform_annotation(self, label: Label, shot_idx: int, shot_config: RenderConfig) -> dict[str, Any]:
         pass
@@ -31,14 +44,27 @@ class DepthStrategyNPZ(IOStrategy):
         pass
 
     def get_storage_spec(self) -> StorageSpec:
-        pass
+        return StorageSpec(
+            single_file_per_image=True
+        )
 
     def get_subdir_for(self, shot_id: Union[int,], f_type: file_type | Literal["image"]) -> str:
-        pass
+        """
+        Pascal VOC structure: images/ and annotations/ folders
+        """
+        if f_type == "image":
+            return "images/"
+        else:
+            return "depth/"
 
-    def get_filename_for(self, shot_id: Union[int,], f_type: file_type | Literal["image"]) -> str:
-        pass
+    def get_filename_for(self, shot_id: int, f_type: file_type | Literal["image"]) -> str:
+        """ Generate filename for image or annotation. """
+        base_name = f"{self.write_cfg.prefix}_{shot_id:04d}" if self.write_cfg.zero_pad else f"{self.write_cfg.prefix}_{shot_id}"
+        return base_name
 
     def ensure_directories(self) -> None:
-        pass
+        """ """
+        image_dir = join(self.write_cfg.save_path, "images/")
+        label_dir = join(self.write_cfg.save_path, "depth/")
+        self._make_dirs([image_dir, label_dir])
 
