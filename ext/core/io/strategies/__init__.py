@@ -21,6 +21,10 @@ class SupportedFormats(Enum):
     PCD_CLASS = "PCD Class"
     PCD = "PCD"
 
+    #
+    THERMAL = "Thermal"
+    DEPTH = "Depth"
+    NORMAL = "Normal"
 
 from .coco_strategy import *
 from .yolo_strategy import *

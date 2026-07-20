@@ -246,6 +246,42 @@ class PCDConfigHandler(LabelConfigHandler):
     def extract(context) -> dict:
         return {}
 
+@LabelingConfigRegistry.register(SupportedFormats.THERMAL.value)
+class ThermalHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+@LabelingConfigRegistry.register(SupportedFormats.DEPTH.value)
+class DepthHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+@LabelingConfigRegistry.register(SupportedFormats.NORMAL.value)
+class NormalHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
 class LabelConfigDataProperty(PropertyGroup):
     """
 
