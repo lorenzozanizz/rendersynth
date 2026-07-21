@@ -5,7 +5,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Union, Literal
 from os import makedirs
 
-
 class FolderStructure(metaclass=ABCMeta):
 
     @abstractmethod
@@ -42,4 +41,3 @@ class FolderStructure(metaclass=ABCMeta):
         """
         for directory in dirs:
             makedirs(directory, exist_ok=True)
-

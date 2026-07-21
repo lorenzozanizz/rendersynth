@@ -1,4 +1,4 @@
-from typing import Union, Literal, Any, Collection
+from typing import Union, Collection
 from os.path import join
 
 from ..io_strategy import IOStrategy, FormatSpecification
@@ -12,8 +12,8 @@ from ...configurations import RenderConfig, BatchMetadata
 file_type = str
 extension = str
 
-@LabelingFormatRegistry.register_strategy(SupportedFormats.NORMAL.value)
-class NormalMapStrategy(IOStrategy):
+@LabelingFormatRegistry.register_strategy(SupportedFormats.IMAGE_ONLY.value)
+class ImageOnlyStrategy(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:
         return FormatSpecification(
@@ -49,10 +49,7 @@ class NormalMapStrategy(IOStrategy):
         """
         Pascal VOC structure: images/ and annotations/ folders
         """
-        if f_type == "image":
-            return "images/"
-        else:
-            return "normals/"
+        return "images/"
 
     def get_filename_for(self, shot_id: int, f_type: file_type | Literal["image"]) -> str:
         """ Generate filename for image or annotation. """
@@ -62,6 +59,5 @@ class NormalMapStrategy(IOStrategy):
     def ensure_directories(self) -> None:
         """ """
         image_dir = join(self.write_cfg.save_path, "images/")
-        label_dir = join(self.write_cfg.save_path, "normals/")
-        self._make_dirs([image_dir, label_dir])
+        self._make_dirs([image_dir])
 

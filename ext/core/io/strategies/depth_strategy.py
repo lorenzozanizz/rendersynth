@@ -12,11 +12,9 @@ from ...configurations import RenderConfig, BatchMetadata
 file_type = str
 extension = str
 
-class DepthStrategyPNG(IOStrategy):
-    pass
 
 @LabelingFormatRegistry.register_strategy(SupportedFormats.DEPTH_PNG.value)
-class DepthStrategyNPZ(IOStrategy):
+class DepthStrategyPNG(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:
         return FormatSpecification(

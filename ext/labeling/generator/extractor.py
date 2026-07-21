@@ -101,6 +101,22 @@ class Extractor(metaclass=ABCMeta):
 
     @staticmethod
     def prepare_for_shot(shot_idx: int) -> None:
+        """
+
+        :param shot_idx:
+        :return:
+        """
+        # For the default implementation, simply ignore the preparation: nothing needs
+        # to be set up.
+        return
+
+    @staticmethod
+    def finalize_shot(shot_idx: int) -> None:
+        """
+
+        :param shot_idx:
+        :return:
+        """
         # For the default implementation, simply ignore the preparation: nothing needs
         # to be set up.
         return

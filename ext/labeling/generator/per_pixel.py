@@ -1,16 +1,19 @@
 from contextlib import AbstractContextManager
 from typing import Callable, Union
 from pathlib import Path
+import os
 
 from ..compositing_utils import NodeCompositor
 
-from ..writing_folder_structure import FolderStructure
 from ...utils.timer import TimingContext
 
 from ..class_engine import ClassificationEngine
 
 from .extractor import Extractor
 from .data_structure import *
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ...core.io.io_strategy import IOStrategy
 
 class PixelMapExtractor(Extractor):
     """
@@ -32,7 +35,7 @@ class PixelMapExtractor(Extractor):
         self.datatype = datatype
         self.normalized_depth = normalize_depth
 
-        self.declared_strategy: Optional[FolderStructure] = None
+        self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
 
     def extract(self,
@@ -161,14 +164,17 @@ class PixelMapExtractor(Extractor):
             self.compositor.delete_node_group('depth_tree')
             self.compositor.unregister_group('depth_tree')
 
-        def set_write_path(self, path: Union[str, Path]) -> None:
+        def set_write_path(self, directory: Union[str, Path], name: str) -> None:
             node = self.compositor.get_node('file_output')
             if node is None:
                 return
-            node.base_path = path
-
+            node.base_path = directory
+            node.file_slots[0].path = name
 
     class CompositorNormalContext:
+        """
+
+        """
 
         name_types_normals = {
             'render_layer': ('CompositorNodeRLayers', []),
@@ -246,11 +252,12 @@ class PixelMapExtractor(Extractor):
             self.compositor.delete_node_group('normal')
             self.compositor.unregister_group('normal')
 
-        def set_write_path(self, path: Union[str, Path]) -> None:
+        def set_write_path(self, directory: Union[str, Path], name: str) -> None:
             node = self.compositor.get_node('file_output')
             if node is None:
                 return
-            node.base_path = path
+            node.base_path = directory
+            node.file_slots[0].path = name
 
     def get_context(self) -> AbstractContextManager:
         config = {
@@ -270,11 +277,15 @@ class PixelMapExtractor(Extractor):
         if self.declared_strategy is None:
             pass
         else:
-            map_path = self.declared_strategy.get_filename_for(shot_idx, "map")
-            self.active_output_context_node.set_write_path(map_path)
+            write_dir = self.declared_strategy.get_full_dir_for(shot_idx, "map")
+            filename = self.declared_strategy.get_filename_for(shot_idx, "map")
+            self.active_output_context_node.set_write_path(write_dir, filename)
+            # map_path = self.declared_strategy.get_full_path_for(shot_idx, "map")
+            # print("Setting as output path: ", map_path)
+            # self.active_output_context_node.set_write_path(map_path)
         return
 
-    def declare_folder_structure(self, folder_strategy: FolderStructure) -> None:
+    def declare_folder_structure(self, folder_strategy: "IOStrategy") -> None:
         """
 
         :param folder_strategy:
@@ -283,3 +294,26 @@ class PixelMapExtractor(Extractor):
         # The default implementation ignores the folder structure as it does not
         # require it.
         self.declared_strategy = folder_strategy
+
+    def finalize_shot(self, shot_idx: int) -> None:
+        """
+
+        :param shot_idx:
+        :return:
+        """
+        if self.declared_strategy is None or self.active_output_context_node is None:
+            return
+
+        directory = self.declared_strategy.get_full_dir_for(shot_idx, "map")
+        prefix = self.declared_strategy.get_filename_for(shot_idx, "map")
+        frame = self.ctx.scene.frame_current  # whatever Blender used as suffix for the current frame,
+        # which is what is getting appended to the output of the compositor
+        ext = ".png"  # or read from config/format
+
+        produced = os.path.join(directory, f"{prefix}{frame:04d}{ext}")
+        target = os.path.join(directory, f"{prefix}{ext}")
+
+        if os.path.exists(produced) and produced != target:
+            if os.path.exists(target):
+                os.remove(target)
+            os.rename(produced, target)

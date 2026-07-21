@@ -12,7 +12,7 @@ from pathlib import Path
 from .configurations import LabelExtractionConfig, RenderConfig, GenerationConfig, BatchMetadata
 
 from .io import OutputWriter
-from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor, PixelMapExtractor
+from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor, PixelMapExtractor, EmptyExtractor
 
 from ..labeling.generator import LabelData
 from ..labeling.class_engine import ClassificationEngine
@@ -92,6 +92,10 @@ class ExtractorRepository:
         elif matches(
             labeling_format, (SupportedFormats.THERMAL.value,)
         ): return None
+
+        elif matches(
+            labeling_format, (SupportedFormats.IMAGE_ONLY.value,)
+        ): return EmptyExtractor(data)
 
         return None
 
@@ -248,3 +252,6 @@ class LabelingOrchestrator:
 
     def prepare_for_shot(self, shot_idx: int) -> None:
         self.extractor.prepare_for_shot(shot_idx=shot_idx)
+
+    def terminate_preparation(self, shot_idx):
+        self.extractor.finalize_shot(shot_idx=shot_idx)

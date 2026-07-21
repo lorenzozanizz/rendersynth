@@ -110,6 +110,8 @@ class Executor:
                             scene.render.filepath = write_path
                             bpy.ops.render.render(write_still=True)
 
+                            self.labeling_orchestrator.terminate_preparation(shot_idx=shot_idx)
+
                             # Run generation pipeline (handles extraction + formatting)
                             self.labeling_orchestrator.process_shot(
                                 render_cfg,

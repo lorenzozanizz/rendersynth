@@ -282,6 +282,20 @@ class NormalHandler(LabelConfigHandler):
         return {}
 
 
+@LabelingConfigRegistry.register(SupportedFormats.IMAGE_ONLY.value)
+class NormalHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        layout.label(text="No configuration required")
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+
 class LabelConfigDataProperty(PropertyGroup):
     """
 

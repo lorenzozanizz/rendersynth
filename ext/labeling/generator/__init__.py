@@ -6,6 +6,7 @@ from .bounding_box import BoundingBoxExtractor
 from .convex_hull import PolygonExtractor
 from .landmarks import LandmarksExtractor
 from .per_pixel import PixelMapExtractor
+from .empty import EmptyExtractor
 from .extractor import Extractor
 
 from .data_structure import *

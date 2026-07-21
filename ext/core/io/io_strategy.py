@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from collections.abc import Collection
 from contextlib import nullcontext, AbstractContextManager
+from os.path import join
 
 from ...labeling.generator.data_structure import *
 from ..configurations import RenderConfig, BatchMetadata, WritingConfig
 
-# This is requierd here for typing purposes, for some reason pycharm does not detect
+# This is required here for typing purposes, for some reason pycharm does not detect
 # the dataclasses below with the reimport
 from dataclasses import dataclass
 
@@ -120,3 +121,19 @@ class IOStrategy(FolderStructure, metaclass=ABCMeta):
         :return:
         """
         return
+
+
+    # If a substrategy wants to change this path and directory utilities, it can
+    # easily override them dynamically.
+    def get_full_dir_for(self, shot_idx: int, f_type: str) -> str:
+        """ Absolute-ish directory (rooted at write_cfg.save_path) a file of this
+        type would be written into.  """
+        return join(self.write_cfg.save_path, self.get_subdir_for(shot_idx, f_type))
+
+    def get_full_path_for(self, shot_idx: int, f_type: str, ext: str = "") -> str:
+        """ Get the full file path (dir + filename [+ ext]) for a given content to be
+        serialized. """
+        if ext and not ext.startswith("."):
+            ext = f".{ext}"
+        filename = self.get_filename_for(shot_idx, f_type)
+        return join(self.get_full_dir_for(shot_idx, f_type), filename) + ext

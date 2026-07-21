@@ -109,10 +109,13 @@ class OutputWriter:
             if not ext.startswith("."):
                 ext = f".{ext}"
 
-            name = self.io_strategy.get_filename_for(self.shot_idx, f_type=file_type)
-            path = self.io_strategy.get_subdir_for(self.shot_idx, f_type=file_type)
+            write_dir = self.io_strategy.get_full_path_for(self.shot_idx, file_type, ext)
+            # name = self.io_strategy.get_filename_for(self.shot_idx, f_type=file_type)
+            # path = self.io_strategy.get_subdir_for(self.shot_idx, f_type=file_type)
+            # write_dir = join(self.config.save_path, path, name) + ext
+            # ^ Previous version of the code, changed after extending the IOStrategy to expose fully
+            # writing paths for the given strategy.
 
-            write_dir = join(self.config.save_path, path, name) + ext
             with open(write_dir, 'w') as f:
                 f.write(file_content)
 
@@ -143,8 +146,6 @@ class OutputWriter:
             # some indexes are already present, start counting from the last
             return self._analyze_folder_last_index(self.get_image_folder(), prefix)
         return 0
-
-
 
     @staticmethod
     def _analyze_folder_last_index(path_root: str | Path, prefix) -> int:
