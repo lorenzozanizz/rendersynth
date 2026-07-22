@@ -25,6 +25,7 @@ class Executor:
         self.ctx = context
         self.parameters: GenerationConfig = gen_params
         self.write_params = write_params
+        self.labeling_params = label_params
         self.reporter = reporter
 
         self.pipeline: ExecutablePipeline = ExecutablePipeline(self.ctx, data, reporter)
@@ -102,22 +103,24 @@ class Executor:
                             # require to sample the pixel colors directly from the rendered scene!
                             write_path = self.writer.get_image_write_path()
 
-                            # The orchestrator may need to prepare some things before acting. e.g.
-                            # change compositor nodes.
-                            self.labeling_orchestrator.prepare_for_shot(shot_idx=shot_idx)
+                            if self.labeling_params.write_labels:
+                                # The orchestrator may need to prepare some things before acting. e.g.
+                                # change compositor nodes.
+                                self.labeling_orchestrator.prepare_for_shot(shot_idx=shot_idx)
 
                             # Renders
                             scene.render.filepath = write_path
                             bpy.ops.render.render(write_still=True)
 
-                            self.labeling_orchestrator.terminate_preparation(shot_idx=shot_idx)
+                            if self.labeling_params.write_labels:
+                                self.labeling_orchestrator.terminate_preparation(shot_idx=shot_idx)
 
-                            # Run generation pipeline (handles extraction + formatting)
-                            self.labeling_orchestrator.process_shot(
-                                render_cfg,
-                                rendered_data_path=write_path,
-                                depsgraph=self.ctx.evaluated_depsgraph_get()
-                            )
+                                # Run generation pipeline (handles extraction + formatting)
+                                self.labeling_orchestrator.process_shot(
+                                    render_cfg,
+                                    rendered_data_path=write_path,
+                                    depsgraph=self.ctx.evaluated_depsgraph_get()
+                                )
 
 
                         # ^ Frame context exits here—restores frame-level state, required for
