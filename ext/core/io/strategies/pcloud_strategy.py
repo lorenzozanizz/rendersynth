@@ -316,3 +316,227 @@ class PCDFormatter(IOStrategy):
     - Each annotation is independent (entities may share points)
     """.replace('    ', '')
     # note: we remove the beginning tabs to avoid an ugly indentation in the README
+
+@LabelingFormatRegistry.register_strategy(SupportedFormats.PCD_CLASS.value)
+class PCDClassFormatter(PCDFormatter):
+    """ Point Cloud Data (PCD) format writer -- position + class only.
+
+    Same as PCDFormatter (PCD_CLASS_COLOR), but the per-point PCD content
+    omits the r, g, b fields. Class/metadata bookkeeping (classes.json,
+    annotations.json) is unchanged, since class information is still written.
+    """
+
+    def _generate_pcd_content(self, point_cloud: set, class_id: int, class_name: str) -> str:
+        """ Generate PCD file content with position + class, no color. """
+        point_count = len(point_cloud)
+        lines = [
+            "# .PCD - Point Cloud Data file format\n",
+            f"# Generated from Blender annotation system with Rendersynth\n",
+            f"# Class: {class_name} (ID: {class_id})\n",
+            "VERSION .7\n", "FIELDS x y z class\n",
+            "SIZE 4 4 4 4\n", "TYPE f f f u\n", f"COUNT {point_count}\n",
+            f"WIDTH {point_count}\n", "HEIGHT 1\n",
+            "VIEWPOINT 0 0 0 1 0 0 0\n", f"POINTS {point_count}\n",
+            "DATA ascii\n"
+        ]
+
+        # Define fields: x, y, z (position) + class (label). Color is dropped.
+        for point_data in point_cloud:
+            # Handle both unpacked tuples and direct point data
+            if isinstance(point_data, tuple) and len(point_data) == 2:
+                point_xyz, _rgb_color = point_data
+            else:
+                # Fallback: assume it's a point with embedded color info
+                point_xyz = point_data[:3]
+
+            x, y, z = point_xyz
+
+            # Format: x y z class_id
+            line = (
+                f"{x:.{self.coordinate_precision}f} "
+                f"{y:.{self.coordinate_precision}f} "
+                f"{z:.{self.coordinate_precision}f} "
+                f"{class_id}\n"
+            )
+            lines.append(line)
+
+        return "".join(lines)
+
+    def finalize(self, aggregated: dict[str, Any]) -> Collection[tuple[file_type, extension, str]]:
+        """ Finalize output: create metadata and class definition files. """
+        output_files = []
+
+        classes_content = json.dumps({
+            'classes': [
+                {'id': cid, 'name': cname}
+                for cid, cname in sorted(self.class_registry.items())
+            ],
+            'total_classes': len(self.class_registry),
+        }, indent=2)
+        output_files.append(('classes', '.json', classes_content))
+
+        annotations_content = json.dumps({
+            'annotations': aggregated['annotations'],
+            'batch_info': aggregated['batch_metadata'],
+            'format': 'PCD_CLASS',
+            'total_annotations': len(aggregated['annotations']),
+        }, indent=2, default=str)
+        output_files.append(('annotations', '.json', annotations_content))
+
+        output_files.append(('README', '.md', PCDClassFormatter.README_CONTENT))
+
+        return tuple(output_files)
+
+    README_CONTENT = """# Point Cloud Dataset (PCD Class Format)
+    ## Structure
+    
+    point_clouds/         - Individual .pcd files (one per annotation)
+    metadata/
+      - classes.json    - Class definitions and mappings
+      - annotations.json - Annotation metadata and point cloud references
+      - README.md       - This file
+    
+    ## PCD File Format
+    
+    Each .pcd file contains point cloud data with the following fields:
+    
+    - **x, y, z** (float): 3D coordinates in camera space
+    - **class** (uint32): Class ID for semantic labeling
+    
+    Color is not written for this format.
+    
+    ### Example Header
+    
+    # .PCD v.7 - Point Cloud Data file format
+    VERSION .7
+    FIELDS x y z class
+    SIZE 4 4 4 4
+    TYPE f f f u
+    POINTS 1000
+    DATA ascii
+    
+    ## Classes
+    
+    Classes are defined in classes.json:
+    {
+      "classes": [
+        {"id": 0, "name": "background"},
+        {"id": 1, "name": "person"}
+      ],
+      "total_classes": 2
+    }
+    
+    ## Metadata
+    
+    Annotation metadata is stored in `annotations.json` with:
+    - Point cloud reference
+    - Class assignment
+    - Visibility scores
+    - Bounding box data (if available)
+    
+    ## Notes
+    
+    - All coordinates are in camera-centric space (-1 to 1)
+    - Each annotation is independent (entities may share points)
+    """.replace('    ', '')
+    # note: we remove the beginning tabs to avoid an ugly indentation in the README
+
+
+@LabelingFormatRegistry.register_strategy(SupportedFormats.PCD.value)
+class PCDPlainFormatter(PCDFormatter):
+    """ Point Cloud Data (PCD) format writer -- position only.
+
+    Same as PCDFormatter (PCD_CLASS_COLOR), but the per-point PCD content
+    omits both color and class fields.
+    """
+
+    def _generate_pcd_content(self, point_cloud: set, class_id: int, class_name: str) -> str:
+        """ Generate PCD file content with position only, no color/class. """
+        point_count = len(point_cloud)
+        lines = [
+            "# .PCD - Point Cloud Data file format\n",
+            f"# Generated from Blender annotation system with Rendersynth\n",
+            "VERSION .7\n", "FIELDS x y z\n",
+            "SIZE 4 4 4\n", "TYPE f f f\n", f"COUNT {point_count}\n",
+            f"WIDTH {point_count}\n", "HEIGHT 1\n",
+            "VIEWPOINT 0 0 0 1 0 0 0\n", f"POINTS {point_count}\n",
+            "DATA ascii\n"
+        ]
+
+        # Only position (x, y, z) is written -- color and class are dropped.
+        for point_data in point_cloud:
+            # Handle both unpacked tuples and direct point data
+            if isinstance(point_data, tuple) and len(point_data) == 2:
+                point_xyz, _rgb_color = point_data
+            else:
+                # Fallback: assume it's a point with embedded color info
+                point_xyz = point_data[:3]
+
+            x, y, z = point_xyz
+
+            # Format: x y z
+            line = (
+                f"{x:.{self.coordinate_precision}f} "
+                f"{y:.{self.coordinate_precision}f} "
+                f"{z:.{self.coordinate_precision}f}\n"
+            )
+            lines.append(line)
+
+        return "".join(lines)
+
+    def finalize(self, aggregated: dict[str, Any]) -> Collection[tuple[file_type, extension, str]]:
+        """ Finalize output: create metadata files (no classes.json, since
+        no class information is written for this format). """
+        output_files = []
+
+        annotations_content = json.dumps({
+            'annotations': aggregated['annotations'],
+            'batch_info': aggregated['batch_metadata'],
+            'format': 'PCD',
+            'total_annotations': len(aggregated['annotations']),
+        }, indent=2, default=str)
+        output_files.append(('annotations', '.json', annotations_content))
+
+        output_files.append(('README', '.md', PCDPlainFormatter.README_CONTENT))
+
+        return tuple(output_files)
+
+    README_CONTENT = """# Point Cloud Dataset (PCD Format)
+    ## Structure
+    
+    point_clouds/         - Individual .pcd files (one per annotation)
+    metadata/
+      - annotations.json - Annotation metadata and point cloud references
+      - README.md       - This file
+    
+    ## PCD File Format
+    
+    Each .pcd file contains point cloud data with the following fields:
+    
+    - **x, y, z** (float): 3D coordinates in camera space
+    
+    Neither color nor class is written for this format.
+    
+    ### Example Header
+    
+    # .PCD v.7 - Point Cloud Data file format
+    VERSION .7
+    FIELDS x y z
+    SIZE 4 4 4
+    TYPE f f f
+    POINTS 1000
+    DATA ascii
+    
+    ## Metadata
+    
+    Annotation metadata is stored in `annotations.json` with:
+    - Point cloud reference
+    - Visibility scores
+    - Bounding box data (if available)
+    
+    ## Notes
+    
+    - All coordinates are in camera-centric space (-1 to 1)
+    - Each annotation is independent (entities may share points)
+    """.replace('    ', '')
+    # note: we remove the beginning tabs to avoid an ugly indentation in the README
