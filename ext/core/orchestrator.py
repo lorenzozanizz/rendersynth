@@ -61,7 +61,7 @@ class ExtractorRepository:
         # IOStrategy uses to distinguish the three formats
         elif matches(labeling_format, (
             SupportedFormats.COCO.value, SupportedFormats.PASCAL_VOC.value,
-            SupportedFormats.CVAT_XML_IMAGES.value
+            SupportedFormats.CVAT_XML_IMAGES.value, SupportedFormats.ULTRALYTICS_YOLO.value,
         )): return BoundingBoxExtractor(data)
 
         # For the keypoints format extraction, the landmarks extractor is necessary to
