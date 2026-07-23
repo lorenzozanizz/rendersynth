@@ -83,8 +83,8 @@ class Label:
     polygon: list[tuple[float, float]] = None
     segmentation: list[int] = None # run length encoding
     point_cloud: Iterable = None
-    # depth maps, normal maps, etc... (numpy arrays usually)
-    per_pixel_map = None
+    # depth maps, normal maps, etc... (path to the generated image on disk)
+    per_pixel_map: Optional[str] = None
 
     # Skeleton/landmark geometry, used when annotation_type == "keypoints"
     keypoints: list[KeypointAnnotation] = None
