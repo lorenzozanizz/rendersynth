@@ -92,11 +92,6 @@ class ExtractorRepository:
         elif matches(
             labeling_format, (SupportedFormats.THERMAL.value,)
         ): return None
-
-        elif matches(
-            labeling_format, (SupportedFormats.IMAGE_ONLY.value,)
-        ): return EmptyExtractor(data)
-
         return None
 
 class LabelingOrchestrator:

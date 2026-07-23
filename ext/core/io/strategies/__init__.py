@@ -10,9 +10,6 @@ class SupportedFormats(Enum):
     """
 
     #
-    IMAGE_ONLY = "Media Only"
-
-    #
     ULTRALYTICS_YOLO = "Ultralytics YOLO"
     COCO = "COCO"
     COCO_SEGMENTATION = "COCO Segmentation"

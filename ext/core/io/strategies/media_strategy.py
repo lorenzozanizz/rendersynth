@@ -12,7 +12,6 @@ from ...configurations import RenderConfig, BatchMetadata
 file_type = str
 extension = str
 
-@LabelingFormatRegistry.register_strategy(SupportedFormats.IMAGE_ONLY.value)
 class ImageOnlyStrategy(IOStrategy):
 
     def get_specification(self) -> FormatSpecification:
