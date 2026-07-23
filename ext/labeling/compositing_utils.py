@@ -31,8 +31,7 @@ class NodeCompositor:
         # extract the scene node_tree which is the composite tree.
         # self.tree = self.ctx.scene.node_tree
         self.tree = getattr(scene, "node_tree", None)
-        print("Scene of the compositor", self.ctx.scene)
-        print("Context of the compositor", self.tree)
+
         if self.tree is None:
             self.tree = getattr(scene, "compositing_node_group", None)
 
@@ -94,7 +93,6 @@ class NodeCompositor:
                 raise RuntimeError(f"Cannot set node defaults for node {name}")
 
             for assignment in info:
-                print(assignment)
                 if len(assignment) == 3:
                     socket, index, v = assignment
                     # vector item to assign

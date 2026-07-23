@@ -1,4 +1,4 @@
-""" Random Dataset Generator for Blender
+""" Rendersynth, an extension for Blender
 
 This addon generates synthetic datasets by applying randomized
 transformations to objects in the scene and rendering multiple images.
@@ -13,8 +13,8 @@ Features:
 - Export datasets for computer vision pipelines (YOLO)
 
 
-GitHub: https://github.com/lorenzozanizz/synth-blender-dataset
-Documentation: https://github.com/lorenzozanizz/synth-blender-dataset/wiki
+GitHub: https://github.com/lorenzozanizz/rendersynth
+Documentation: https://lorenzozanizz.github.io/rendersynth/
 
 
 Version: 1.0.0
@@ -23,7 +23,7 @@ License: MIT
 """
 
 bl_info = {
-    "name": "Random Dataset Generator",
+    "name": "Rendersynth",
     "author": "lorenzozanizz",
     "version": (1, 0, 0),
     "blender": (4, 5, 0),

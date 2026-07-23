@@ -36,7 +36,6 @@ class KeypointsPreviewRenderer(PreviewRenderer):
         width: int, height: int, style: PreviewStyle,
     ) -> Optional[str]:
 
-        print("Im rendering the skeeltonozzos diddio")
         # Visual weight for keypoint dots and skeleton connectors, kept independent of
         # PreviewStyle.geometry_line_width since normally keypoints are much smaller shapes than
         # a bbox/polygon outline.

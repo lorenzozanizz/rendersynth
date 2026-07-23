@@ -47,7 +47,7 @@ User can also specify named classes and assign classes to blender objects. Multi
 1. Download the repository and select the /ext/ extension archive and compress it as a `.zip` archive. 
 2. In Blender, navigate to **Edit → Preferences → Add-ons**
 3. Click **Install...** and select the downloaded `.zip` file
-4. Enable the addon by checking the box next to "Random Dataset Generator"
+4. Enable the addon by checking the box next to "Rendersynth"
 
 The addon will appear in the 3D Viewport sidebar under the **Synthetic** panel.
 

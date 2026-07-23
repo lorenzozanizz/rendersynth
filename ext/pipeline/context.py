@@ -34,7 +34,7 @@ class FrameContext:
             try:
                 ctx.__exit__(exc_type, exc_val, exc_tb)
             except Exception as e:
-                print(f"Error exiting frame context: {e}")
+                UniqueLogger.quick_log(f"Error exiting frame context: {e}")
         return False
 
 
@@ -73,7 +73,7 @@ class NestedPipelineContext:
             try:
                 ctx.__exit__(exc_type, exc_val, exc_tb)
             except Exception as e:
-                print(f"Error exiting global context: {e}")
+                UniqueLogger.quick_log(f"Error exiting global context: {e}")
         return False
 
 

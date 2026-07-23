@@ -1,7 +1,7 @@
-schema_version = "0.9.2"
+schema_version = "1.0.0"
 
 id = "rendersynth"
-version = "0.9.2"
+version = "1.0.0"
 name = "Rendersynth"
 tagline = "A blender extension to generate and label synthetic data for Computer Vision"
 maintainer = "lorenzozanizz"
