@@ -6,55 +6,18 @@ from .configurations import PreviewRenderConfig, LabelExtractionConfig, RenderCo
 from .orchestrator import LabelingOrchestrator
 
 from ..labeling.generator import LabelData
-from ..labeling.bpy_properties import LabelClass
-from ..labeling.conversions import convert_geometry_camera_to_absolute_y_inverted, convert_camera_centered_to_absolute_pixels
-from ..labeling.ray_casting import geometry_bounds
+from ..labeling.preview_renderers import PreviewRendererRegistry, PreviewStyle
 from ..pipeline.bpy_properties import PipelineData
 from ..pipeline.context import NestedPipelineContext
 
 from ..utils.timer import TimingContext
-from ..utils.images import (draw_bounding_box, draw_bitmap_text, font_size_fit_box_perc,
-                            estimate_text_pixel_height, draw_polygon)
+from ..utils.images import PixelCanvas, draw_bitmap_text, font_size_fit_box_perc, estimate_text_pixel_height
 
-from dataclasses import dataclass
-from typing import Dict, Iterable, Literal, Union
+from typing import Dict, Literal, Iterable
 import tempfile
 import os
 
 import bpy
-
-
-@dataclass
-class PreviewRenderData:
-    """
-    Data container representing a single annotated object in the preview render.
-
-    Stores all relevant information required to draw annotations such as bounding
-    boxes or polygons, including object identity, classification, geometry, and
-    visibility. LabelData is converted into a list of such objects before drawing.
-
-    :param obj_name: Name of the object or entity
-    :param visibility: Estimated visibility, if computed (0.0 to 1.0 as percentage)
-    :param cls: Associated label class
-    :param geometry: Geometry representation (bounding box, polygon, or some other structure)
-    :param is_entity: Whether the item represents an entity rather than a standard object
-    :param type: Type of annotation ("bbox" or "polygon")
-    """
-
-    obj_name: str
-    visibility: float
-    cls: LabelClass
-
-    geometry: Union[
-        tuple,  # bbox: (x, y, w, h)
-        list[tuple],  # polygon: [(x1,y1), (x2,y2), ...]
-        dict  # flexible structure
-    ]
-
-    is_entity: bool
-    type: Literal["bbox", "polygon"]  # "bbox", "polygon", "depth"
-
-    ideal_bbox: tuple[float, float, float, float] = None
 
 
 class PreviewGenerator:
@@ -65,9 +28,18 @@ class PreviewGenerator:
     and as a renderer, rendering the scene to a temporary image and overlaying annotation
     data such as bounding boxes, polygons, class labels.
     It also times statistics for debugging and visualization purposes.
+
+    Drawing itself is delegated per-label to whatever PreviewRenderer is registered
+    for that label's annotation_type (see preview_renderers): this class
+    only handles picking which image ends up displayed, batching "overlay" renderers
+    onto a single PixelCanvas, and the housekeeping around rendering the shot.
     """
 
     _preview_name = "__randomizer_preview.png"
+    # Single, reused shot slot for preview generation: every preview run overwrites
+    # the same temp files rather than accumulating a history, since only the latest
+    # preview is ever shown
+    _preview_shot_idx = 0
 
     def __init__(self, context, data: PipelineData,
                  parameters: PreviewRenderConfig,
@@ -105,6 +77,13 @@ class PreviewGenerator:
             writer=None
         )
 
+        # Some extractors (e.g. PixelMapExtractor, for depth/normal formats) write
+        # files themselves outside the normal writer pipeline and need to know a
+        # write location even though preview has no real OutputWriter. This does nothing
+        # for extractors who don't need it.
+        self.label_temp_dir = os.path.join(tempfile.gettempdir(), "randomizer_preview_labels")
+        self.labeling_orchestrator.declare_temp_folder_structure(self.label_temp_dir)
+
     def compile_contexts(self) -> NestedPipelineContext:
         """ Obtains the context manager from the pipeline. The context manager has two
         context levels: a full context which restores the total state before the execution, and
@@ -139,31 +118,40 @@ class PreviewGenerator:
                 # Execute pipeline
                 self.pipeline.execute()
 
-
                 # We render in a temp path
                 scene.render.filepath = self.path
-                with TimingContext(self.timings, 'render'):
-                    bpy.ops.render.render(write_still=True)
 
-                default_camera = self.ctx.scene.camera
-                if not default_camera:
-                    self.reporter.report({'WARNING'}, "No default camera was set, no labels preview could be generated")
-                else:
-                    self.used_camera = default_camera
-                    render_cfg = RenderConfig(
-                        height=scene.render.resolution_x,
-                        width=scene.render.resolution_y,
-                        image_ext=scene.render.image_settings.file_format,
-                        camera=default_camera,
-                    )
+                # Extractors that write files themselves outside the normal writer
+                # pipeline (e.g. PixelMapExtractor, driving the compositor directly)
+                # need the same prepare-render-finalize lifecycle a real batch run
+                # gives them via generation.py's per-shot loop
+                with self.labeling_orchestrator.get_extraction_context():
+                    self.labeling_orchestrator.prepare_for_shot(shot_idx=self._preview_shot_idx)
 
-                    with TimingContext(self.timings, 'labeling'):
-                        self.labeling_orchestrator.process_shot(
-                            render_cfg=render_cfg,
-                            rendered_data_path=self.path,
-                            depsgraph=self.ctx.evaluated_depsgraph_get()
+                    with TimingContext(self.timings, 'render'):
+                        bpy.ops.render.render(write_still=True)
+
+                    self.labeling_orchestrator.terminate_preparation(shot_idx=self._preview_shot_idx)
+
+                    default_camera = self.ctx.scene.camera
+                    if not default_camera:
+                        self.reporter.report(
+                            {'WARNING'}, "No default camera was set, no labels preview could be generated")
+                    else:
+                        self.used_camera = default_camera
+                        render_cfg = RenderConfig(
+                            height=scene.render.resolution_x,
+                            width=scene.render.resolution_y,
+                            image_ext=scene.render.image_settings.file_format,
+                            camera=default_camera,
                         )
 
+                        with TimingContext(self.timings, 'labeling'):
+                            self.labeling_orchestrator.process_shot(
+                                render_cfg=render_cfg,
+                                rendered_data_path=self.path,
+                                depsgraph=self.ctx.evaluated_depsgraph_get()
+                            )
 
         # ^ Global contexts exit here—restores global state
 
@@ -185,9 +173,25 @@ class PreviewGenerator:
             bpy.data.images.remove(img)
         bpy.ops.image.open(filepath=self.path)
 
+    @staticmethod
+    def _swap_displayed_image(path: str) -> "bpy.types.Image":
+        """ Replace the image currently shown in the render window with the image
+        at path (e.g. a depth/normal map written by the compositor), removing
+        whatever was already loaded under that name first so Blender doesn't reuse
+        outdated cached pixel data.
+
+        :param path: Filesystem path of the image to display.
+        :return: The newly (re)loaded Blender image.
+        """
+        name = Path(path).name
+        if img := bpy.data.images.get(name):
+            bpy.data.images.remove(img)
+        bpy.ops.image.open(filepath=path)
+        return bpy.data.images[name]
+
     def display_and_render_preview(self,
                                    show_obj_name: bool = True,
-                                   show_class_name_or_id: str = "id",
+                                   show_class_name_or_id: Literal["id", "name", "none"] = "id",
                                    show_obj_geometry: bool = True,
                                    show_entity: bool = True,
                                    ignore_default_class: str = "",
@@ -210,98 +214,70 @@ class PreviewGenerator:
         self._open_render_f12_menu()
 
         scene = self.ctx.scene
-        img = bpy.data.images[PreviewGenerator._preview_name]
+        label_data: LabelData = self.labeling_orchestrator.get_last_label_data()
 
         # self.visible is a { object, bounding_box } dictionary, but the extraction may have failed
-        if not self.labeling_orchestrator.get_last_label_data():
+        if not label_data:
             return
 
         width = int(scene.render.resolution_x * scene.render.resolution_percentage / 100)
         height = int(scene.render.resolution_y * scene.render.resolution_percentage / 100)
 
-        render_data = PreviewGenerator.make_preview_render_data(self.labeling_orchestrator.get_last_label_data())
+        style = PreviewStyle(
+            show_obj_name=show_obj_name,
+            show_class_name_or_id=show_class_name_or_id,
+            show_geometry=show_obj_geometry,
+            show_visibility=show_visibility,
+            max_preview_points=self.parameters.max_preview_points,
+        )
+
+        # Defaults to the RGB render; a "replace"-mode label (e.g. a per-pixel
+        # depth/normal map) swaps this out entirely, below.
+        displayed_img = bpy.data.images[PreviewGenerator._preview_name]
+
         with TimingContext(self.timings, 'annotating'):
-            for data in render_data:
-
-                match_class = data.cls
-                # Only classified objects have a bounding box and label info
-                if not match_class:
-                    continue
-                elif ignore_default_class and match_class.name == ignore_default_class:
-                    continue
-                if data.is_entity and not show_entity:
+            overlay_labels = []
+            for label in label_data:
+                renderer_cls = PreviewRendererRegistry.get_for(label.annotation_type)
+                if renderer_cls is None:
+                    # No renderer registered for this annotation_type: nothing to draw.
                     continue
 
-                # Draw the information related to the object, conditional on the render flags and
-                # the preview settings.
-                self._render_object_info(img, data, width, height,
-                     show_class_name_or_id=show_class_name_or_id, show_geometry=show_obj_geometry,
-                     show_obj_name=show_obj_name, show_visibility=show_visibility)
+                if renderer_cls.display_mode == "replace":
+                    # The annotation IS the image (e.g. a depth/normal map already
+                    # rendered to disk): swap the displayed image instead of drawing
+                    # an overlay. A preview run only ever uses one extractor/format,
+                    # so this never coexists with "overlay" labels in practice --
+                    # there is nothing meaningful to overlay on a depth/normal map
+                    # even if it did.
+                    replacement_path = renderer_cls().render(None, label, (0, 0, 0, 0), width, height, style)
+                    if replacement_path:
+                        displayed_img = self._swap_displayed_image(replacement_path)
+                    continue
+
+                # Only classified objects have class/name info to draw.
+                if not label.cls:
+                    continue
+                if ignore_default_class and label.cls.name == ignore_default_class:
+                    continue
+                if label.is_entity and not show_entity:
+                    continue
+
+                overlay_labels.append((label, renderer_cls))
+
+            if overlay_labels:
+                canvas = PixelCanvas(displayed_img)
+                for label, renderer_cls in overlay_labels:
+                    color = tuple(label.cls.color)
+                    renderer_cls().render(canvas, label, color, width, height, style)
+
+                # Overwrite the image buffer only once, avoiding the previious terrible
+                # performance effect that would overwrite the image for every geometry piece
+                # (box, point, etc...)
+                canvas.flush()
 
         if show_rendering_time:
-            self._render_bottom_left_time_stats(img, width)
-
-    def _render_object_info(self, img, data: PreviewRenderData, width: int, height: int,
-                            # Flags which are used to conditionally draw various elements in the object info
-                            show_geometry: bool = True, show_obj_name: bool = True,
-                            show_class_name_or_id: str = "id", show_visibility: bool = True,
-                            show_unoccluded_bbox: bool = False) -> None:
-        """ Renders information (geometry, object name, class id, estimated visibility) ù
-        for a single object starting from its PreviewRanderData
-
-        :param img: the blender img object
-        :param width: width of the canvas
-        :param height: height of the canvas
-        :param show_geometry: whether to show geometry of the object
-        :param show_obj_name: whether to show object name
-        :param show_class_name_or_id: whether to show class name or id
-        :param show_visibility: whether to show estimated visibility
-        :param show_unoccluded_bbox: whether to show unoccluded bbox
-        """
-        # new_xyxy is the bounding box in pixel integer space
-        # We have to invert the ys, because blender image pixel API has the y values of the bottom row
-        # as 0, which is the opposite way
-
-        # Residue from the old implementation, which could only handle bboxes
-        # new_xyxy = convert_camera_centered_to_absolute_pixels_y_inverted(xyxy, width, height)
-        # p0 = (new_xyxy[0], new_xyxy[1])
-        # p1 = (new_xyxy[2], new_xyxy[3])
-
-        pixel_geo = convert_geometry_camera_to_absolute_y_inverted(data.geometry, width, height)
-
-        color_prop = tuple(data.cls.color)
-        color = (color_prop[0], color_prop[1], color_prop[2], color_prop[3])
-
-        # box_width = abs(new_xyxy[0] - new_xyxy[2])
-        x_min, y_min, x_max, y_max = geometry_bounds(pixel_geo)
-        geometry_width = int(abs(x_max-x_min))
-        # Draw the bounding box first, so that the text is visible in all cases, hopefully.
-        if show_geometry:
-            self._render_geometry(img, color, line_width=7, pixel_space_geometry=pixel_geo)
-        if show_unoccluded_bbox:
-            unoccluded_pixel_geo = convert_camera_centered_to_absolute_pixels(data.ideal_bbox, width, height)
-            self._render_geometry(img, color, line_width=2, pixel_space_geometry=unoccluded_pixel_geo)
-        if show_obj_name or (show_class_name_or_id != "none"):
-
-            text = f"" if show_class_name_or_id == "none" else \
-                f" {data.cls.name}" if show_class_name_or_id == "name" else f"{data.cls.class_id}"
-            if show_obj_name:
-                text = f"{data.obj_name}" + (" - " if text else "") + text
-            # Generate in a single pass the text to be written, then write it.
-
-            font_size = font_size_fit_box_perc(text, geometry_width, 0.9)
-            draw_bitmap_text(
-                img, text, (x_min + 20, 10 + y_max + estimate_text_pixel_height("", font_size)),
-                color=color, size=font_size)
-
-        if show_visibility:
-            # estimated_occlusion = float(estimate_occlusion_3d(obj, self.used_camera, self.ctx, scene.render, xyxy))
-            text = f"{int(data.visibility * 100)}%"
-
-            font_size = font_size_fit_box_perc(text, geometry_width, 0.3)
-            draw_bitmap_text(img, text, (x_min + 20, y_min - 10),
-                             color=color, size=font_size)
-
+            self._render_bottom_left_time_stats(displayed_img, width)
 
     def _render_bottom_left_time_stats(self, img, width: int) -> None:
         """ Render timing statistics text in the bottom-left corner of the image.
@@ -334,26 +310,27 @@ class PreviewGenerator:
         num_objects = len(self.labeling_orchestrator.visible_objects)
 
     @staticmethod
-    def _render_geometry(img, color, pixel_space_geometry, line_width: int = 4) -> None:
+    def _render_geometry(_img, _color, pixel_space_geometry, _line_width: int = 4) -> None:
         """ Render annotations onto the image (e.g. polygons, bounding boxes etc...).
         Supports both bounding boxes and polygon geometries in pixel space.
 
-        :param img: The image object to draw onto
-        :param color: RGBA color tuple
+        :param _img: The image object to draw onto
+        :param _color: RGBA color tuple
         :param pixel_space_geometry: Geometry in pixel coordinates
-        :param line_width: Width of the drawn lines for the geometry
+        :param _line_width: Width of the drawn lines for the geometry
         """
         # Bounding box
         if type(pixel_space_geometry) == tuple:
             new_xyxy = pixel_space_geometry
-            p0 = (new_xyxy[0], new_xyxy[1])
-            p1 = (new_xyxy[2], new_xyxy[3])
-            draw_bounding_box(img, color, p0, p1, y_grows_up_to_down=False, line_width=line_width)
+            _p0 = (new_xyxy[0], new_xyxy[1])
+            _p1 = (new_xyxy[2], new_xyxy[3])
+            # draw_bounding_box(img, color, p0, p1, y_grows_up_to_down=False, line_width=line_width)
         if type(pixel_space_geometry) == list:
-            draw_polygon(img, pixel_space_geometry, color, line_width=line_width)
+            pass
+            # draw_polygon(img, pixel_space_geometry, color, line_width=line_width)
 
     @staticmethod
-    def make_preview_render_data(label_data: LabelData) -> Iterable[PreviewRenderData]:
+    def make_preview_render_data(label_data: LabelData) -> Iterable: # Iterable[PreviewRenderData]:
         """ Convert LabelData into preview render data structures. for easier consumption
         during annotation rendering.
 
@@ -362,12 +339,12 @@ class PreviewGenerator:
         """
         render_data = []
         for label in label_data:
-            geometry = None
+            _geometry = None
             if label.annotation_type.startswith("polygon"):
-                geometry = label.polygon
+                _geometry = label.polygon
             elif label.annotation_type.startswith("bbox"):
-                geometry = label.bbox
+                _geometry = label.bbox
 
-            render_data.append(PreviewRenderData(label.obj_or_entity_name, label.visibility, label.cls,
-                geometry, label.is_entity, label.annotation_type, ideal_bbox=label.ideal_bbox))
+            # render_data.append(PreviewRenderData(label.obj_or_entity_name, label.visibility, label.cls,
+            #     geometry, label.is_entity, label.annotation_type, ideal_bbox=label.ideal_bbox))
         return render_data

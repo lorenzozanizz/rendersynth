@@ -314,6 +314,13 @@ class PixelMapExtractor(Extractor):
         # require it.
         self.declared_strategy = folder_strategy
 
+    @staticmethod
+    def needs_folder_structure() -> bool:
+        # The compositor writes depth/normal maps directly to disk, outside the
+        # normal writer pipeline, so it needs to know a write location even when there is
+        # no real OutputWriter (e.g. single-shot preview generation).
+        return True
+
     def finalize_shot(self, shot_idx: int) -> None:
         """
 

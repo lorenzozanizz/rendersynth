@@ -31,7 +31,7 @@ class PerPixelPreviewRenderer(PreviewRenderer):
         return ("per_pixel",)
 
     def render(
-        self, canvas: PixelCanvas, label: Label, color: tuple[float, float, float, float],
+        self, canvas: Optional[PixelCanvas], label: Label, color: tuple[float, float, float, float],
         width: int, height: int, style: PreviewStyle,
     ) -> Optional[str]:
         # Simply return the pixel map given by the per pixel extractors. The renderer will

@@ -84,7 +84,7 @@ class PreviewRenderer(ABC):
     @abstractmethod
     def render(
         self,
-        canvas: PixelCanvas,
+        canvas: Optional[PixelCanvas],
         label: Label,
         color: tuple[float, float, float, float],
         width: int,
@@ -100,7 +100,8 @@ class PreviewRenderer(ABC):
         image that should be displayed in place of the RGB render the caller (PreviewGenerator)
          is responsible for actually swapping the displayed image in the Blender image buffer.
 
-        :param canvas: Shared PixelCanvas for the current preview frame.
+        :param canvas: Shared PixelCanvas for the current preview frame, or None
+            when called for a "replace"-mode renderer that has no use for one.
         :param label: The Label to render.
         :param color: RGBA color associated with the label's class.
         :param width: Width of the preview image in pixels.

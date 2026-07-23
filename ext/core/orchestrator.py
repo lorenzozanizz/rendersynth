@@ -9,9 +9,9 @@ from contextlib import AbstractContextManager
 from typing import Dict, Collection, Any, Tuple, Union, Optional
 
 from pathlib import Path
-from .configurations import LabelExtractionConfig, RenderConfig, GenerationConfig, BatchMetadata
+from .configurations import LabelExtractionConfig, RenderConfig, GenerationConfig, BatchMetadata, WritingConfig
 
-from .io import OutputWriter
+from .io import OutputWriter, LabelingFormatRegistry
 from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor, PixelMapExtractor, EmptyExtractor
 
 from ..labeling.generator import LabelData
@@ -255,3 +255,42 @@ class LabelingOrchestrator:
 
     def terminate_preparation(self, shot_idx):
         self.extractor.finalize_shot(shot_idx=shot_idx)
+
+    # The following two functions were added after the preview rework, and only affect
+    # preview and not batch generation.
+
+    def get_extraction_context(self) -> AbstractContextManager:
+        """ Get the extractor's own context manager (e.g. compositor node setup
+        for PixelMapExtractor), independent of any writer's context.
+
+        begin_generation() combines this with the writer's context for full
+        batch runs; callers with no OutputWriter at all (i.e. PreviewGenerator,
+        which generates a single shot) use this directly instead. """
+
+        # This is needed because certain preview functionality require the context
+        # to be created, for example for compositing nodes
+        return self.extractor.get_context()
+
+    def declare_temp_folder_structure(self, save_path: str, prefix: str = "preview") -> None:
+        """ Declare a throwaway IOStrategy, pointed at a temporary directory, for
+        extractors that need to know a write location even though there is no
+        real OutputWriter.
+        Reuses the exact same IOStrategy subclass a real batch run of this
+        orchestrator's format would use (via LabelingFormatRegistry)
+        This does nothing if this orchestrator's extractor doesn't need a folder structure
+        at all (see Extractor.needs_folder_structure)
+
+        :param save_path: Directory the throwaway strategy should write into.
+        :param prefix: Filename prefix passed to the throwaway WritingConfig.
+        """
+        if not self.extractor.needs_folder_structure():
+            return
+
+        strategy_cls = LabelingFormatRegistry.get_strategy(self.config.format)
+        if strategy_cls is None:
+            return
+
+        write_cfg = WritingConfig(from_last=False, save_path=save_path, prefix=prefix)
+        strategy = strategy_cls(write_cfg, {})
+        strategy.ensure_directories()
+        self.extractor.declare_folder_structure(strategy)

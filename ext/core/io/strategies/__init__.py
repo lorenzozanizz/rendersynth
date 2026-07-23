@@ -26,7 +26,7 @@ class SupportedFormats(Enum):
     PCD = "PCD"
 
     #
-    THERMAL = "Thermal"
+    THERMAL = "Thermal (Experimental)"
     DEPTH_PNG = "Depth"
     NORMAL = "Normal"
 

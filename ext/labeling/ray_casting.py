@@ -410,6 +410,3 @@ def geometry_bounds(geometry: Geometry) -> tuple:
 
 def compute_geometry_area(geometry: Geometry) -> float:
     pass
-
-
-

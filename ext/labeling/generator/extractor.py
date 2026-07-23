@@ -90,6 +90,22 @@ class Extractor(metaclass=ABCMeta):
         # require it.
         return
 
+    # Declare this in the parent extractor class as static and not abstract, so only
+    # extractors (like per_pixel) which need to override this are influenced.
+    @staticmethod
+    def needs_folder_structure() -> bool:
+        """ Whether this extractor requires a folder structure/IOStrategy to be
+        declared via declare_folder_structure() even when there is no real
+        OutputWriter for example for preview generation.
+
+        Extractors that write files themselves outside the normal writer
+        pipeline should override this to return True so callers without a writer (e.g.
+        PreviewGenerator) know to declare a throwaway one.
+
+        :return: False by default.
+        """
+        return False
+
     @staticmethod
     def ray_casting_needs() -> dict[str, Any]:
         return {}
