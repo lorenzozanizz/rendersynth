@@ -320,7 +320,7 @@ class SamplerCompiler:
     def compile(config: Dict[str, Any], dim) -> CompiledSampler:
         """Compile either simple or node-graph config"""
         use_tree = config['use_tree']
-        if use_tree in config:
+        if use_tree:
             # Node-graph format
             return SamplerCompiler._compile_node_config(config, dim)
         else:
