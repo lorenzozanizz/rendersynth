@@ -69,7 +69,7 @@ class Label:
     obj_or_entity_name: str
     cls: Optional[LabelClass]
 
-    annotation_type: Literal["bbox", "polygon", "keypoints"]  # "bbox", "polygon", "keypoints", "depth"
+    annotation_type: Literal["bbox", "polygon", "keypoints", "point_cloud", "per_pixel"]
 
     # Whether a label belongs to a single object or to a composite multi-mesh entity
     is_entity: bool
