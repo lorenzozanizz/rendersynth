@@ -163,6 +163,10 @@ class PixelMapExtractor(Extractor):
             self.compositor.link_nodes(self.link_mappings_depth)
             self.compositor.set_node_defaults(self.default_assignments_depth)
 
+            output_node = self.compositor.get_node("file_output")
+            output_node.format.color_management = "OVERRIDE"
+            output_node.format.view_settings.view_transform = "Raw"
+
             # Register the nodes together so that we can remove them at the same time when exiting
             self.compositor.register_names_as_group('depth_tree', self.name_types_depth.keys())
 
@@ -250,6 +254,10 @@ class PixelMapExtractor(Extractor):
             self.compositor.gen_nodes(self.name_types_normals)
             self.compositor.link_nodes(self.link_mappings_normals)
             self.compositor.set_node_defaults(self.default_assignments_normal)
+
+            output_node = self.compositor.get_node("file_output")
+            output_node.format.color_management = "OVERRIDE"
+            output_node.format.view_settings.view_transform = "Raw"
 
             # Register the nodes together so that we can remove them at the same time when exiting
             self.compositor.register_names_as_group('normal', self.name_types_normals.keys())
