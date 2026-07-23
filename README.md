@@ -3,7 +3,7 @@
 
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://lorenzozanizz.github.io/rendersynth)
 [![Architecture](https://img.shields.io/badge/architecture-docs-informational)](./docs/architecture)
-[![Tutorials](https://img.shields.io/badge/tutorials-20+-success)](./docs/tutorials)
+[![Tutorials](https://img.shields.io/badge/tutorials-success)](./docs/tutorials)
 [![Email](https://img.shields.io/badge/email-contact-red)](mailto:zanilorenzopm@gmail.com)
 [![GitHub stars](https://img.shields.io/github/stars/lorenzozanizz/rendersynth?style=social)](https://github.com/lorenzozanizz/rendersynth/stargazers)
 
@@ -36,7 +36,15 @@ User can also specify named classes and assign classes to blender objects. Multi
 - **Live Preview**: Allows the user to generate previews of the output of the blender directly inside Blender, including boundary boxes, labels and visibility statistics
 
 - **Logging system** (work in progress) Allows to analyze the results of single stochastic processes to inspect the generation and the outut of constraints solvers (work in progress)
-- **Many labeling formats** The user can extract multiple labeling information from the randomized scene, using the same seed to extract multiple types of data. 
+- **Many labeling formats** The extension currently:
+  - ULTRALYITICS YOLO
+  - COCO 
+  - COCO Keypoints
+  - COCO Segmentation (skeletons)
+  - Depth maps
+  - Normal maps
+  - CVAT XML
+  - Point clouds (classes, colors)
 ## System Requirements
 
 - **Blender**: 4.5.0 or later
