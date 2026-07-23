@@ -422,3 +422,27 @@ class LightColorSchema(PipeSchema):
             ColorDistributionSelector.reset(context)
         else:
             TypedObjectTargeter.setup_from_config(config[wsk.TYPED_OBJ.value], context)
+
+@PipeSchemaRegistry.register(PipeNames.POV.value)
+class ChangePovSchema(PipeSchema):
+
+    @staticmethod
+    def extract_config_from_ui(context, operation) -> dict:
+        """ """
+        conditional = ConditionalWidget(ObjectTargeter)
+        dic = {
+            wsk.OBJECT.value: conditional.extract_data(context),
+            wsk.POSITION.value:  PositionListSelector.extract_data(context)
+        }
+        return dic
+
+    @staticmethod
+    def apply_config_to_ui(context, operation, config) -> None:
+        """ """
+        conditional = ConditionalWidget(ObjectTargeter)
+        if not config:
+            conditional.reset(context)
+            PositionListSelector.reset(context)
+        else:
+            conditional.setup_from_config(config[wsk.OBJECT.value], context)
+            PositionListSelector.setup_from_config(config[wsk.POSITION.value], context )

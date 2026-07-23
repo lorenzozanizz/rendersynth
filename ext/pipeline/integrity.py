@@ -109,6 +109,18 @@ class MoveValidator(PipeValidator):
         pos_ok = PositionListSelectorValidator.validate(config[wsk.POSITION.value])
         return obj_ok and pos_ok
 
+
+@ValidatorRegistry.register(PipeNames.POV.value)
+class MoveValidator(PipeValidator):
+
+    @staticmethod
+    def validate(pipe: PipelineOperation,  config: dict) -> bool:
+        conditional = ConditionalValidator(ObjectTargeterValidator)
+        obj_ok = conditional.validate(partial_config=config[wsk.OBJECT.value])
+        pos_ok = PositionListSelectorValidator.validate(config[wsk.POSITION.value])
+        return obj_ok and pos_ok
+
+
 @ValidatorRegistry.register(PipeNames.VISIBILITY.value)
 class VisibilityValidator(PipeValidator):
 

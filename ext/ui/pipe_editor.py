@@ -259,6 +259,17 @@ class BezierLockCameraOperation(PipeDrawer):
         conditional = ConditionalWidget(ObjectTargeter, ask_text="Lock camera to object")
         conditional.draw(layout, context)
 
+@OperationDrawerRegistry.register(PipeNames.POV.value)
+class ChangePOVOperation(PipeDrawer):
+
+    @staticmethod
+    def draw_editor(layout, context) -> None:
+        # If the user wants to lock the camera to a point, he must specify said point
+        conditional = ConditionalWidget(ObjectTargeter, ask_text="Lock camera to object")
+        conditional.draw(layout, context)
+        layout.separator()
+        PositionListSelector.draw(layout, context)
+
 @OperationDrawerRegistry.register(PipeNames.LINE.value)
 class MoveAlongLineOperation(PipeDrawer):
 

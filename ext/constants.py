@@ -58,7 +58,7 @@ class PipeNames(Enum):
     BASE_COLOR  = "Base Color"      # (x)
 
     # Lighting
-    TEMPERATURE = "Temperature"     # (x)
+    TEMPERATURE = "Temperature"
     POWER       = "Power"
     COLOR       = "Color"
 

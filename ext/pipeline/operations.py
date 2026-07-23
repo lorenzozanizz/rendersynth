@@ -913,3 +913,40 @@ class LightTemperaturePropertyOperation(SimpleLightPropertyOperation):
 
     def get_prop(self, target) -> Any:
         return self.target.temperature
+
+
+@OperationRegistry.register(PipeNames.POV.value)
+class ChangePOVOperation(PipelineOperation):
+
+    def __init__(self):
+        self.target_camera = None
+        self.positions = None
+        self.distribution = None
+
+        self.enable_lock = False
+        self.lock_target = None
+
+    def compile(self, context, config: dict):
+        self.target_camera = context.scene.camera
+        self.enable_lock = config[wsk.OBJECT.value][wsk.ENABLED.value]
+
+        if self.enable_lock:
+            obj_names = config[wsk.OBJECT.value][wsk.OBJECT_NAMES.value]
+            first_obj = obj_names[0]
+            self.lock_target = bpy.data.objects[first_obj]
+
+        # The distribution will be compiled ( a discrete uniform )
+        self.positions = config[wsk.POSITION.value][wsk.POSITION_LIST.value]
+        self.distribution = SamplerCompiler.make_distribution(
+            Distribution.CATEGORICAL_UNIFORM.name, 1, n=len(self.positions) - 1)
+
+    def execute(self, context):
+        point = self.distribution.sample()
+        self.target_camera.location = point
+
+
+    def get_global_context(self):
+        return BezierLockOperation.BezierLockContext(self.target_camera, self.lock_target, do_lock=self.enable_lock)
+
+    def get_frame_context(self):
+        return None
