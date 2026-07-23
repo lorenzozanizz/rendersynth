@@ -11,7 +11,7 @@ Classes: KeypointsPreviewRenderer
 from typing import Optional
 
 from ..generator.data_structure import Label
-from ..conversions import convert_camera_point_list_absolute_pixels_y_inverted
+from ..conversions import convert_camera_point_list_absolute_pixels_y
 from ..ray_casting import get_minimal_bounding_box_fast
 from ...utils.images import PixelCanvas, draw_thick_pixel, draw_line
 from .base import PreviewRenderer, PreviewStyle
@@ -36,6 +36,7 @@ class KeypointsPreviewRenderer(PreviewRenderer):
         width: int, height: int, style: PreviewStyle,
     ) -> Optional[str]:
 
+        print("Im rendering the skeeltonozzos diddio")
         # Visual weight for keypoint dots and skeleton connectors, kept independent of
         # PreviewStyle.geometry_line_width since normally keypoints are much smaller shapes than
         # a bbox/polygon outline.
@@ -51,7 +52,7 @@ class KeypointsPreviewRenderer(PreviewRenderer):
         if not keypoints:
             return None
 
-        pixel_points = convert_camera_point_list_absolute_pixels_y_inverted(
+        pixel_points = convert_camera_point_list_absolute_pixels_y(
             [(kp.x, kp.y) for kp in keypoints], width, height)
 
         # index -> pixel position, only for keypoints actually labeled, so skeleton

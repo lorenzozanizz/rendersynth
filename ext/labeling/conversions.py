@@ -207,6 +207,25 @@ def convert_camera_point_list_absolute_pixels_y_inverted(
         pixel_list.append((x_p, y_p))
     return pixel_list
 
+def convert_camera_point_list_absolute_pixels_y(
+    p_list: List[tuple[float, float]], width: int, height: int
+) -> list[tuple[int, int]]:
+    """
+
+    :param p_list:
+    :param width:
+    :param height:
+    :return:
+    """
+    pixel_list = list()
+    for p in p_list:
+        x_p = int((p[0] + 1) * width / 2)
+        y_p = int((p[1] + 1) * height / 2)
+        pixel_list.append((x_p, y_p))
+    return pixel_list
+
+
+
 # ------ General geometry conversion ------
 
 Geometry = Union[ tuple[float, float, float, float], List[tuple[float, float]], dict]
