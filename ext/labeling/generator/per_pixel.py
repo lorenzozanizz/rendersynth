@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from typing import Callable, Union
+from typing import Callable, Union, Optional
 from pathlib import Path
 import os
 
@@ -37,6 +37,10 @@ class PixelMapExtractor(Extractor):
 
         self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
+        # Path extract() should attach to its Label, computed by prepare_for_shot() once the
+        # strategy (hence the output directory/filename) is known for the
+        # current shot. For more infos see prepare_for_shot()
+        self._pending_map_path: Optional[str] = None
 
     def extract(self,
         visible_objects: dict[Any, list],
@@ -45,28 +49,37 @@ class PixelMapExtractor(Extractor):
         camera,
         estimate_visibility: bool = True, **kwargs
     ) -> LabelData:
-        """
+        """ Extract the required data. Per-pixel maps (depth/normal) aren't computed here,
+        instead they're written to disk directly by the compositor node graph set up in get_context()
+        by the render call that happens around this extractor's use (prepare_for_shot
+        points the compositor's output node at the right path, the render call
+        triggers the compositor to write the file, finalize_shot renames it to its
+        final name). This method's job is just to report that path as a Label so the
+        rest of the pipeline has something to point to.
 
-        :param visible_objects:
-        :param classifier:
-        :param entity_data:
-        :param camera:
-        :param estimate_visibility:
-        :param kwargs:
-        :return:
+        :param visible_objects: the unused raytracing data  (reduced to minimum)
+        :param classifier: the unused classifier
+        :param entity_data: unused entity data
+        :param camera: unused camera
+        :param estimate_visibility: unused visibility flag
+        :param kwargs: None
+        :return: A LabelData with a single Label if a shot has been
+            prepared (see prepare_for_shot), otherwise an empty LabelData.
         """
         ret_data = LabelData()
 
-        if self.data_map is None:
-
-            pass
-        # just a quick check, ensure the dimensions are still the same, just as a
-        # sanity check.
-        if True:
-            pass
-
         with (TimingContext(self.timings, 'labeling')):
-            pass
+            if self._pending_map_path is not None:
+                ret_data.add(
+                    Label(
+                        obj_or_entity_name=self.datatype,
+                        cls=None,
+                        annotation_type="per_pixel",
+                        is_entity=False,
+                        visibility=1.0,
+                        per_pixel_map=self._pending_map_path,
+                    )
+                )
 
         return ret_data
 
@@ -275,7 +288,7 @@ class PixelMapExtractor(Extractor):
         # For the default implementation, simply ignore the preparation: nothing needs
         # to be set up.
         if self.declared_strategy is None:
-            pass
+            self._pending_map_path = None
         else:
             write_dir = self.declared_strategy.get_full_dir_for(shot_idx, "map")
             filename = self.declared_strategy.get_filename_for(shot_idx, "map")
@@ -283,6 +296,12 @@ class PixelMapExtractor(Extractor):
             # map_path = self.declared_strategy.get_full_path_for(shot_idx, "map")
             # print("Setting as output path: ", map_path)
             # self.active_output_context_node.set_write_path(map_path)
+
+            # The compositor's file output node writes with Blender's current-frame
+            # number appended to filename BUT finalize_shot() strips that suffix by renaming the
+            # produced file to exactly this path once rendering has completed. Keep the ".png"
+            # extension in sync with finalize_shot().
+            self._pending_map_path = os.path.join(write_dir, f"{filename}.png")
         return
 
     def declare_folder_structure(self, folder_strategy: "IOStrategy") -> None:
