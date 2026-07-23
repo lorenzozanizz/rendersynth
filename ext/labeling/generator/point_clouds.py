@@ -86,8 +86,9 @@ class PointCloudExtractor(Extractor):
                     cloud_data = self.extract_color_data(image_data, cloud_data)
 
                 ret_data.add(
+                    # See comment below for entities
                     Label(obj.name, cls, point_cloud=cloud_data,
-                          bbox=bbox, visibility=self.estimated_visibility.get(obj), annotation_type="bbox",
+                          bbox=bbox, visibility=self.estimated_visibility.get(obj), annotation_type="point_cloud",
                           is_entity=False, ideal_bbox=orig_bbox)
                 )
             # If required, estimate visibility (No entity mode)
@@ -144,7 +145,9 @@ class PointCloudExtractor(Extractor):
                     Label(entity_name, cls,
                           bbox=total_visible_bbox,
                           point_cloud=total_cloud,
-                          visibility=self.estimated_visibility.get(entity_name), annotation_type="bbox",
+                          # Labels are annotated as point clouds even if they also contain bbox information,
+                          # this is required for the preview system
+                          visibility=self.estimated_visibility.get(entity_name), annotation_type="point_cloud",
                           is_entity=True)
                 )
 

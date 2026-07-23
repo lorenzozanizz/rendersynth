@@ -65,6 +65,10 @@ class PreviewRenderConfig:
     # wish to disable it.
     ignore_default_class: bool = True
 
+    # Point cloud labels can carry far more points than are useful to plot in a
+    # preview; this caps how many are drawn (random-subsampled) per label.
+    max_preview_points: int = 2000
+
 @dataclass
 class RenderConfig:
     """ Render configuration extracted from Blender's render config at generation time.

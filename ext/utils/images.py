@@ -4,6 +4,14 @@ Provides helpers to manipulate raster pixel arrays, including drawing lines,
 polygons, bounding boxes, and bitmap text using a simple 8-bit font system included in /utils/fonts.
 Note that in blender, images raster have y=0 on the <u>bottom</u> of the image!
 
+Classes:
+    PixelCanvas: Checks out an image's pixel buffer once so multiple draw calls
+        (e.g. several preview renderers drawing many labels in one frame) can share it
+        instead of each re-reading/rewriting img.pixels individually. Pass a PixelCanvas
+        instead of a raw Blender image to any draw_* function below to opt into this
+        the function will draw into it without flushing, leaving the caller responsible
+        for a single canvas.flush() at the end.
+
 Functions:
     draw_color: Set or invert pixel color values.
     draw_line: Draw a line using Bresenham's algorithm.
@@ -55,6 +63,45 @@ def to_index(p: tuple, w: int, channels: int = 4) -> int:
     return (p[0] + p[1]*w)*channels
 
 
+class PixelCanvas:
+    """ Checks out a Blender image's pixel buffer once so that multiple draw calls (e.g. many
+    renderers drawing many labels in a single preview frame) can share the same in-memory list or numpy array
+    instead of each call re-reading img.pixels into a fresh list and writing/updating it back,
+    which is very costly cost when drawing many small primitives (e.g. point clouds).
+
+    Callers are responsible for calling flush() once after all drawing is done.
+    """
+
+    def __init__(self, img, channels: int = 4):
+        self.img = img
+        self.channels = channels
+        self.width, self.height = img.size
+        self.pixels = list(img.pixels)
+
+    def index(self, p: tuple) -> int:
+        return to_index(p, self.width, self.channels)
+
+    def flush(self) -> None:
+        """ Write the working buffer back to the Blender image and refresh it. """
+        self.img.pixels[:] = self.pixels
+        self.img.update()
+
+
+def ensure_is_canvas(img_or_canvas: Union["PixelCanvas", Any], channels: int = 4) -> tuple["PixelCanvas", bool]:
+    """ Resolve a PixelCanvas from either an existing canvas, which is reused as-is
+    (the caller owns flushing it), or a raw Blender image, which is wrapped in a
+    fresh canvas that this function's caller is then responsible for flushing
+    immediately. This is not to break the previous version.
+
+    :param img_or_canvas: a PixelCanvas or a raw Blender image object.
+    :param channels: Number of color channels, used only when wrapping a raw image.
+    :return: (canvas, owns_canvas) where owns_canvas is True if the caller must flush it.
+    """
+    if isinstance(img_or_canvas, PixelCanvas):
+        return img_or_canvas, False
+    return PixelCanvas(img_or_canvas, channels=channels), True
+
+
 def draw_bounding_box(
         img, color: tuple[float, float, float, float],
         lower_point: Tuple[int, int], upper_point: Tuple[int, int], y_grows_up_to_down: bool = True,
@@ -80,8 +127,9 @@ def draw_bounding_box(
     :param line_width: Thickness of box lines
     :param channels: Number of color channels (usually 4 for RGBA)
     """
-    width, height = img.size
-    pixels = list(img.pixels)
+    canvas, owns_canvas = ensure_is_canvas(img, channels)
+    width, height = canvas.width, canvas.height
+    pixels = canvas.pixels
 
     max_idx = to_index((width-1, height-1), width, channels=channels)
 
@@ -129,9 +177,8 @@ def draw_bounding_box(
     vertical_line((p0[0], p0[1]), box_height)
     vertical_line((p1[0], p0[1]), box_height)
 
-    img.pixels[:] = pixels
-    # Should probably update image
-    img.update()
+    if owns_canvas:
+        canvas.flush()
 
 
 def font_size_fit_box_perc(text: str, max_width: int, ratio: float = 1.0) -> int:
@@ -201,8 +248,9 @@ def draw_bitmap_text(img, text: str, position: tuple[int, int] = (0, 0),
     :param channels: the number of channels
     """
 
-    width, height = img.size
-    pixels = list(img.pixels)
+    canvas, owns_canvas = ensure_is_canvas(img, channels)
+    width, height = canvas.width, canvas.height
+    pixels = canvas.pixels
 
     x_offset, y_offset = position
     x_offset = int(x_offset)
@@ -237,8 +285,8 @@ def draw_bitmap_text(img, text: str, position: tuple[int, int] = (0, 0),
 
         current_x += char_width_pixels * size + min(2, 1*size // 2)
 
-    img.pixels[:] = pixels
-    img.update()
+    if owns_canvas:
+        canvas.flush()
 
 
 def fill_polygon(img, polygon: list[tuple], color, channels: int = 4) -> None:
@@ -251,8 +299,9 @@ def fill_polygon(img, polygon: list[tuple], color, channels: int = 4) -> None:
     :param polygon: a list of clockwise vertices
     :param color: the color of the polygon
     """
-    width, height = img.size
-    pixels = list(img.pixels)
+    canvas, owns_canvas = ensure_is_canvas(img, channels)
+    width, height = canvas.width, canvas.height
+    pixels = canvas.pixels
 
     # For each scanline
     min_y = min(p[1] for p in polygon)
@@ -282,8 +331,8 @@ def fill_polygon(img, polygon: list[tuple], color, channels: int = 4) -> None:
                 for x in range(x_start, x_end):
                     draw_color(pixels, color, to_index((x, y), width, channels=channels))
 
-    img.pixels[:] = pixels
-    img.update()
+    if owns_canvas:
+        canvas.flush()
 
 
 def draw_thick_pixel(pixels, color, x: int, y: int, line_width: int, width:int, height: int, channels: int=4) -> None:
@@ -377,8 +426,9 @@ def draw_polygon(img, vertices: list[tuple[int, int]],
     if len(vertices) < 2:
         return
 
-    width, height = img.size
-    pixels = list(img.pixels)
+    canvas, owns_canvas = ensure_is_canvas(img, channels)
+    width, height = canvas.width, canvas.height
+    pixels = canvas.pixels
     # Draw lines between consecutive vertices, wrapping around to the first vertex.
     # NOTE that like all other such functions, it is assumed that the points follow blender convention
     # (e.g. the y=0 is at the bottom of the image)
@@ -391,5 +441,5 @@ def draw_polygon(img, vertices: list[tuple[int, int]],
         # point then this draws a point correctly (its handled inside draw_line)
         draw_line(pixels, p0, p1, color, width, height, line_width, channels)
 
-    img.pixels[:] = pixels
-    img.update()
+    if owns_canvas:
+        canvas.flush()
