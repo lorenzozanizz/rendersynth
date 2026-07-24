@@ -10,7 +10,7 @@
 A Blender extension for generating synthetic datasets through procedural randomization and batch rendering. This addon enables users to create diverse image datasets with controlled variations in object placement, material properties, lighting conditions, and scene parameters.
 Additionally, the extensions supports a preview functionality which allows to inspect the output of the pipeline and the computed labels directly inside Blender.
 
-The extensions is intended for low to medium sized computer vision products, wihch benefit more from ease of generation rather than the efficiency and generality of tools like Blenderproc. 
+The extension is intended for low to medium sized computer vision products, which benefit more from ease of generation rather than the efficiency and generality of tools like Blenderproc. 
 
 ## Overview
   ![Functionality](./resources/banner.png)
@@ -167,7 +167,7 @@ Pipelines are stored as JSON for reproducibility and sharing across .blend files
 
 - Complex shader networks may not be fully randomized through the UI; direct material node editing may be necessary for advanced cases
   (the idea is to randomize certain nodes in the shader which impact the appearence of the full Cycles material)
-- Very large pipelines with many operations may impact interactive performance, EEVEE is reccomended for preview. 
+- Very large pipelines with many operations may impact interactive performance, EEVEE is recommendend for preview. 
 
 ## Contributing
 
