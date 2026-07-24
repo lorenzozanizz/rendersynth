@@ -3,15 +3,15 @@ schema_version = "1.0.0"
 id = "rendersynth"
 version = "1.0.0"
 name = "Rendersynth"
-tagline = "A blender extension to generate and label synthetic data for Computer Vision"
+tagline = "Generate and label randomized synthetic data for Computer Vision"
 maintainer = "lorenzozanizz"
 type = "add-on"
 
 website = "https://github.com/lorenzozanizz/rendersynth"
-tags = ["Data Generation", "Computer Vision", "Render", "Utility"]
+tags = ["Physics", "Render"]
 blender_version_min = "4.5.0"
 
-license = ["SPDX:MIT"]
+license = ["SPDX:MIT", "SPDX:GPL-3.0-or-later"]
 
 [permissions]
 files = "Load/save synthetic datasets, store configuration and logs"
