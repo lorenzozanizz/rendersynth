@@ -36,7 +36,7 @@ User can also specify named classes and assign classes to blender objects. Multi
 - **Live Preview**: Allows the user to generate previews of the output of the blender directly inside Blender, including boundary boxes, labels and visibility statistics
 
 - **Logging system** (work in progress) Allows to analyze the results of single stochastic processes to inspect the generation and the outut of constraints solvers (work in progress)
-- **Many labeling formats** The extension currently:
+- **Many labeling formats** The extension currently supports:
   - ULTRALYITICS YOLO
   - COCO 
   - COCO Keypoints
