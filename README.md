@@ -3,14 +3,14 @@
 
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-blue)](https://lorenzozanizz.github.io/rendersynth)
 [![Architecture](https://img.shields.io/badge/architecture-docs-informational)](./docs/architecture)
-[![Tutorials](https://img.shields.io/badge/tutorials-20+-success)](./docs/tutorials)
+[![Tutorials](https://img.shields.io/badge/tutorials-success)](./docs/tutorials)
 [![Email](https://img.shields.io/badge/email-contact-red)](mailto:zanilorenzopm@gmail.com)
-[![GitHub stars](https://img.shields.io/github/stars/lorenzozanizz/rendersynth?style=social)](https://github.com/lorenzozanizz/rendersynth/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/lorenzozanizz/rendersynth?style=social)](https://lorenzozanizz.github.io/rendersynth)
 
 A Blender extension for generating synthetic datasets through procedural randomization and batch rendering. This addon enables users to create diverse image datasets with controlled variations in object placement, material properties, lighting conditions, and scene parameters.
 Additionally, the extensions supports a preview functionality which allows to inspect the output of the pipeline and the computed labels directly inside Blender.
 
-The extensions is intended for low to medium sized computer vision products, wihch benefit more from ease of generation rather than the efficiency and generality of tools like Blenderproc. 
+The extension is intended for low to medium sized computer vision products, which benefit more from ease of generation rather than the efficiency and generality of tools like Blenderproc. 
 
 ## Overview
   ![Functionality](./resources/banner.png)
@@ -36,7 +36,15 @@ User can also specify named classes and assign classes to blender objects. Multi
 - **Live Preview**: Allows the user to generate previews of the output of the blender directly inside Blender, including boundary boxes, labels and visibility statistics
 
 - **Logging system** (work in progress) Allows to analyze the results of single stochastic processes to inspect the generation and the outut of constraints solvers (work in progress)
-- **Many labeling formats** The user can extract multiple labeling information from the randomized scene, using the same seed to extract multiple types of data. 
+- **Many labeling formats** The extension currently supports:
+  - ULTRALYITICS YOLO
+  - COCO 
+  - COCO Keypoints
+  - COCO Segmentation (skeletons)
+  - Depth maps
+  - Normal maps
+  - CVAT XML
+  - Point clouds (classes, colors)
 ## System Requirements
 
 - **Blender**: 4.5.0 or later
@@ -44,6 +52,16 @@ User can also specify named classes and assign classes to blender objects. Multi
 
 ## Installation
 
+You can either download one of the released .zips in the Github Release section or build a release from the current repository version. 
+
+### Release download
+
+1. Select the release
+2. Download the .ext zip file
+3. In Blender, navigate to **Edit → Preferences → Add-ons**
+4. Click **Install...** and select the downloaded `.zip` file
+
+### Manual extension creation
 1. Download the repository and select the /ext/ extension archive and compress it as a `.zip` archive. 
 2. In Blender, navigate to **Edit → Preferences → Add-ons**
 3. Click **Install...** and select the downloaded `.zip` file
@@ -149,7 +167,7 @@ Pipelines are stored as JSON for reproducibility and sharing across .blend files
 
 - Complex shader networks may not be fully randomized through the UI; direct material node editing may be necessary for advanced cases
   (the idea is to randomize certain nodes in the shader which impact the appearence of the full Cycles material)
-- Very large pipelines with many operations may impact interactive performance, EEVEE is reccomended for preview. 
+- Very large pipelines with many operations may impact interactive performance, EEVEE is recommendend for preview. 
 
 ## Contributing
 
