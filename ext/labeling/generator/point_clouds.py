@@ -71,7 +71,7 @@ class PointCloudExtractor(Extractor):
             self.visible_objects = recomposed_clouds
 
             # There are simple objects visibility, not entities.
-            for obj, ( cloud_data, bbox )in self.visible_objects.items():
+            for obj, ( cloud_data, bbox ) in self.visible_objects.items():
                 cls = classifier.map_obj(obj)
                 if not cls:
                     continue
@@ -99,8 +99,7 @@ class PointCloudExtractor(Extractor):
             # bounding boxes for each smaller point cloud, so now we must join them together.
             # The operation of joining the clouds before computing the bboxes and computing the total
             # box is equivalent mathematically!
-            visible_named_objects = {obj.name: (obj, bbox) for obj, (ps, bbox) in self.visible_objects.items()}
-
+            visible_named_objects = {obj.name: (obj, (ps, bbox)) for obj, (ps, bbox) in self.visible_objects.items()}
             for entity_name, components in entity_data.items():
 
                 cls = classifier.map_entity(entity_name)
@@ -113,7 +112,7 @@ class PointCloudExtractor(Extractor):
                     continue
                 bboxes = [visible_named_objects[name][1][1] for name in visible_components]
                 clouds = [visible_named_objects[name][1][0] for name in visible_components]
-                if not bboxes or clouds:
+                if not bboxes or not clouds:
                     continue
 
                 total_visible_bbox = union_bounding_boxes(bboxes)
