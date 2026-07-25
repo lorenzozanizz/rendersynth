@@ -738,7 +738,7 @@ class FocalLengthOperation(PipelineOperation):
         """ Execute the focal length operation, which rnadomizes the focal length of the scene
         camera. """
         # Sample a scalar value, then assign the camera focal length.
-        value = self.distribution.sample()
+        value = self.distribution.sample()[0]
         self.camera.lens = value
 
     class CameraFocalLengthContext(ContextManager):
@@ -942,7 +942,8 @@ class ChangePOVOperation(PipelineOperation):
 
     def execute(self, context):
         point = self.distribution.sample()
-        self.target_camera.location = point
+        target_pt = self.positions[point]
+        self.target_camera.location = target_pt
 
 
     def get_global_context(self):

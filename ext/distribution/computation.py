@@ -162,7 +162,7 @@ class PresetSampler(CompiledSampler):
         return [random.normalvariate(params['mean'], params['std']) for _ in range(dim)]
 
     @staticmethod
-    def _sample_uniform_sphere(params: Dict[str, Any], _dim: int = 3):
+    def _sample_uniform_sphere(params: Dict[str, Any], dim: int = 3):
         # The default dimensionality is 3, we are sampling in three dimensions.
         dis = SphereDistribution(params)
         return dis.sample()

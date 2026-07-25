@@ -530,21 +530,22 @@ class SavePipeOperator(Operator):
         op_name = str(operation.operation_type)
         # Interrogate the registry
         schema = PipeSchemaRegistry.get(op_name)
-        config = schema.extract_config_from_ui(context, operation)
-        serialized = dumps(config)
+        if schema is not None:
 
-        UniqueLogger.quick_log(serialized)
-        # Now we write back the serialized dictionary in a blender property associated with the pipe.
-        # The overhead of saving strings and deserializing is minimal because the heavy task (generation)
-        # initially deserializes all the pipeline into dictionaries.
-        operation.config = serialized
+            config = schema.extract_config_from_ui(context, operation)
+            serialized = dumps(config)
 
-        # We must now call the validator and ensure that the pipe is correctly configured, to display as a
-        # warning sign
-        validator = ValidatorRegistry.get(op_name)
-        if validator:
-            operation.valid = validator.validate(operation, config)
+            UniqueLogger.quick_log(serialized)
+            # Now we write back the serialized dictionary in a blender property associated with the pipe.
+            # The overhead of saving strings and deserializing is minimal because the heavy task (generation)
+            # initially deserializes all the pipeline into dictionaries.
+            operation.config = serialized
 
+            # We must now call the validator and ensure that the pipe is correctly configured, to display as a
+            # warning sign
+            validator = ValidatorRegistry.get(op_name)
+            if validator:
+                operation.valid = validator.validate(operation, config)
 
         if self.on_save_return:
             # Change back to tab

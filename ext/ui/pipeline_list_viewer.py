@@ -54,6 +54,7 @@ pipe_to_ico_mapping = {
     PipeNames.BEZIER_LOCK:  "IPO_BACK",
     PipeNames.SPHERE_LOCK:  "MATSPHERE",
     PipeNames.POV:          "WORLD"
+    PipeNames.JITTER:       "MATSPHERE",
 
 }
 
@@ -337,7 +338,7 @@ class AddCameraCategoryPipeMenu(Menu):
         layout.label(text='Camera Operations')
 
         for name in (
-            PipeNames.BEZIER_LOCK, PipeNames.SPHERE_LOCK, PipeNames.FOCAL_LEN, PipeNames.JITTER, PipeNames.DISTANCE,
+            PipeNames.BEZIER_LOCK, PipeNames.SPHERE_LOCK, PipeNames.FOCAL_LEN, PipeNames.JITTER,
             PipeNames.POV
         ):
             layout.operator(Labels.ADD_PIPE.value, text=name.value,

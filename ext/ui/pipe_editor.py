@@ -230,7 +230,7 @@ class FocalLengthOperation(PipeDrawer):
 
     @staticmethod
     def draw_editor(layout, context) -> None:
-        NodeDistributionSelector.draw(layout, context)
+        NodeDistributionSelector.draw(layout, context, dim=1)
 
 @OperationDrawerRegistry.register(PipeNames.NODE_PROP.value)
 class RandomizeNodePropOperation(PipeDrawer):
