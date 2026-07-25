@@ -2,6 +2,26 @@
 
 ## Installation Steps
 
+### Download from release
+
+1. **Pick a release** 
+   - From the Github repository, select a release version
+   - Locate the ext.zip file and download it
+   
+3. **Install in Blender**
+   - Open Blender (4.5+ required for the extension)
+   - Go to **Edit → Preferences → Get Extensions**
+   - Click the **⋮** (three dots) in top-right → **Install from Disk**
+   - Select your `.zip` file
+   - Enable the extension by toggling the checkbox
+
+4. **Access the extension**
+   - Find it in the 3D Viewport sidebar (**N** key)
+   - Or check the location specified in the extension's documentation
+
+
+### Download latest branch from repository
+
 1. **Download the extension**
    - Clone or download this repository (https://github.com/lorenzozanizz/synth-blender-dataset)
    - Locate the `/ext/` folder in the repo
@@ -13,7 +33,7 @@
    - Wrong structure: `extension.zip` > `ext/` → files
 
 3. **Install in Blender**
-   - Open Blender (4.2+ required for extensions)
+   - Open Blender (4.5+ required for the extension)
    - Go to **Edit → Preferences → Get Extensions**
    - Click the **⋮** (three dots) in top-right → **Install from Disk**
    - Select your `.zip` file
@@ -25,7 +45,7 @@
 
 ## Requirements
 
-- **Blender**: 4.2.0 or later
+- **Blender**: 4.5.0 or later
 
 ## Troubleshooting
 
