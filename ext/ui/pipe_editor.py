@@ -287,6 +287,8 @@ class SimpleMaterialPropertyEditor(PipeDrawer):
         # Simple properties only have the distribution to edit.
         typed_selector = TypedNodeTargeter(text="Shader Node:", node_type='bsdf')
         typed_selector.draw(layout, context)
+        # Can be applied as offset to the node intensity
+        OffsetMode.draw(layout, context)
         NodeDistributionSelector.draw(layout, context, dim=1)
 
 @OperationDrawerRegistry.register(PipeNames.ROUGHNESS.value)
