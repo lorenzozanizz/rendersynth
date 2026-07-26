@@ -198,7 +198,7 @@ class COCOFormatter(IOStrategy):
         return (("instances", ".json", coco_json),)
 
 
-@LabelingFormatRegistry.register_strategy(SupportedFormats.COCO_SEGMENTATION.value)
+@LabelingFormatRegistry.register_strategy(SupportedFormats.COCO_POLYGON.value)
 class COCOSegmentation(IOStrategy):
     """
     COCO format implementation for instance segmentation.

@@ -199,7 +199,7 @@ class COCOConfigHandler(LabelConfigHandler):
     def extract(context) -> dict:
         return {}
 
-@LabelingConfigRegistry.register(SupportedFormats.COCO_SEGMENTATION.value)
+@LabelingConfigRegistry.register(SupportedFormats.COCO_POLYGON.value)
 class COCOSegmentationConfigHandler(LabelConfigHandler):
 
     @staticmethod

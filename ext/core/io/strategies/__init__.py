@@ -12,7 +12,7 @@ class SupportedFormats(Enum):
     #
     ULTRALYTICS_YOLO = "Ultralytics YOLO"
     COCO = "COCO"
-    COCO_SEGMENTATION = "COCO Segmentation"
+    COCO_POLYGON = "COCO Polygon"
     COCO_KEYPOINTS = "COCO Keypoints"
     PASCAL_VOC = "Pascal VOC"
     CVAT_XML_IMAGES = "CVAT XML Images"

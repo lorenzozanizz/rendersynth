@@ -75,7 +75,7 @@ class ExtractorRepository:
         # are not strictly required.
         # This is not a problem for convex shapes.
         elif matches(labeling_format, (
-            SupportedFormats.COCO_SEGMENTATION.value,
+            SupportedFormats.COCO_POLYGON.value,
         )): return PolygonExtractor(data)
 
         #
