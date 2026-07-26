@@ -16,3 +16,4 @@ from .polygon import PolygonPreviewRenderer
 from .keypoints import KeypointsPreviewRenderer
 from .point_cloud import PointCloudPreviewRenderer
 from .per_pixel import PerPixelPreviewRenderer
+from .segmentation import SegmentationPreviewRenderer

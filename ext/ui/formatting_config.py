@@ -282,6 +282,31 @@ class NormalHandler(LabelConfigHandler):
         return {}
 
 
+@LabelingConfigRegistry.register(SupportedFormats.SEGMENTATION_EXR.value)
+class NormalHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+@LabelingConfigRegistry.register(SupportedFormats.SEGMENTATION_PNG.value)
+class NormalHandler(LabelConfigHandler):
+
+    @staticmethod
+    def draw(context, layout) -> None:
+        pass
+
+    @staticmethod
+    def extract(context) -> dict:
+        return {}
+
+
+
 
 
 class LabelConfigDataProperty(PropertyGroup):
@@ -313,3 +338,6 @@ class LabelConfigDataProperty(PropertyGroup):
 
     # used in [PCD*]
     generate_info: BoolProperty(default=False, name="Generate metadata")            # type: ignore
+
+    # Used in [Segmentation*]
+    split_map_per_class: BoolProperty(default=False, name="Split map per class")    # type: ignore

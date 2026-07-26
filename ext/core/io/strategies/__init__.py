@@ -22,6 +22,9 @@ class SupportedFormats(Enum):
     PCD_CLASS = "PCD Class"
     PCD = "PCD"
 
+    SEGMENTATION_PNG = "Segmentation PNG"
+    SEGMENTATION_EXR = "Segmentation EXR"
+
     #
     THERMAL = "Thermal (Experimental)"
     DEPTH_PNG = "Depth"
