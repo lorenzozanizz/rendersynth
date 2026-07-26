@@ -53,7 +53,7 @@ pipe_to_ico_mapping = {
     PipeNames.FOCAL_LEN:    "CAMERA_STEREO",
     PipeNames.BEZIER_LOCK:  "IPO_BACK",
     PipeNames.SPHERE_LOCK:  "MATSPHERE",
-    PipeNames.POV:          "WORLD"
+    PipeNames.POV:          "WORLD",
     PipeNames.JITTER:       "MATSPHERE",
 
 }
