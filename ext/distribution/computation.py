@@ -188,22 +188,9 @@ class PresetSampler(CompiledSampler):
 
         return [random.gauss(mean_vec[i], std) for i in range(dim)]
 
-    d = Distribution
-    DISTRIBUTION_MAP = {
-        d.NONE:                             lambda _1, _2: None,
-        d.UNIFORM:                          _sample_uniform,
-        d.BERNOULLI:                        _sample_bernoulli,
-        d.BETA:                             _sample_beta,
-        d.GEOMETRIC:                        _sample_geometric,
-        d.BINOMIAL:                         _sample_binomial,
-        d.GAUSSIAN:                         _sample_gaussian,
-        d.UNIFORM_K_OUT_OF_N:               _sample_k_out_of_n,
-        d.CATEGORICAL_UNIFORM:              _sample_categorical_uniform,
-        d.MULTIVARIATE_UNIFORM:             _sample_multivariate_uniform,
-        d.MULTIVARIATE_GAUSSIAN:            _sample_multivariate_gaussian,
-        d.UNIFORM_SPHERE:                   _sample_uniform_sphere,
-        d.MULTIVARIATE_ISOTROPIC_GAUSSIAN:  _sample_isotropic_gaussian
-    }
+    # This needs to be built at runtime due to Python 9 limitations.
+    # See the note in _get_sampler
+    DISTRIBUTION_MAP = {}
 
     @staticmethod
     def _get_sampler(type_e: Distribution) -> Callable:
@@ -212,6 +199,27 @@ class PresetSampler(CompiledSampler):
         :param type_e:
         :return:
         """
+        if not PresetSampler.DISTRIBUTION_MAP:
+            # Why is this needed? Before, the map was being constructed for each sample,
+            # which made sampling unnecessarily more expensive. Then i tried building it once
+            # at class scope, but in Python 9 this cannot be done easily for staticmethods.
+            # So only build once when necessary.
+            d = Distribution
+            PresetSampler.DISTRIBUTION_MAP = {
+                d.NONE: lambda _1, _2: None,
+                d.UNIFORM: PresetSampler._sample_uniform,
+                d.BERNOULLI: PresetSampler._sample_bernoulli,
+                d.BETA: PresetSampler._sample_beta,
+                d.GEOMETRIC: PresetSampler._sample_geometric,
+                d.BINOMIAL: PresetSampler._sample_binomial,
+                d.GAUSSIAN: PresetSampler._sample_gaussian,
+                d.UNIFORM_K_OUT_OF_N: PresetSampler._sample_k_out_of_n,
+                d.CATEGORICAL_UNIFORM: PresetSampler._sample_categorical_uniform,
+                d.MULTIVARIATE_UNIFORM: PresetSampler._sample_multivariate_uniform,
+                d.MULTIVARIATE_GAUSSIAN: PresetSampler._sample_multivariate_gaussian,
+                d.UNIFORM_SPHERE: PresetSampler._sample_uniform_sphere,
+                d.MULTIVARIATE_ISOTROPIC_GAUSSIAN: PresetSampler._sample_isotropic_gaussian
+            }
 
         return PresetSampler.DISTRIBUTION_MAP[type_e]
 
