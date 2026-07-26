@@ -154,6 +154,7 @@ class PixelMapExtractor(Extractor):
             self.prev_scene_render_layer_z = scene.view_layers["ViewLayer"].use_pass_z
             self.prev_scene_render_layer_normal = scene.view_layers["ViewLayer"].use_pass_normal
 
+            scene.use_nodes = True
             # We have to instruct the rendering pass to preserve the depth data.
             scene.view_layers["ViewLayer"].use_pass_z = True
 
@@ -246,6 +247,7 @@ class PixelMapExtractor(Extractor):
             self.prev_scene_render_layer_z = scene.view_layers["ViewLayer"].use_pass_z
             self.prev_scene_render_layer_normal = scene.view_layers["ViewLayer"].use_pass_normal
 
+            scene.use_nodes = True
             # We have to instruct the rendering pass to preserve the normal
             scene.view_layers["ViewLayer"].use_pass_normal = True
 
