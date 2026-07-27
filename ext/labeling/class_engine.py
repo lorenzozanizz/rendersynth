@@ -1,4 +1,4 @@
-from typing import Union, Any, Iterable, Dict, List, Optional
+from typing import Union, Any, Iterable, Dict, List, Optional, Collection
 from  .bpy_properties import LabelClass, ObjectLabel, LabelRule
 
 import bpy
@@ -17,6 +17,8 @@ class ClassificationEngine:
         self.labels_mappings: Dict[str, LabelClass] = { }  # obj_name -> class_id
         self.entity_mappings: Dict[str, LabelClass] = { }
 
+        self.entity_data: Optional[Dict] = None
+
     def extract_entity_data(self) -> Dict[str, List[str]]:
         """
 
@@ -29,7 +31,12 @@ class ClassificationEngine:
             name = ent_declaration.entity_name
             components = [ comp.obj_name for comp in ent_declaration.obj_names ]
             ret_data[name] = components
+
+        self.entity_data = ret_data
         return ret_data
+
+    def get_entity_data(self) -> Optional[Dict[str, List[str]]]:
+        return self.entity_data
 
     def extract_class_labels_data(self) -> Dict[str, Any]:
         """ Fully serializes the labeling configuration into JSON-compatible format.
@@ -266,3 +273,130 @@ class ClassificationEngine:
 
     def get_mapping(self) -> Dict[str, LabelClass]:
         return self.labels_mappings
+
+    def _unpack_entities_into_objects(self, entities, name_mappings: Dict[str, LabelClass]) -> Dict[str, LabelClass]:
+        """ Unpack classified entities into its object subcomponents. This does not
+        overwrite the object class, which takes priority.
+
+        :param entities: a dictionary mapping an entity to a class
+        :param name_mappings: a dictionary to be updated containing mappings of object names to classes
+        :return:
+        """
+        ent_data = self.get_entity_data()
+        if ent_data is None:
+            # We cannot do anything if entity data has not yet been extracted by the scene, avoid
+            # making a mess
+            return name_mappings
+        for ent_name, ent_class in entities.items():
+            components = ent_data.get(ent_name)
+            if components is None:
+                # Something is wrong, ignore it
+                continue
+            # Only update values which are not present yet, so we do not overwrite
+            name_mappings.update({comp: ent_class for comp in components if name_mappings.get(comp, None) is None})
+        return name_mappings
+
+    def request_full_mapping(self, all_names: Collection[str]) -> Dict[str, LabelClass]:
+        """ Given a list of all defined Blender objects in a given scene, returns a dictionary
+        mapping an object to its LabelClass correspective object.
+
+        :param all_names: All defined names
+        :return: a mapping from the object name to its class.
+        """
+
+        entities = {}
+        name_mappings = {}
+        label_data = self.ctx.scene.labeling_data
+        labels = label_data.direct_labels
+
+        for label in labels:
+            # Note: up to date there are no checks on actual uniqueness of the assignments.
+            # the last assignment wins.
+            if not self._sanitize_direct_mapping(label):
+                continue
+
+            names = label.obj_names
+            label_cls = label.class_id
+            target_class: Optional[LabelClass] = self.resolve_class_by_id(label_cls)
+            if target_class is None:
+                # There is a dangling reference. ignore (and report, maybe?)
+                continue
+
+            if label.is_entity:
+                entities.update({name.obj_name: target_class for name in names})
+            else:
+                name_mappings.update({name.obj_name: target_class for name in names})
+
+        name_mappings = self._unpack_entities_into_objects(entities, name_mappings)
+
+        # Names requested that haven't been resolved by direct labels/entities yet.
+        all_names_set = set(all_names)
+        missing_names = all_names_set - name_mappings.keys()
+
+        do_use_rules = label_data.use_rules
+        if do_use_rules and missing_names:
+            # Only build the name -> bpy object lookup if we actually need it for rules.
+            name_map = {name: bpy.data.objects.get(name) for name in missing_names}
+            mapping_rules = label_data.label_rules
+
+            for mapping_rule in mapping_rules:
+                if not missing_names:
+                    break
+
+                relevant_data = self._sanitize_rule_mapping(mapping_rule)
+                if not relevant_data:
+                    continue
+
+                mapping_class = next(
+                    (cls for cls in label_data.label_classes
+                     if str(cls.class_id).lower() == mapping_rule.class_id.lower()),
+                    None,
+                )
+                if mapping_class is None:
+                    # Dangling class reference on the rule so we skip it.
+                    continue
+
+                rule_type = mapping_rule.rule_type.lower()
+                resolved = []
+
+                if rule_type == "material":
+                    material = relevant_data
+                    for missing_name in missing_names:
+                        obj = name_map.get(missing_name)
+                        if obj and obj.data and hasattr(obj.data, "materials"):
+                            if material.name in obj.data.materials:
+                                resolved.append(missing_name)
+
+                elif rule_type == "name_contains":
+                    partial_match = mapping_rule.name_filter.lower()
+                    resolved = [
+                        name for name in missing_names
+                        if partial_match in name.lower()
+                    ]
+
+                elif rule_type == "collection":
+                    collection = relevant_data
+                    collection_obj_names = {obj.name for obj in collection.objects}
+                    resolved = list(missing_names & collection_obj_names)
+
+                for name in resolved:
+                    name_mappings[name] = mapping_class
+                    missing_names.discard(name)
+
+        # Future addition point anything still unresolved after direct labels/entities/rules
+        # falls through here
+        if missing_names:
+            name_mappings.update(self._resolve_unmapped_names(missing_names))
+
+        return name_mappings
+
+    def _resolve_unmapped_names(self, _missing_names: Collection[str]) -> Dict[str, LabelClass]:
+        """ Hook for assigning a fallback LabelClass to names that couldn't be
+        resolved via direct labels, entities, or rules.
+
+        default_cls = self.resolve_class_by_id(self.ctx.scene.labeling_data.default_class_id)
+        return {
+            name: default_cls for name in missing_names
+        } if default_cls else { }
+        """
+        return {}

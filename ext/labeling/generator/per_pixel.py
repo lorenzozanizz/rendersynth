@@ -294,7 +294,7 @@ class PixelMapExtractor(Extractor):
             self.active_output_context_node =  PixelMapExtractor.CompositorNormalContext(self.ctx, config)
             return self.active_output_context_node
 
-    def prepare_for_shot(self, shot_idx: int) -> None:
+    def prepare_for_shot(self, all_objects: Iterable, class_engine: ClassificationEngine, shot_idx: int) -> None:
         # For the default implementation, simply ignore the preparation: nothing needs
         # to be set up.
         if self.declared_strategy is None:

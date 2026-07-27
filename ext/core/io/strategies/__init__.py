@@ -37,3 +37,4 @@ from .pcloud_strategy import *
 from .depth_strategy import *
 from .nmap_strategy import *
 from .media_strategy import *
+from .segmentation_strategy import *

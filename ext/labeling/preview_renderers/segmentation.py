@@ -15,8 +15,10 @@ class SegmentationPreviewRenderer(PreviewRenderer):
         # This is used for both segmentation PNG and segmentation EXR
         return ("segmentation",)
 
-    def render(self, canvas: Optional[PixelCanvas], label: Label,
-               color: tuple[float, float, float, float], width: int,
-               height: int, style: PreviewStyle) -> Optional[str]:
-        # Stub: read the PNG class map, regardless of whether we are writing an EXR or a PNG.
-        pass
+    def render(
+        self, canvas: Optional[PixelCanvas], label: Label, color: tuple[float, float, float, float],
+        width: int, height: int, style: PreviewStyle,
+    ) -> Optional[str]:
+        # Simply return the pixel map given by the per pixel extractors. The renderer will
+        # exchange this instead of the shot.
+        return label.per_pixel_map

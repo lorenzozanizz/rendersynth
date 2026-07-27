@@ -11,6 +11,7 @@ from typing import Any, Dict, Callable
 from contextlib import nullcontext
 
 from .data_structure import *
+from ..class_engine import ClassificationEngine
 from ..writing_folder_structure import FolderStructure
 
 class Extractor(metaclass=ABCMeta):
@@ -79,6 +80,19 @@ class Extractor(metaclass=ABCMeta):
         """ Get the mappings from object to bounding boxes """
         pass
 
+    def prepare_for_shot(self, all_objects: Iterable, class_engine: ClassificationEngine, shot_idx: int) -> None:
+        """
+
+        :param all_objects: All the available objects in the Blender scene
+        :param class_engine: The ClassificationEngine active in the scene
+        :param shot_idx:
+        :return:
+        """
+        # For the default implementation, simply ignore the preparation: nothing needs
+        # to be set up.
+        return
+
+
     @staticmethod
     def declare_folder_structure(folder_strategy: FolderStructure) -> None:
         """
@@ -114,17 +128,6 @@ class Extractor(metaclass=ABCMeta):
     def get_context():
         # Default implementation
         return nullcontext()
-
-    @staticmethod
-    def prepare_for_shot(shot_idx: int) -> None:
-        """
-
-        :param shot_idx:
-        :return:
-        """
-        # For the default implementation, simply ignore the preparation: nothing needs
-        # to be set up.
-        return
 
     @staticmethod
     def finalize_shot(shot_idx: int) -> None:

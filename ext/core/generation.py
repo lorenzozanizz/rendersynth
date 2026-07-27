@@ -41,6 +41,9 @@ class Executor:
             # The orchestrator will assign the label serialization strategy to the writer
             writer=self.writer
         )
+        self.labeling_orchestrator.set_avail_objects(
+            [obj.name for obj in bpy.data.objects]
+        )
 
     def compile_contexts(self) -> NestedPipelineContext:
         """

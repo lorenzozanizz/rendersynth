@@ -76,6 +76,9 @@ class PreviewGenerator:
             # The orchestrator will assign the label serialization strategy to the writer
             writer=None
         )
+        self.labeling_orchestrator.set_avail_objects(
+            [obj.name for obj in bpy.data.objects]
+        )
 
         # Some extractors (e.g. PixelMapExtractor, for depth/normal formats) write
         # files themselves outside the normal writer pipeline and need to know a

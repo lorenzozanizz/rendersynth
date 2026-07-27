@@ -123,6 +123,10 @@ class LabelingOrchestrator:
         self.reporter = reporter
 
         self.classifier = ClassificationEngine(self.ctx)
+        # Extract the entity data from the scene, which is to be used by the extractor to
+        # compose together multi-object entities.
+        self.classifier.extract_entity_data()
+
         self.visible_objects = None
 
         # Explicitly instantiate the label formatter and extractor based on the configuration
@@ -132,7 +136,12 @@ class LabelingOrchestrator:
         if self.writer:
             self.extractor.declare_folder_structure(writer.get_strategy())
 
+        # A collection of all available Blender scene objects
+        self.avail_objects: Optional[Collection] = []
         self.label_data = None
+
+    def set_avail_objects(self, avail_set: Collection[str]) -> None:
+        self.avail_objects = avail_set
 
     def process_shot(self, render_cfg: RenderConfig, rendered_data_path: Union[Path | str], depsgraph) -> None:
         """ The orchestrator processes the shot obtaining the render config from the
@@ -154,11 +163,12 @@ class LabelingOrchestrator:
         # blender 'Object' to a point cloud representing raytracing hits. Depending on the
         # labeling type, this becomes a polygon or a box or depth data (TBI)
 
-        # Step 1] Extract the entity data from the scene, which is to be used by the extractor to
-        # compose together multi-object entities.
-        entity_scene_data = self.classifier.extract_entity_data()
+        entity_scene_data = self.classifier.get_entity_data()
+        if entity_scene_data is None:
+            self.classifier.extract_entity_data()
+            entity_scene_data = self.classifier.get_entity_data()
 
-        # Step 2] Extract the visible entities which are going to be bound and classified by the
+        # Step 1] Extract the visible entities which are going to be bound and classified by the
         # extractor and classifier
 
         # Provide a default value for certain parameters, le the extractor express its needs for ray
@@ -256,7 +266,11 @@ class LabelingOrchestrator:
         pass
 
     def prepare_for_shot(self, shot_idx: int) -> None:
-        self.extractor.prepare_for_shot(shot_idx=shot_idx)
+        self.extractor.prepare_for_shot(
+            all_objects=self.avail_objects,
+            class_engine=self.classifier,
+            shot_idx=shot_idx
+        )
 
     def terminate_preparation(self, shot_idx):
         self.extractor.finalize_shot(shot_idx=shot_idx)
