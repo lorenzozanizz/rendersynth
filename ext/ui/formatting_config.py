@@ -200,7 +200,7 @@ class COCOConfigHandler(LabelConfigHandler):
         return {}
 
 @LabelingConfigRegistry.register(SupportedFormats.COCO_POLYGON.value)
-class COCOSegmentationConfigHandler(LabelConfigHandler):
+class COCOPolygonConfigHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
@@ -282,31 +282,20 @@ class NormalHandler(LabelConfigHandler):
         return {}
 
 
-@LabelingConfigRegistry.register(SupportedFormats.SEGMENTATION_EXR.value)
-class NormalHandler(LabelConfigHandler):
+@LabelingConfigRegistry.register(SupportedFormats.SEGMENTATION.value)
+class SegmentationPNGHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
+        source = context.scene.labeling_config
+        LabelConfigHandler._draw_props(layout, source,
+            ('split_map_per_class',)
+        )
         pass
 
     @staticmethod
     def extract(context) -> dict:
         return {}
-
-
-@LabelingConfigRegistry.register(SupportedFormats.SEGMENTATION_PNG.value)
-class NormalHandler(LabelConfigHandler):
-
-    @staticmethod
-    def draw(context, layout) -> None:
-        pass
-
-    @staticmethod
-    def extract(context) -> dict:
-        return {}
-
-
-
 
 
 class LabelConfigDataProperty(PropertyGroup):
@@ -341,3 +330,6 @@ class LabelConfigDataProperty(PropertyGroup):
 
     # Used in [Segmentation*]
     split_map_per_class: BoolProperty(default=False, name="Split map per class")    # type: ignore
+    png_or_exr: EnumProperty(                                                       # type: ignore
+        name="Class map format",
+        items=[("PNG", "PNG", "PNG"), ("EXR", "EXR", "EXR")],)

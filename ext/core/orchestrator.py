@@ -12,7 +12,8 @@ from pathlib import Path
 from .configurations import LabelExtractionConfig, RenderConfig, GenerationConfig, BatchMetadata, WritingConfig
 
 from .io import OutputWriter, LabelingFormatRegistry
-from ..labeling import PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor, PixelMapExtractor, EmptyExtractor
+from ..labeling import (PolygonExtractor, BoundingBoxExtractor, LandmarksExtractor,
+                        PixelMapExtractor, SegmentationExtractor)
 
 from ..labeling.generator import LabelData
 from ..labeling.class_engine import ClassificationEngine
@@ -78,17 +79,26 @@ class ExtractorRepository:
             SupportedFormats.COCO_POLYGON.value,
         )): return PolygonExtractor(data)
 
-        #
+        # For normal maps, the PixelMapExtractor uses a compositor node tree to extract world normal
+        # data from the rendering pass and maps it into an RGB encoding. Note that the generated normal
+        # is currently the WORLD normal, not relative to the camera
         elif matches(
             labeling_format, (SupportedFormats.NORMAL.value,)
         ): return PixelMapExtractor(data, datatype="normal")
 
-        #
+        # For depth maps, the same extractor as normal maps is used. The only thing that changes is the
+        # usage of a different compositor node tree.
         elif matches(
             labeling_format, (SupportedFormats.DEPTH_PNG.value,)
         ): return PixelMapExtractor(data, datatype="depth")
 
         #
+        elif matches(
+            labeling_format, (
+            SupportedFormats.SEGMENTATION.value,
+        )): return SegmentationExtractor(data)
+
+        # Not implemented yet!
         elif matches(
             labeling_format, (SupportedFormats.THERMAL.value,)
         ): return None
