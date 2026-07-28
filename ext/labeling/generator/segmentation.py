@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from typing import Union, Optional, Dict, List, Tuple, Collection
+from typing import Union, List, Tuple, Collection
 from pathlib import Path
 import os
 
@@ -69,6 +69,7 @@ class SegmentationExtractor(Extractor):
         write_dir = self.declared_strategy.get_full_dir_for(shot_idx, "segmentation")
         filename = self.declared_strategy.get_filename_for(shot_idx, "segmentation")
 
+        print("Write direcotry and file name", write_dir, filename)
         # Class membership can in principle change per-shot (e.g. random show/hide of objects),
         # so we rebuild the node chain per shot rather than assuming it was
         # already correct from __enter__. If nothing changed this does nothing.
@@ -85,10 +86,6 @@ class SegmentationExtractor(Extractor):
     def declare_folder_structure(self, folder_strategy: "IOStrategy") -> None:
         self.declared_strategy = folder_strategy
 
-    @staticmethod
-    def needs_folder_structure() -> bool:
-        return True
-
     def finalize_shot(self, shot_idx: int) -> None:
         if self.declared_strategy is None or self.active_output_context_node is None:
             return
@@ -102,9 +99,17 @@ class SegmentationExtractor(Extractor):
         target = os.path.join(directory, f"{prefix}{ext}")
 
         if os.path.exists(produced) and produced != target:
+            print("A produced target was found: ", produced, target)
             if os.path.exists(target):
                 os.remove(target)
             os.rename(produced, target)
+
+    @staticmethod
+    def needs_folder_structure() -> bool:
+        # The compositor writes depth/normal maps directly to disk, outside the
+        # normal writer pipeline, so it needs to know a write location even when there is
+        # no real OutputWriter (e.g. single-shot preview generation).
+        return True
 
     # A development note:
     # generating programmatically compositing nodes is very undocumented in BPY.
@@ -180,6 +185,7 @@ class SegmentationExtractor(Extractor):
             scene.use_nodes = self.prev_scene_use_nodes
             view_layer.use_pass_cryptomatte_object = self.prev_use_pass_cryptomatte_object
 
+            self.delete_previous_node_group()  # <-- tear down cryptomatte/mix/add chain first
             self.compositor.delete_node_group(self.GROUP_NAME)
             self.compositor.unregister_group(self.GROUP_NAME)
 
@@ -221,6 +227,7 @@ class SegmentationExtractor(Extractor):
             self.compositor.register_names_as_group('segmentation_classes', class_node_names)
 
             if self.final_node_name is not None:
+                print("Im linking yo!")
                 self.compositor.link_nodes({
                     # Finally link the last node to the file output, the last node is
                     # the mix/add of all previous nodes.
