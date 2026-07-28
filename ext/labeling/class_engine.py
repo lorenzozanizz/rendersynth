@@ -336,7 +336,7 @@ class ClassificationEngine:
         do_use_rules = label_data.use_rules
         if do_use_rules and missing_names:
             # Only build the name -> bpy object lookup if we actually need it for rules.
-            name_map = {name: bpy.data.objects.get(name) for name in missing_names}
+            name_map = all_names
             mapping_rules = label_data.label_rules
 
             for mapping_rule in mapping_rules:

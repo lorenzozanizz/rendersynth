@@ -23,7 +23,7 @@ class Executor:
     ):
         self.data = data
         self.ctx = context
-        self.parameters: GenerationConfig = gen_params
+        self.generation_config: GenerationConfig = gen_params
         self.write_params = write_params
         self.labeling_params = label_params
         self.reporter = reporter
@@ -58,8 +58,8 @@ class Executor:
         """Execute all compiled operations"""
 
         scene       = self.ctx.scene
-        amount      = self.parameters.amount
-        seed        = self.parameters.seed
+        amount      = self.generation_config.amount
+        seed        = self.generation_config.seed
 
         # Seed the random library with the user requested seed.
         random.seed(seed)
@@ -79,14 +79,20 @@ class Executor:
         try:
             with update_viewport:
 
-                # Hint the labeling orchestrator that generation is commencing
-                labeling_context = self.labeling_orchestrator.begin_generation(self.parameters)
+                # This instructs the orchestrator to pass down its scene objects to its children, meaning that
+                # no more changes to the objects present in the scene should happen after this.
+                self.labeling_orchestrator.propagate_scene_objects()
+
+                # Hint the labeling orchestrator that generation is commencing, this not only
+                # includes the extraction context but also the file writing context.
+                labeling_context = self.labeling_orchestrator.begin_generation(self.generation_config)
                 full_context = self.compile_contexts()
-                # And join the two contexts together
+                # And join the two contexts together, in total: pipeline, writing and extraction configs.
                 with MultiContext(labeling_context, full_context):
 
                     for shot_idx in range(start_idx, start_idx + amount):
-                        # Frame context enters/exits each iteration
+                        # Frame context enters/exits each iteration, it's a different sub-context
+                        # that ensures that we have a consisent initial state for every frame.
 
                         self.writer.set_shot_index(shot_idx)
                         with full_context.frame_context():

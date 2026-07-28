@@ -77,7 +77,7 @@ class PreviewGenerator:
             writer=None
         )
         self.labeling_orchestrator.set_avail_objects(
-            [obj.name for obj in bpy.data.objects]
+            [obj.name for obj in self.ctx.scene.objects]
         )
 
         # Some extractors (e.g. PixelMapExtractor, for depth/normal formats) write
@@ -116,6 +116,9 @@ class PreviewGenerator:
         update_viewport = NoViewportUpdate(disable=False)
 
         with update_viewport:
+            # This instructs the orchestrator to pass down its scene objects to its children, meaning that
+            # no more changes to the objects present in the scene should happen after this.
+            self.labeling_orchestrator.propagate_scene_objects()
             full_context = self.compile_contexts()
             with full_context:
                 # Execute pipeline

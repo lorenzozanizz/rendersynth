@@ -204,6 +204,17 @@ class LabelingOrchestrator:
 
         return
 
+    def propagate_scene_objects(self) -> None:
+        """
+
+        :return:
+        """
+        self.extractor.declare_scene_objects(
+            all_objects=self.avail_objects,
+            class_engine=self.classifier,
+        )
+
+
     def begin_generation(self, gen_cfg: GenerationConfig) -> AbstractContextManager:
         """
 
@@ -267,8 +278,6 @@ class LabelingOrchestrator:
 
     def prepare_for_shot(self, shot_idx: int) -> None:
         self.extractor.prepare_for_shot(
-            all_objects=self.avail_objects,
-            class_engine=self.classifier,
             shot_idx=shot_idx
         )
 

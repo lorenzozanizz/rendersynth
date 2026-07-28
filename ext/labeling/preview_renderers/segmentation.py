@@ -10,6 +10,8 @@ from .registry import PreviewRendererRegistry
 @PreviewRendererRegistry.register
 class SegmentationPreviewRenderer(PreviewRenderer):
 
+    display_mode = "replace"
+
     @staticmethod
     def annotation_types() -> tuple[str, ...]:
         # This is used for both segmentation PNG and segmentation EXR

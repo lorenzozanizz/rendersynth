@@ -80,7 +80,12 @@ class Extractor(metaclass=ABCMeta):
         """ Get the mappings from object to bounding boxes """
         pass
 
-    def prepare_for_shot(self, all_objects: Iterable, class_engine: ClassificationEngine, shot_idx: int) -> None:
+    def declare_scene_objects(self, all_objects: Iterable, class_engine: ClassificationEngine):
+        # For the default implementation, simply ignore the preparation: nothing needs
+        # to be set up.
+        return
+
+    def prepare_for_shot(self, shot_idx: int) -> None:
         """
 
         :param all_objects: All the available objects in the Blender scene

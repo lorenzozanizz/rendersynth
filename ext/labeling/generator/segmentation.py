@@ -37,6 +37,7 @@ class SegmentationExtractor(Extractor):
         self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
         self._pending_map_path: Optional[str] = None
+        self._matte_pending_map = None
 
     def extract(self, visible_objects, classifier, entity_data, camera, estimate_visibility: bool = True,
                 rendered_shot_data: Any = None, **kwargs) -> LabelData:
@@ -61,7 +62,18 @@ class SegmentationExtractor(Extractor):
 
         return ret_data
 
-    def prepare_for_shot(self, all_objects: Iterable, class_engine: ClassificationEngine, shot_idx: int) -> None:
+    def declare_scene_objects(self, all_objects: Iterable, class_engine: ClassificationEngine) -> None:
+        """
+
+        :param all_objects:
+        :param class_engine:
+        :return:
+        """
+        # Compute the required matte mappings
+        matte_mappings = class_engine.request_full_mapping(list(all_objects))
+        self._matte_pending_map = matte_mappings
+
+    def prepare_for_shot(self, shot_idx: int) -> None:
         if self.declared_strategy is None:
             self._pending_map_path = None
             return
@@ -69,11 +81,6 @@ class SegmentationExtractor(Extractor):
         write_dir = self.declared_strategy.get_full_dir_for(shot_idx, "segmentation")
         filename = self.declared_strategy.get_filename_for(shot_idx, "segmentation")
 
-        print("Write direcotry and file name", write_dir, filename)
-        # Class membership can in principle change per-shot (e.g. random show/hide of objects),
-        # so we rebuild the node chain per shot rather than assuming it was
-        # already correct from __enter__. If nothing changed this does nothing.
-        self.active_output_context_node.rebuild_for_objects(all_objects, class_engine)
         self.active_output_context_node.set_write_path(write_dir, filename)
 
         self._pending_map_path = os.path.join(write_dir, f"{filename}.{self.png_or_exr}")
@@ -81,6 +88,7 @@ class SegmentationExtractor(Extractor):
     def get_context(self) -> AbstractContextManager:
         config = {"png_or_exr": self.png_or_exr}
         self.active_output_context_node = SegmentationExtractor.CryptoMatteSegmentationCompositor(self.ctx, config)
+        self.active_output_context_node.assign_mappings(self._matte_pending_map)
         return self.active_output_context_node
 
     def declare_folder_structure(self, folder_strategy: "IOStrategy") -> None:
@@ -99,7 +107,6 @@ class SegmentationExtractor(Extractor):
         target = os.path.join(directory, f"{prefix}{ext}")
 
         if os.path.exists(produced) and produced != target:
-            print("A produced target was found: ", produced, target)
             if os.path.exists(target):
                 os.remove(target)
             os.rename(produced, target)
@@ -122,20 +129,18 @@ class SegmentationExtractor(Extractor):
         N-1 chained additive Mix nodes accumulating them into a single class map.
         """
 
-        RENDER_LAYER = "render_layer"
-        FILE_OUTPUT = "file_output"
         GROUP_NAME = "segmentation_tree"
 
         # Utilities for the NodeCompositor object to create nodes.
-        node_config = {
-            RENDER_LAYER: ('CompositorNodeRLayers', []),
-            FILE_OUTPUT: ('CompositorNodeOutputFile', []),
+        base_nodes = {
+            "render_layer": ('CompositorNodeRLayers', []),
+            "file_output": ('CompositorNodeOutputFile', []),
         }
 
-        link_config: set = set()
+        base_link_config: set = set()
 
-        default_config = {
-            FILE_OUTPUT: [('base_path', '')],
+        base_default_config = {
+            "file_output": [('base_path', '')],
         }
 
         def __init__(self, context, config: dict):
@@ -148,6 +153,8 @@ class SegmentationExtractor(Extractor):
 
             self.compositor = NodeCompositor(context=self.ctx)
             self.final_node_name: Optional[str] = None
+
+            self.matte_mappings: Optional[dict] = None
 
         def __enter__(self):
             scene = self.ctx.scene
@@ -162,47 +169,47 @@ class SegmentationExtractor(Extractor):
             # Base nodes only (render layer + file output). Per-class nodes are added by
             # rebuild_for_objects(), called from prepare_for_shot() once we actually know
             # the object -> class mapping.
-            self.compositor.gen_nodes(self.node_config)
-            self.compositor.link_nodes(self.link_config)
-            self.compositor.set_node_defaults(self.default_config)
 
-            output_node = self.compositor.get_node(self.FILE_OUTPUT)
+            self.rebuild_for_objects(self.matte_mappings)
+
+            output_node = self.compositor.get_node("file_output")
             output_node.format.file_format = 'PNG' if self.png_or_exr == 'png' else 'OPEN_EXR'
             # Like other extractors we need to disable color management and gamma correction
             # to get the real colors output.
             output_node.format.color_management = "OVERRIDE"
             output_node.format.view_settings.view_transform = "Raw"
 
-            self.compositor.register_names_as_group(
-                self.GROUP_NAME, [self.RENDER_LAYER, self.FILE_OUTPUT]
-            )
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb):
+            return
             scene = self.ctx.scene
             view_layer = scene.view_layers["ViewLayer"]
 
             scene.use_nodes = self.prev_scene_use_nodes
             view_layer.use_pass_cryptomatte_object = self.prev_use_pass_cryptomatte_object
 
-            self.delete_previous_node_group()  # <-- tear down cryptomatte/mix/add chain first
+            # This deletes all nodes, default and non default.
             self.compositor.delete_node_group(self.GROUP_NAME)
             self.compositor.unregister_group(self.GROUP_NAME)
 
+        def assign_mappings(self, mappings: Dict[str, LabelClass]) -> None:
+            self.matte_mappings = mappings
+
         def set_write_path(self, directory: Union[str, Path], name: str) -> None:
-            node = self.compositor.get_node(self.FILE_OUTPUT)
+            node = self.compositor.get_node("file_output")
             if node is None:
                 return
             node.base_path = str(directory)
             node.file_slots[0].path = name
 
-        def rebuild_for_objects(self, all_names: Collection[str], class_engine: ClassificationEngine) -> None:
+        def rebuild_for_objects(self, mapping: Dict[str, LabelClass]) -> None:
             """ Tears down the previous per-class node chain (if any) and rebuilds
             it from the current object -> class mapping. Must run after __enter__.
             """
-            self.delete_previous_node_group()
-
-            mapping = class_engine.request_full_mapping(all_names)
+            if self.matte_mappings is None:
+                raise RuntimeError("Cannot construct a compositor tree with cryptomattes as the mappings "
+                                   "were not previously assigned to the compositor context. ")
 
             class_to_objects: Dict[str, List[str]] = {}
             class_colors: Dict[str, tuple] = {}
@@ -220,19 +227,24 @@ class SegmentationExtractor(Extractor):
                 class_to_objects, class_colors
             )
 
+            # Enrich the computed nodes with the default configurations.
+            node_config.update(self.base_nodes)
+            default_config.update(self.base_default_config)
+
             self.compositor.gen_nodes(node_config)
             self.compositor.link_nodes(link_config)
-            self.compositor.set_node_defaults(default_config)
-
-            self.compositor.register_names_as_group('segmentation_classes', class_node_names)
 
             if self.final_node_name is not None:
-                print("Im linking yo!")
                 self.compositor.link_nodes({
                     # Finally link the last node to the file output, the last node is
                     # the mix/add of all previous nodes.
-                    ((self.final_node_name, self.FILE_OUTPUT), (0, 0))
+                    ((self.final_node_name, "file_output"), ("Result", "Image"))
                 })
+            self.compositor.set_node_defaults(default_config)
+
+            class_node_names = list(class_node_names) + list(self.base_nodes.keys())
+            self.compositor.register_names_as_group(self.GROUP_NAME, class_node_names)
+
 
         def delete_previous_node_group(self) -> None:
             if 'segmentation_classes' in self.compositor.groups:
@@ -279,7 +291,7 @@ class SegmentationExtractor(Extractor):
                 )
                 class_node_names.extend([crypto_name, mix_name])
 
-                link_config.add(((self.RENDER_LAYER, crypto_name), ('Image', 'Image')))
+                link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
                 link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
 
                 # Set as default value for the "A" and "B of the mixer just
@@ -309,7 +321,7 @@ class SegmentationExtractor(Extractor):
                     link_config.add(((mix_name, add_name), ('Result', 'B')))
                     # THIS is important: without this we would dim out some of the color information
                     # for no reason.
-                    default_config[add_name] = [('Factor', 1.0)]
+                    default_config[add_name] = [(0, 1.0)]
 
                     prev_color_add_name = add_name
 

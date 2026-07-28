@@ -69,7 +69,10 @@ class NodeCompositor:
                 from_port = self._get_port_number(from_node, from_port, 'output')
             if isinstance(to_port, str):
                 to_port = self._get_port_number(to_node, to_port, 'input')
-
+            if from_port < 0 or to_port < 0:
+                raise RuntimeError(f"A port could not be resolved for a link between {from_n} and {to_n}. "
+                                   f"Resolved to node port numbers {from_port} and {to_port}.")
+            print("Ports: ", from_node.outputs[from_port], to_node.inputs[to_port])
             self.tree.links.new(from_node.outputs[from_port], to_node.inputs[to_port])
 
     def set_node_defaults(self, node_defaults: dict) -> None:
@@ -157,13 +160,8 @@ class NodeCompositor:
         :param node_type: Socket collection type, either 'input' or 'output'.
         :return: Socket index if found, otherwise -1.
         """
-        if node_type == 'output':
-            for idx, socket in enumerate(node.outputs):
-                if socket.name == name:
-                    return idx
-            return -1
-        else:
-            for idx, socket in enumerate(node.inputs):
-                if socket.name == name:
-                    return idx
-            return -1
+        sockets = node.outputs if node_type == 'output' else node.inputs
+        for idx, socket in enumerate(sockets):
+            if socket.name == name and socket.enabled:
+                return idx
+        return -1
