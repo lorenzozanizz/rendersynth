@@ -156,6 +156,7 @@ class SegmentationExtractor(Extractor):
 
             self.matte_mappings: Optional[dict] = None
 
+
         def __enter__(self):
             scene = self.ctx.scene
             view_layer = scene.view_layers["ViewLayer"]
@@ -182,7 +183,6 @@ class SegmentationExtractor(Extractor):
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb):
-            return
             scene = self.ctx.scene
             view_layer = scene.view_layers["ViewLayer"]
 
