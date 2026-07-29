@@ -38,6 +38,8 @@ class SegmentationExtractor(Extractor):
         self.active_output_context_node = None
         self._pending_map_path: Optional[str] = None
         self._matte_pending_map = None
+        self.declared_output_nodes = []
+
 
     def extract(self, visible_objects, classifier, entity_data, camera, estimate_visibility: bool = True,
                 rendered_shot_data: Any = None, **kwargs) -> LabelData:
@@ -147,6 +149,7 @@ class SegmentationExtractor(Extractor):
             self.config = config
             self.ctx = context
             self.png_or_exr: Literal["png", "exr"] = config.get("png_or_exr")
+            self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class")
 
             self.prev_scene_use_nodes = None
             self.prev_use_pass_cryptomatte_object = None
@@ -167,10 +170,8 @@ class SegmentationExtractor(Extractor):
             scene.use_nodes = True
             view_layer.use_pass_cryptomatte_object = True
 
-            # Base nodes only (render layer + file output). Per-class nodes are added by
-            # rebuild_for_objects(), called from prepare_for_shot() once we actually know
-            # the object -> class mapping.
-
+            # This function is the main hook for the composite tree constructor, which changes
+            # based on the output format (EXR/PNG) and the choice of distinguishing one mask per class
             self.rebuild_for_objects(self.matte_mappings)
 
             output_node = self.compositor.get_node("file_output")
@@ -203,6 +204,15 @@ class SegmentationExtractor(Extractor):
             node.base_path = str(directory)
             node.file_slots[0].path = name
 
+        def build_png_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
+            pass
+
+        def build_exr_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
+            pass
+
+        def build_exr_single_output(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
+            pass
+
         def rebuild_for_objects(self, mapping: Dict[str, LabelClass]) -> None:
             """ Tears down the previous per-class node chain (if any) and rebuilds
             it from the current object -> class mapping. Must run after __enter__.
@@ -223,7 +233,20 @@ class SegmentationExtractor(Extractor):
                 self.final_node_name = None
                 return
 
-            node_config, link_config, default_config, class_node_names = self._build_class_chain(
+            builder_func = None
+            if self.png_or_exr == "png" and self.split_map_per_class == "single":
+                builder_func = self.build_png_single_output
+            elif self.png_or_exr == "png" and self.split_map_per_class == "per_class":
+                builder_func = self.build_png_multiple_outputs
+            elif self.png_or_exr == "exr" and self.split_map_per_class == "single":
+                builder_func = self.build_exr_single_output
+            elif self.png_or_exr == "exr" and self.split_map_per_class == "per_class":
+                builder_func = self.build_exr_multiple_outputs
+            if builder_func is None:
+                raise ValueError("The configuration parameters for the segmentation extractor are incorrect "
+                                 "and do not correspond to a compositor node tree builder.")
+
+            node_config, link_config, default_config, class_node_names = builder_func(
                 class_to_objects, class_colors
             )
 
@@ -252,7 +275,7 @@ class SegmentationExtractor(Extractor):
                 self.compositor.unregister_group('segmentation_classes')
             self.final_node_name = None
 
-        def _build_class_chain(
+        def build_png_single_output(
             self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]
         ) -> Tuple[dict, set, dict, list]:
             """ Builds one Cryptomatte + color Mix node per class, then chains N-1 additive
