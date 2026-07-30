@@ -204,9 +204,6 @@ class SegmentationExtractor(Extractor):
             node.base_path = str(directory)
             node.file_slots[0].path = name
 
-        def build_png_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
-            pass
-
         def build_exr_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
             pass
 
@@ -347,6 +344,63 @@ class SegmentationExtractor(Extractor):
                     default_config[add_name] = [(0, 1.0)]
 
                     prev_color_add_name = add_name
+
+            self.final_node_name = prev_color_add_name
+            return node_config, link_config, default_config, class_node_names
+
+        def build_png_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) \
+                -> Tuple[dict, set, dict, list]:
+            """ Builds one Cryptomatte + color Mix node per class, then chains N-1 additive
+            Mix nodes to accumulate them into a single class map. This is used for PNG output,
+            one file per shot mode. One-file-per-class distinguishes each cryptomatte object node.
+            """
+            node_config: dict = {}
+            link_config: set = set()
+            default_config: dict = {}
+            class_node_names: list = []
+
+            view_layer_name = self.ctx.scene.view_layers["ViewLayer"].name
+            layer_id = f"{view_layer_name}.CryptoObject"
+
+            prev_color_add_name: Optional[str] = None
+
+            for cls_id, obj_names in class_to_objects.items():
+
+                crypto_name = f"cryptomatte_{cls_id}"
+                mix_name = f"mix_{cls_id}"
+                out_name = f"out_{cls_id}"
+                color = class_colors.get(cls_id, (1.0, 1.0, 1.0))
+
+                node_config[crypto_name] = (
+                    'CompositorNodeCryptomatteV2',
+                    [
+                        {"name": "source", "value": "RENDER"},
+                        {"name": "layer_name", "value": layer_id},
+                        {"name": "matte_id", "value": ",".join(obj_names)},
+                    ]
+                )
+                node_config[mix_name] = (
+                    'ShaderNodeMix',
+                    [
+                        {"name": "data_type", "value": "RGBA"},
+                        {"name": "blend_type", "value": "MIX"},
+                    ]
+                )
+                class_node_names.extend([crypto_name, mix_name])
+
+                link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
+                link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+
+                # Set as default value for the "A" and "B of the mixer just
+                # the color to be written for the class and full BLACK (0, 0, 0, 1.0) RGBA
+                default_config[mix_name] = [
+                    ('A', 0, 0.0), ('A', 1, 0.0), ('A', 2, 0.0), ('A', 3, 1.0),
+                    ('B', 0, color[0]), ('B', 1, color[1]), ('B', 2, color[2]), ('B', 3, 1.0),
+                ]
+                # No Add node should be inserted here, instead insert an output node and configure it.
+                node_config[out_name] = (
+                    'CompositorNodeOutputFile', []
+                )
 
             self.final_node_name = prev_color_add_name
             return node_config, link_config, default_config, class_node_names
