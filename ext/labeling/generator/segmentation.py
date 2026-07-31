@@ -146,8 +146,6 @@ class SegmentationExtractor(Extractor):
         def __init__(self, context, config: dict):
             self.config = config
             self.ctx = context
-            self.png_or_exr: Literal["png", "exr"] = config.get("png_or_exr")
-            self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class")
 
             self.prev_scene_use_nodes = None
             self.prev_use_pass_cryptomatte_object = None
@@ -156,7 +154,11 @@ class SegmentationExtractor(Extractor):
             self.output_nodes: List[str] = []
 
             self.matte_mappings: Optional[dict] = None
-
+            # Configurations taken from the outer extractor straight out of the
+            # blender scene
+            self.png_or_exr: Literal["png", "exr"] = config.get("png_or_exr")
+            self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class")
+            self.discretize = config.get("discretize")
 
         def __enter__(self):
             scene = self.ctx.scene
@@ -182,7 +184,12 @@ class SegmentationExtractor(Extractor):
                     output_node.format.view_settings.view_transform = "Raw"
                 else:
                     # OpenEXR raw numerical formatting.
-                    pass
+                    output_node.format.file_format = "OPENEXR MULTILAYER"
+                    output_node.format.color_management = "OVERRIDE"
+                    # The data we have to store is not a color data, so we instruct openexr to NOt apply any
+                    # gamma correction or the sorts.
+                    output_node.format.linear_colorspace_settings.name = "NON-COLOR"
+
 
             return self
 
@@ -289,6 +296,7 @@ class SegmentationExtractor(Extractor):
             for cls_id, obj_names in class_to_objects.items():
                 crypto_name = f"cryptomatte_{cls_id}"
                 mix_name = f"mix_{cls_id}"
+                thresh_name = f"threshold_{cls_id}"
                 color = class_colors.get(cls_id, (1.0, 1.0, 1.0))
 
                 node_config[crypto_name] = (
@@ -299,6 +307,14 @@ class SegmentationExtractor(Extractor):
                         {"name": "matte_id", "value": ",".join(obj_names)},
                     ]
                 )
+                if self.discretize:
+                    # Add a threshold node and put it in between the matte and the mixer to get clean boundaries.
+                    node_config[thresh_name] = (
+                        'CompositorNodeMath',
+                        [
+                            {"name": "operation", "value": "GREATER_THAN"},
+                        ]
+                    )
                 node_config[mix_name] = (
                     'ShaderNodeMix',
                     [
@@ -309,7 +325,12 @@ class SegmentationExtractor(Extractor):
                 class_node_names.extend([crypto_name, mix_name])
 
                 link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
-                link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+                if not self.discretize:
+                    link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+                else:
+                    # If we are discretizing, we need an intermediate link.
+                    link_config.add(((crypto_name, thresh_name), ('Matte', 0)))  # Matte -> Value input 0
+                    link_config.add(((thresh_name, mix_name), ('Value', 'Factor')))  # thresholded -> Factor
 
                 # Set as default value for the "A" and "B of the mixer just
                 # the color to be written for the class and full BLACK (0, 0, 0, 1.0) RGBA
