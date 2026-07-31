@@ -395,6 +395,8 @@ class SegmentationExtractor(Extractor):
                 crypto_name = f"cryptomatte_{cls_id}"
                 mix_name = f"mix_{cls_id}"
                 out_name = f"out_{cls_id}"
+                thresh_name = f"threshold_{cls_id}"
+
                 color = class_colors.get(cls_id, (1.0, 1.0, 1.0))
 
                 node_config[crypto_name] = (
@@ -415,7 +417,12 @@ class SegmentationExtractor(Extractor):
                 class_node_names.extend([crypto_name, mix_name])
 
                 link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
-                link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+                if not self.discretize:
+                    link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+                else:
+                    # If we are discretizing, we need an intermediate link.
+                    link_config.add(((crypto_name, thresh_name), ('Matte', 0)))  # Matte -> Value input 0
+                    link_config.add(((thresh_name, mix_name), ('Value', 'Factor')))  # thresholded -> Factor
 
                 # Set as default value for the "A" and "B of the mixer just
                 # the color to be written for the class and full BLACK (0, 0, 0, 1.0) RGBA
