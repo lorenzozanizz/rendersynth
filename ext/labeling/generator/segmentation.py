@@ -136,13 +136,11 @@ class SegmentationExtractor(Extractor):
         # Utilities for the NodeCompositor object to create nodes.
         base_nodes = {
             "render_layer": ('CompositorNodeRLayers', []),
-            "file_output": ('CompositorNodeOutputFile', []),
         }
 
         base_link_config: set = set()
 
         base_default_config = {
-            "file_output": [('base_path', '')],
         }
 
         def __init__(self, context, config: dict):
@@ -155,7 +153,7 @@ class SegmentationExtractor(Extractor):
             self.prev_use_pass_cryptomatte_object = None
 
             self.compositor = NodeCompositor(context=self.ctx)
-            self.final_node_name: Optional[str] = None
+            self.output_nodes: List[str] = []
 
             self.matte_mappings: Optional[dict] = None
 
@@ -174,12 +172,17 @@ class SegmentationExtractor(Extractor):
             # based on the output format (EXR/PNG) and the choice of distinguishing one mask per class
             self.rebuild_for_objects(self.matte_mappings)
 
-            output_node = self.compositor.get_node("file_output")
-            output_node.format.file_format = 'PNG' if self.png_or_exr == 'png' else 'OPEN_EXR'
-            # Like other extractors we need to disable color management and gamma correction
-            # to get the real colors output.
-            output_node.format.color_management = "OVERRIDE"
-            output_node.format.view_settings.view_transform = "Raw"
+            for output_node in self.output_nodes:
+                output_node = self.compositor.get_node(output_node)
+                if self.png_or_exr == 'PNG':
+                    output_node.format.file_format = 'PNG'
+                    # Like other extractors we need to disable color management and gamma correction
+                    # to get the real colors output.
+                    output_node.format.color_management = "OVERRIDE"
+                    output_node.format.view_settings.view_transform = "Raw"
+                else:
+                    # OpenEXR raw numerical formatting.
+                    pass
 
             return self
 
@@ -227,7 +230,6 @@ class SegmentationExtractor(Extractor):
 
             if not class_to_objects:
                 # Nothing classified: leave file_output unlinked rather than erroring.
-                self.final_node_name = None
                 return
 
             builder_func = None
@@ -253,13 +255,6 @@ class SegmentationExtractor(Extractor):
 
             self.compositor.gen_nodes(node_config)
             self.compositor.link_nodes(link_config)
-
-            if self.final_node_name is not None:
-                self.compositor.link_nodes({
-                    # Finally link the last node to the file output, the last node is
-                    # the mix/add of all previous nodes.
-                    ((self.final_node_name, "file_output"), ("Result", "Image"))
-                })
             self.compositor.set_node_defaults(default_config)
 
             class_node_names = list(class_node_names) + list(self.base_nodes.keys())
@@ -270,7 +265,7 @@ class SegmentationExtractor(Extractor):
             if 'segmentation_classes' in self.compositor.groups:
                 self.compositor.delete_node_group('segmentation_classes')
                 self.compositor.unregister_group('segmentation_classes')
-            self.final_node_name = None
+            self.output_nodes = None
 
         def build_png_single_output(
             self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]
@@ -288,6 +283,8 @@ class SegmentationExtractor(Extractor):
             layer_id = f"{view_layer_name}.CryptoObject"
 
             prev_color_add_name: Optional[str] = None
+
+            node_config["file_output"] =  ('CompositorNodeOutputFile', [])
 
             for cls_id, obj_names in class_to_objects.items():
                 crypto_name = f"cryptomatte_{cls_id}"
@@ -345,7 +342,14 @@ class SegmentationExtractor(Extractor):
 
                     prev_color_add_name = add_name
 
-            self.final_node_name = prev_color_add_name
+            final_node_name = prev_color_add_name
+            self.output_nodes = ["file_output"]
+            if final_node_name is not None:
+                link_config.add(
+                    # Finally link the last node to the file output, the last node is
+                    # the mix/add of all previous nodes.
+                    ((final_node_name, "file_output"), ("Result", "Image"))
+                )
             return node_config, link_config, default_config, class_node_names
 
         def build_png_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) \
@@ -362,7 +366,8 @@ class SegmentationExtractor(Extractor):
             view_layer_name = self.ctx.scene.view_layers["ViewLayer"].name
             layer_id = f"{view_layer_name}.CryptoObject"
 
-            prev_color_add_name: Optional[str] = None
+            # Reset the output nodes
+            self.output_nodes = []
 
             for cls_id, obj_names in class_to_objects.items():
 
@@ -401,6 +406,7 @@ class SegmentationExtractor(Extractor):
                 node_config[out_name] = (
                     'CompositorNodeOutputFile', []
                 )
+                self.output_nodes.append("file_output")
+                link_config.add(((mix_name, out_name), ("Result", "Image")))
 
-            self.final_node_name = prev_color_add_name
             return node_config, link_config, default_config, class_node_names
