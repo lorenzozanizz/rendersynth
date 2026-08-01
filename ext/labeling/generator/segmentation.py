@@ -159,6 +159,7 @@ class SegmentationExtractor(Extractor):
             self.png_or_exr: Literal["png", "exr"] = config.get("png_or_exr")
             self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class")
             self.discretize = config.get("discretize")
+            self.black_and_white = config.get("black_and_white")
 
         def __enter__(self):
             scene = self.ctx.scene
@@ -182,6 +183,10 @@ class SegmentationExtractor(Extractor):
                     # to get the real colors output.
                     output_node.format.color_management = "OVERRIDE"
                     output_node.format.view_settings.view_transform = "Raw"
+                    if self.black_and_white:
+                        # Can only do this trick with png images, openEXR requires extra nodes to be
+                        # added during tree compositing.
+                        output_node.format.color_mode = "BW"
                 else:
                     # OpenEXR raw numerical formatting.
                     output_node.format.file_format = "OPENEXR MULTILAYER"
@@ -215,9 +220,6 @@ class SegmentationExtractor(Extractor):
             node.file_slots[0].path = name
 
         def build_exr_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
-            pass
-
-        def build_exr_single_output(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
             pass
 
         def rebuild_for_objects(self, mapping: Dict[str, LabelClass]) -> None:
@@ -438,3 +440,70 @@ class SegmentationExtractor(Extractor):
                 link_config.add(((mix_name, out_name), ("Result", "Image")))
 
             return node_config, link_config, default_config, class_node_names
+
+        def build_exr_single_output(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
+            """
+
+            :param class_to_objects:
+            :param class_colors:
+            :return:
+            """
+            node_config: dict = {}
+            link_config: set = set()
+            default_config: dict = {}
+            class_node_names: list = []
+
+            view_layer_name = self.ctx.scene.view_layers["ViewLayer"].name
+            layer_id = f"{view_layer_name}.CryptoObject"
+
+            # The EXR is a single node, we will create many inputs rather than stacking everything
+            # together as in PNGs.
+            out_name = "file_output"
+            self.output_nodes = [out_name]
+            for cls_id, obj_names in class_to_objects.items():
+
+                crypto_name = f"cryptomatte_{cls_id}"
+                mix_name = f"mix_{cls_id}"
+                thresh_name = f"threshold_{cls_id}"
+
+                color = class_colors.get(cls_id, (1.0, 1.0, 1.0))
+
+                node_config[crypto_name] = (
+                    'CompositorNodeCryptomatteV2',
+                    [
+                        {"name": "source", "value": "RENDER"},
+                        {"name": "layer_name", "value": layer_id},
+                        {"name": "matte_id", "value": ",".join(obj_names)},
+                    ]
+                )
+                node_config[mix_name] = (
+                    'ShaderNodeMix',
+                    [
+                        {"name": "data_type", "value": "RGBA"},
+                        {"name": "blend_type", "value": "MIX"},
+                    ]
+                )
+                class_node_names.extend([crypto_name, mix_name])
+
+                link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
+                if not self.discretize:
+                    link_config.add(((crypto_name, mix_name), ('Matte', 'Factor')))
+                else:
+                    # If we are discretizing, we need an intermediate link.
+                    link_config.add(((crypto_name, thresh_name), ('Matte', 0)))  # Matte -> Value input 0
+                    link_config.add(((thresh_name, mix_name), ('Value', 'Factor')))  # thresholded -> Factor
+
+                # Set as default value for the "A" and "B of the mixer just
+                # the color to be written for the class and full BLACK (0, 0, 0, 1.0) RGBA
+                default_config[mix_name] = [
+                    ('A', 0, 0.0), ('A', 1, 0.0), ('A', 2, 0.0), ('A', 3, 1.0),
+                    ('B', 0, color[0]), ('B', 1, color[1]), ('B', 2, color[2]), ('B', 3, 1.0),
+                ]
+                # No Add node should be inserted here, instead insert an output node and configure it.
+                node_config[out_name] = (
+                    'CompositorNodeOutputFile', []
+                )
+                link_config.add(((mix_name, out_name), ("Result", "Image")))
+
+            return node_config, link_config, default_config, class_node_names
+

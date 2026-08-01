@@ -289,7 +289,7 @@ class SegmentationPNGHandler(LabelConfigHandler):
     def draw(context, layout) -> None:
         source = context.scene.labeling_config
         LabelConfigHandler._draw_props(layout, source,
-            ('png_or_exr', 'discretize', 'split_map_per_class',)
+            ('png_or_exr', 'discretize', 'split_map_per_class', 'black_and_white')
         )
         pass
 
@@ -334,3 +334,4 @@ class LabelConfigDataProperty(PropertyGroup):
         name="Class map format",
         items=[("PNG", "PNG", "PNG"), ("EXR", "EXR", "EXR")],)
     discretize: BoolProperty(default=True, name="Discretize")                       # type: ignore
+    black_and_white: BoolProperty(default=False, name="Black and White")            # type. ignore
