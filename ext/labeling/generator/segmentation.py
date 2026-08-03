@@ -1,5 +1,5 @@
 from contextlib import AbstractContextManager
-from typing import Union, List, Tuple, Collection
+from typing import Union, List, Tuple, Collection, Callable
 from pathlib import Path
 import os
 
@@ -254,17 +254,23 @@ class SegmentationExtractor(Extractor):
                 raise ValueError("The configuration parameters for the segmentation extractor are incorrect "
                                  "and do not correspond to a compositor node tree builder.")
 
-            node_config, link_config, default_config, class_node_names = builder_func(
+            node_config, link_config, default_config, class_node_names, callback = builder_func(
                 class_to_objects, class_colors
             )
-
             # Enrich the computed nodes with the default configurations.
             node_config.update(self.base_nodes)
             default_config.update(self.base_default_config)
 
             self.compositor.gen_nodes(node_config)
+
+            # Allow each builder to modify the tree after nodes have been generated (for example
+            # to programmatically add sockets)
+            if callback is not None:
+                callback(self.compositor)
+
             self.compositor.link_nodes(link_config)
             self.compositor.set_node_defaults(default_config)
+
 
             class_node_names = list(class_node_names) + list(self.base_nodes.keys())
             self.compositor.register_names_as_group(self.GROUP_NAME, class_node_names)
@@ -278,7 +284,7 @@ class SegmentationExtractor(Extractor):
 
         def build_png_single_output(
             self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]
-        ) -> Tuple[dict, set, dict, list]:
+        ) -> Tuple[dict, set, dict, list, Optional[Callable]]:
             """ Builds one Cryptomatte + color Mix node per class, then chains N-1 additive
             Mix nodes to accumulate them into a single class map. This is used for PNG output,
             one file per shot mode. One-file-per-class distinguishes each cryptomatte object node.
@@ -373,10 +379,10 @@ class SegmentationExtractor(Extractor):
                     # the mix/add of all previous nodes.
                     ((final_node_name, "file_output"), ("Result", "Image"))
                 )
-            return node_config, link_config, default_config, class_node_names
+            return node_config, link_config, default_config, class_node_names, None
 
         def build_png_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) \
-                -> Tuple[dict, set, dict, list]:
+                -> Tuple[dict, set, dict, list, Optional[Callable]]:
             """ Builds one Cryptomatte + color Mix node per class, then chains N-1 additive
             Mix nodes to accumulate them into a single class map. This is used for PNG output,
             one file per shot mode. One-file-per-class distinguishes each cryptomatte object node.
@@ -439,9 +445,10 @@ class SegmentationExtractor(Extractor):
                 self.output_nodes.append("file_output")
                 link_config.add(((mix_name, out_name), ("Result", "Image")))
 
-            return node_config, link_config, default_config, class_node_names
+            return node_config, link_config, default_config, class_node_names, None
 
-        def build_exr_single_output(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
+        def build_exr_single_output(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]
+                                    ) -> Tuple[dict, set, dict, list, Optional[Callable]]:
             """
 
             :param class_to_objects:
@@ -460,7 +467,23 @@ class SegmentationExtractor(Extractor):
             # together as in PNGs.
             out_name = "file_output"
             self.output_nodes = [out_name]
-            for cls_id, obj_names in class_to_objects.items():
+
+            # For each class, generate a corresponding socket in the EXR Multilayer compositor node
+            # The first socket is already there, so start from 1. (and rename it)
+            compositor_socket_names = [f"socket_out_{c_id}" for c_id in class_to_objects.keys()]
+            def callback_fn(compositor: NodeCompositor):
+                nonlocal compositor_socket_names
+                output_node = compositor.get_node(out_name)
+                for ind, name in enumerate(compositor_socket_names):
+                    if ind == 0:
+                        output_node.layer_slots[0].name = name
+                    else:
+                        output_node.layer_slots.new(name)
+
+            for cls_id, obj_names, class_socket in zip(
+                class_to_objects.items(),
+                compositor_socket_names
+            ):
 
                 crypto_name = f"cryptomatte_{cls_id}"
                 mix_name = f"mix_{cls_id}"
@@ -503,7 +526,7 @@ class SegmentationExtractor(Extractor):
                 node_config[out_name] = (
                     'CompositorNodeOutputFile', []
                 )
-                link_config.add(((mix_name, out_name), ("Result", "Image")))
+                link_config.add(((mix_name, out_name), ("Result", class_socket)))
 
-            return node_config, link_config, default_config, class_node_names
+            return node_config, link_config, default_config, class_node_names, callback_fn
 
