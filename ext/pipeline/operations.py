@@ -46,13 +46,13 @@ class PipelineOperation(DoubleFramedPipe, metaclass=ABCMeta):
 class AxisSetMask:
 
     def __init__(self, config: dict[str, Any]):
-        self.dimensions = config[wsk.DIMENSION.value]
+        self._dimensions = config[wsk.DIMENSION.value]
         self.x = config[wsk.AXIS_RANDOMIZE_PREFIX_X.value]
         self.y = config[wsk.AXIS_RANDOMIZE_PREFIX_Y.value]
         self.z = config[wsk.AXIS_RANDOMIZE_PREFIX_Z.value]
 
     def dimensions(self):
-        return self.dimensions
+        return self._dimensions
 
     def assign(self, vector_attribute: Any, value: Any):
         """
