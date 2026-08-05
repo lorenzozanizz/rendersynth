@@ -19,7 +19,7 @@ def geometric(p: float) -> int:
     :return: number of trials (>=1)
     """
     # Cheap safeguard against possible infinite lock mode.
-    if p < 1e4:
+    if p < 1e-4:
         return 10000
     trials = 1
     while random.random() >= p:
