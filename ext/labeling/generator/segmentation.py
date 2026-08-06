@@ -219,9 +219,6 @@ class SegmentationExtractor(Extractor):
             node.base_path = str(directory)
             node.file_slots[0].path = name
 
-        def build_exr_multiple_outputs(self, class_to_objects: Dict[str, List[str]], class_colors: Dict[str, tuple]) -> None:
-            pass
-
         def rebuild_for_objects(self, mapping: Dict[str, LabelClass]) -> None:
             """ Tears down the previous per-class node chain (if any) and rebuilds
             it from the current object -> class mapping. Must run after __enter__.
@@ -249,7 +246,8 @@ class SegmentationExtractor(Extractor):
             elif self.png_or_exr == "exr" and self.split_map_per_class == "single":
                 builder_func = self.build_exr_single_output
             elif self.png_or_exr == "exr" and self.split_map_per_class == "per_class":
-                builder_func = self.build_exr_multiple_outputs
+                raise ValueError("When using MultilayerEXR a single .exr file contains the labeling information"
+                                 "for all classes, so multiple files are useless.")
             if builder_func is None:
                 raise ValueError("The configuration parameters for the segmentation extractor are incorrect "
                                  "and do not correspond to a compositor node tree builder.")
