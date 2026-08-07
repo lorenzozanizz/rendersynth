@@ -288,9 +288,7 @@ class SegmentationPNGHandler(LabelConfigHandler):
     @staticmethod
     def draw(context, layout) -> None:
         source = context.scene.labeling_config
-        LabelConfigHandler._draw_props(layout, source,
-            ('png_or_exr')
-        )
+        LabelConfigHandler._draw_props(layout, source,'png_or_exr')
         if "EXR" not in source.png_or_exr:
             layout.prop(source, "split_map_per_class")
         # Drawe remaining attributes

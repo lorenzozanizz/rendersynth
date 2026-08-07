@@ -9,21 +9,23 @@ class FolderStructure(metaclass=ABCMeta):
 
     @abstractmethod
     def get_subdir_for(self, shot_id: Union[int, ], f_type: str | Literal["image"]) -> str:
-        """
+        """ Get the name of the subdirectory for the given file type and shot id. The
+        interface allows for different shot ids to be positioned at different directories.
+        Naturally all possible directories need to be instantiated.
 
-        :param shot_id:
-        :param f_type:
-        :return:
+        :param shot_id: The id of the shot
+        :param f_type: The type of file being written, user defined
+        :return: the name of the subdir
         """
         pass
 
     @abstractmethod
     def get_filename_for(self, shot_id: Union[int,  ], f_type: str | Literal["image"]) -> str:
-        """
+        """ Get the name of the file for a given shot id and file type (user defined)
 
-        :param shot_id:
-        :param f_type:
-        :return:
+        :param shot_id: The id of the shot
+        :param f_type: The type of file being written, user defined
+        :return: the filename
         """
         pass
 
@@ -34,10 +36,10 @@ class FolderStructure(metaclass=ABCMeta):
 
     @staticmethod
     def _make_dirs(dirs: list[str]) -> None:
-        """
+        """ A small private utility function which simply creates
+        all directories in a given list of strings.
 
-        :param dirs:
-        :return:
+        :param dirs: list of directory substrings (full paths or relative)
         """
         for directory in dirs:
             makedirs(directory, exist_ok=True)
