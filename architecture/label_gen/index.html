@@ -1,0 +1,1457 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../distributions/">
+      
+      
+        <link rel="next" href="../pipeline_serialization/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Label Generation - Rendersynth Documentation & Tutorials</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#labeling-format-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-header__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rendersynth Documentation & Tutorials
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Label Generation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../setup/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../architecture_overview/" class="md-tabs__link">
+          
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/00_landing/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../examples/00_landing/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-nav__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Rendersynth Documentation & Tutorials
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference_sheet/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Label Generation
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Label Generation
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Concepts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Concepts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#formatspecification" class="md-nav__link">
+    <span class="md-ellipsis">
+      FormatSpecification
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iostrategy-sequence-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      IOStrategy sequence diagram
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implemented-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implemented Formats
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implemented Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ultralytics-yolo" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ultralytics YOLO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coco-bounding-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      COCO (Bounding Box)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pascal-voc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pascal VOC
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cvat-xml-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVAT XML (Images)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-a-custom-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Registering a Custom Format
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Registering a Custom Format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-inside-the-extension-decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      From inside the extension (decorator)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-a-blender-script-python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      From a Blender script (Python API)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Format Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline_serialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Serialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operators/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operators
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline_execution/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline Execution
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    User Interface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context_restoring/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Non-destructiveness
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/01_classes_entities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    1 - Classes & Entities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/02_create_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2 - Create Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/03_labeling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3 - Labeling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/04_distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    4 - Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/05_new_label_format/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    5 - Create Labeling Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/06_shader_randomize/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    6 - Shader Randomization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/07_common_pitfalls.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    7 - Common Pitfalls
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/08_matching_labeling_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    8 - Matching Labeling and Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/09_batch_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    9 - Batch Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/10_preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    10 - Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/11_import_export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    11 - Importing and Exporting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/12_labeling_rigs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    12 - Labeling Rigs and Key
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/01_prod_classification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Product Classification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/02_image_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Image Segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/03_pose_estimation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pose Estimation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="labeling-format-system">Labeling Format System</h1>
+<h2 id="overview">Overview</h2>
+<p>The labeling format system handles serialization of synthetic annotations to standard computer vision formats. It is built around a single abstract class (<code>IOStrategy</code>) and a registry that maps format names to their implementations. The registry is the only entry point you need when selecting or adding a format.</p>
+<p>The code lives under <code>ext/core/io/</code>:</p>
+<pre><code>ext/core/io/
+├── io_strategy.py       # Abstract base class and data structures
+├── registry.py          # LabelingFormatRegistry
+└── strategies/
+    ├── __init__.py       # SupportedFormats enum + imports
+    ├── yolo_strategy.py
+    ├── coco_strategy.py
+    ├── pascal_strategy.py
+    └── cvat_xml_strategy.py
+</code></pre>
+<hr />
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="formatspecification">FormatSpecification</h3>
+<p>Each strategy declares its capabilities and requirements by returning a <code>FormatSpecification</code> from <code>get_specification()</code>. This tells the pipeline how to drive the strategy: whether to write one file per image or one global file, whether class declarations are needed, which geometry types are expected, and so on.</p>
+<pre><code class="language-python">@dataclass
+class FormatSpecification:
+    single_file_per_image: bool         # True for YOLO/Pascal, False for COCO
+    global_metadata_required: bool      # True for COCO
+    aggregation_strategy: Literal[&quot;per_image&quot;, &quot;per_batch&quot;, &quot;global&quot;]
+    requires_class_declaration: bool
+    supports_image_metadata: bool
+    requires_bbox: bool = False
+    requires_polygon: bool = False
+    requires_keypoints: bool = False
+    requires_depth: bool = False
+</code></pre>
+<p>The pipeline reads this spec and calls the appropriate methods. If you implement a new strategy, this is the first thing to get right.</p>
+<h3 id="iostrategy-sequence-diagram">IOStrategy sequence diagram</h3>
+<p>For each batch, the pipeline calls these methods in order:</p>
+<ol>
+<li><code>ensure_directories()</code> — create output directories before writing anything.</li>
+<li><code>transform_annotation(label, shot_idx, shot_config)</code> — convert a single canonical <code>Label</code> object into a format-specific dict. Called once per annotation.</li>
+<li><code>serialize_image_labels(transformed)</code> — used by per-image formats (YOLO, Pascal VOC) to produce file content from a list of transformed annotations for one image. Returns a collection of <code>(file_type, extension, content_string)</code> tuples.</li>
+<li><code>aggregate_batch(annotations, batch_metadata)</code> — used by global formats (COCO) to build the full batch structure from all transformed annotations.</li>
+<li><code>finalize(aggregated)</code> — called once per batch. For COCO this produces the final JSON. For YOLO it produces <code>data.yaml</code> and the image list <code>.txt</code>. Returns <code>(file_type, extension, content_string)</code> tuples.</li>
+</ol>
+<p>File routing is handled by <code>get_subdir_for(shot_id, file_type)</code> and <code>get_filename_for(shot_id, file_type)</code>, which the pipeline uses to determine where to write each returned tuple.</p>
+<hr />
+<h2 id="implemented-formats">Implemented Formats</h2>
+<h3 id="ultralytics-yolo">Ultralytics YOLO</h3>
+<p><strong>Registry key:</strong> <code>"Ultralytics YOLO"</code></p>
+<p>One <code>.txt</code> label file per image. Each line is <code>class_id cx cy w h</code> in normalized coordinates. Additionally produces a <code>data.yaml</code> (dataset config) and a <code>.txt</code> file listing image paths, both at batch finalization.</p>
+<p>Directory layout:</p>
+<pre><code>&lt;save_path&gt;/
+├── images/
+│   └── &lt;prefix&gt;_&lt;shot_id&gt;.png
+└── labels/
+    └── &lt;prefix&gt;_&lt;shot_id&gt;.txt
+</code></pre>
+<p>With <code>split</code> set (e.g. <code>"train"</code>):</p>
+<pre><code>&lt;save_path&gt;/
+└── train/
+    ├── images/
+    └── labels/
+</code></pre>
+<p>Config keys accepted via <code>format_cfg</code>:
+- <code>bbox_precision</code> (int, default 3): decimal places for bbox coordinates.
+- <code>split</code> (str, default <code>""</code>): dataset split name.</p>
+<h3 id="coco-bounding-box">COCO (Bounding Box)</h3>
+<p><strong>Registry key:</strong> <code>"COCO"</code></p>
+<p>Produces a single <code>instances.json</code> per batch following the COCO detection format. Images are accumulated during <code>transform_annotation</code>, categories are built during <code>aggregate_batch</code>, and the final JSON is written in <code>finalize</code>.</p>
+<p>Directory layout:</p>
+<pre><code>&lt;save_path&gt;/
+├── images/
+│   └── &lt;prefix&gt;_&lt;shot_id&gt;.png
+└── instances.json
+</code></pre>
+<p>Config keys:
+- <code>bbox_precision</code> (int, default 2): decimal places for bbox coordinates.
+- <code>split</code> (str, default <code>""</code>): dataset split name.</p>
+<h3 id="pascal-voc">Pascal VOC</h3>
+<p><strong>Registry key:</strong> <code>"Pascal VOC"</code></p>
+<p>One XML annotation file per image. The XML structure follows the standard Pascal VOC schema with <code>&lt;annotation&gt;</code>, <code>&lt;object&gt;</code>, and <code>&lt;bndbox&gt;</code> elements.</p>
+<p>Directory layout:</p>
+<pre><code>&lt;save_path&gt;/
+├── images/
+└── annotations/
+    └── &lt;prefix&gt;_&lt;shot_id&gt;.xml
+</code></pre>
+<p>Config keys:
+- <code>split</code> (str, default <code>""</code>): dataset split name.
+- <code>xml_indent</code> (int, default 2): indentation for pretty-printed XML.</p>
+<h3 id="cvat-xml-images">CVAT XML (Images)</h3>
+<p><strong>Registry key:</strong> <code>"CVAT XML Images"</code></p>
+<p>Produces a single XML file compatible with CVAT's image annotation format.</p>
+<hr />
+<h2 id="registering-a-custom-format">Registering a Custom Format</h2>
+<h3 id="from-inside-the-extension-decorator">From inside the extension (decorator)</h3>
+<p>If your strategy lives within the extension package, use the <code>register_strategy</code> decorator:</p>
+<pre><code class="language-python">from ext.core.io.registry import LabelingFormatRegistry
+from ext.core.io.io_strategy import IOStrategy, FormatSpecification, StorageSpec
+
+@LabelingFormatRegistry.register_strategy(&quot;My Custom Format&quot;)
+class MyFormatter(IOStrategy):
+    def __init__(self, write_config, config):
+        super().__init__(write_config, config)
+        # read your format-specific keys from config dict
+
+</code></pre>
+<h3 id="from-a-blender-script-python-api">From a Blender script (Python API)</h3>
+<p>If you want to register a format at runtime from Blender's scripting tab without modifying the extension source, use <code>register_new</code>:</p>
+<pre><code class="language-python">class MyFormatter(IOStrategy):
+    # ... implement all abstract methods as above ...
+    pass
+
+LabelingFormatRegistry.register_new(&quot;My Custom Format&quot;, MyFormatter)
+
+</code></pre>
+<p><code>register_new</code> validates that the provided class is a subclass of <code>IOStrategy</code> and raises <code>RuntimeError</code> if it is not. It does not validate that all abstract methods are implemented — that will raise at instantiation time when the pipeline tries to use it.</p>
+<hr />
+<h2 id="format-configuration">Format Configuration</h2>
+<p>Format-specific settings are passed as a plain <code>dict</code> at instantiation time, sourced from the UI config. There is no fixed schema — each strategy reads only the keys it needs via <code>config.get(...)</code>.</p>
+<p>When implementing a new strategy, document which keys your <code>__init__</code> reads. Unrecognized keys are silently ignored since strategies use <code>config.get(key)</code> rather than direct access.</p>
+<hr />
+<h2 id="notes">Notes</h2>
+<ul>
+<li><code>COCO_SEGMENTATION</code> and <code>COCO_KEYPOINTS</code> are registered in the registry but not yet implemented (stub classes).</li>
+<li>The <code>aggregation_strategy</code> field in <code>FormatSpecification</code> controls which pipeline path is taken. A strategy that sets <code>"global"</code> must implement <code>aggregate_batch</code> and <code>finalize</code> meaningfully and may raise <code>NotImplementedError</code> in <code>serialize_image_labels</code> (as <code>COCOFormatter</code> does).</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
