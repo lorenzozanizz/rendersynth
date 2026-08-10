@@ -3,7 +3,7 @@
 class ThermalSettings:
     pass
 
-class LandmarkSection:
+class ThermalSection:
     """ Draws the thermal labeling configuration: material definitions,
      configuration for the thermal dynamics, etcetera """
 
