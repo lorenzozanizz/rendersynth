@@ -39,8 +39,8 @@ User can also specify named classes and assign classes to blender objects. Multi
 - **Many labeling formats** The extension currently supports:
   - ULTRALYITICS YOLO
   - COCO 
-  - COCO Keypoints
-  - COCO Segmentation (skeletons)
+  - COCO Keypoints (skeletons)
+  - PNG/Multilayer EXR pixel semantic segmentation 
   - Depth maps
   - Normal maps
   - CVAT XML
@@ -53,6 +53,7 @@ User can also specify named classes and assign classes to blender objects. Multi
 ## Installation
 
 You can either download one of the released .zips in the Github Release section or build a release from the current repository version. 
+You can also find the extension on the ![Blender Extension repository](https://extensions.blender.org/add-ons/rendersynth/).
 
 ### Release download
 
