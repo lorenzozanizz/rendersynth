@@ -114,8 +114,6 @@ def draw_bounding_box(
     draw_bounding_box(img, COLOR, P0, P1, y_grows_up_to_down=True, line_width=5)
     draw_bounding_box(img, COLOR_2, P0_2, P1_2, y_grows_up_to_down=False, line_width=5)
 
-    (613.1937172774869, 908.4112149532709, 1306.8062827225133, 191.77570093457945)
-    compute_bounding_boxes
     The above commands have the same effect, so that the y_grows_up_to_down parameters allows to switch
     between cv2 repr into blender pixel repr where a higher pixel has a greater y.
 
