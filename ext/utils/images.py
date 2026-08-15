@@ -282,6 +282,8 @@ def draw_bitmap_text(img, text: str, position: tuple[int, int] = (0, 0),
                                 draw_color(pixels, color,idx)
 
         current_x += char_width_pixels * size + min(2, 1*size // 2)
+        if crop_width and current_x >= crop_width:
+            return
 
     if owns_canvas:
         canvas.flush()
