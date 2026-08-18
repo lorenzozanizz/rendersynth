@@ -811,7 +811,8 @@ class BezierLockOperation(PipelineOperation):
             self.initial_camera_rot = None
 
         def __enter__(self):
-            self.initial_camera_pos = self.target.location
+            # Conver to tuple to capture by value
+            self.initial_camera_pos = tuple(self.target.location)
             self.initial_camera_rot = self.target.rotation_euler
             if self.do_lock:
                 self.constraint = self.target.constraints.new(type='TRACK_TO')
