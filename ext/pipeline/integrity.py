@@ -111,7 +111,7 @@ class MoveValidator(PipeValidator):
 
 
 @ValidatorRegistry.register(PipeNames.POV.value)
-class MoveValidator(PipeValidator):
+class POVValidator(PipeValidator):
 
     @staticmethod
     def validate(pipe: PipelineOperation,  config: dict) -> bool:
@@ -140,12 +140,6 @@ class MaterialValidator(PipeValidator):
         mat_ok = MaterialSelectorValidator.validate(config[wsk.MATERIAL.value])
         return mat_ok and obj_ok
 
-@ValidatorRegistry.register(PipeNames.TEXTURE.value)
-class TextureValidator(PipeValidator):
-
-    @staticmethod
-    def validate(pipe: PipelineOperation, config: dict) -> bool:
-        return False
 
 @ValidatorRegistry.register(PipeNames.INTENSITY.value)
 class IntensityValidator(PipeValidator):
