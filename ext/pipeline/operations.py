@@ -941,8 +941,10 @@ class ChangePOVOperation(PipelineOperation):
             Distribution.CATEGORICAL_UNIFORM.name, 1, n=len(self.positions) - 1)
 
     def execute(self, context):
-        point = self.distribution.sample()
-        target_pt = self.positions[point]
+        # Get the first point
+        selected_loc_idx = min(max(0, int(self.distribution.sample()[0])), len(self.positions) - 1)
+
+        target_pt = self.positions[selected_loc_idx]
         self.target_camera.location = target_pt
 
 
