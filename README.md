@@ -45,6 +45,7 @@ User can also specify named classes and assign classes to blender objects. Multi
   - Normal maps
   - CVAT XML
   - Point clouds (classes, colors)
+    
 ## System Requirements
 
 - **Blender**: 4.5.0 or later
@@ -107,22 +108,7 @@ Outputs are saved as:
 - Configuration snapshot and logs (for reproducibility)
 Render settings are extracted from the current Blender settings at the time of generation.
 
-## Architecture
-
-The extension is organized into logical modules:
-```
-ext/
-├── distribution/      # Distribution node system and evaluation
-├── pipeline/          # Pipeline data structures and operations
-├── operators/         # Blender operators (UI interactions)
-├── ui/                # User interface panels and viewers
-├── core/              # Core rendering and generation logic
-├── utils/             # Logging and utility functions
-└── constants.py       # Configuration constants
-```
-A more thorough description is detailed inside /docs/Architecture Overview.md
-
-## Key Concepts
+## Concepts
 
 ### Distributions
 Distributions define probability functions for randomization. Two modes are provided to randomize most operations: using a preset distribution (normal, exponential, etc...) or generating a custom distribution through a node based editor (still incomplete). The editor allows the interconnection of nodes: 
@@ -162,21 +148,22 @@ Pipelines can be saved and loaded as JSON, enabling:
 
 ## JSON Configuration Format
 
-Pipelines are stored as JSON for reproducibility and sharing across .blend files:
+Pipelines are stored as JSON for reproducibility and sharing across .blend files. The save file includes definition for all custom distributions and all the settings
+for all stages in a pipeline. 
 
 ## Limitations
 
-- Complex shader networks may not be fully randomized through the UI; direct material node editing may be necessary for advanced cases
+- Complex shader networks may not be fully randomized through the UI and direct material node editing may be necessary for advanced cases
   (the idea is to randomize certain nodes in the shader which impact the appearence of the full Cycles material)
 - Very large pipelines with many operations may impact interactive performance, EEVEE is recommendend for preview. 
 
 ## Contributing
 
-This is a user-focused addon. Bug reports and feature requests can be submitted through the project repository. 
+This is a user-focused addon. Bug reports and feature requests can be submitted by opening an issue
 
 ## Support
 
-For issues, questions, or feature requests, please visit the GitHub repository or consult the documentation wiki.
+For issues, questions, or feature requests, please open an issue. First consult the available documentation.
 
 ---
 
