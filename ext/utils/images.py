@@ -328,7 +328,10 @@ def fill_polygon(img, polygon: list[tuple], color, channels: int = 4) -> None:
             if i + 1 < len(intersections):
                 x_start = int(intersections[i])
                 x_end = int(intersections[i + 1])
+
                 for x in range(x_start, x_end):
+                    if not (0 <= x < width and 0 <= y < height):
+                        continue
                     draw_color(pixels, color, to_index((x, y), width, channels=channels))
 
     if owns_canvas:
@@ -350,7 +353,7 @@ def draw_thick_pixel(pixels, color, x: int, y: int, line_width: int, width:int, 
     """
     for l_dx in range(-line_width // 2, (line_width + 1) // 2):
         for l_dy in range(-line_width // 2, (line_width + 1) // 2):
-            if 0 < x + l_dx < width and 0< y + l_dy < height:
+            if 0 < x + l_dx <= width and 0 <= y + l_dy < height:
                 idx = to_index((x + l_dx, y + l_dy), width, channels=channels)
                 draw_color(pixels, color, idx)
 
