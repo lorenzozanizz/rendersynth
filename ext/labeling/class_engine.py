@@ -379,6 +379,8 @@ class ClassificationEngine:
                     collection_obj_names = {obj.name for obj in collection.objects}
                     resolved = list(missing_names & collection_obj_names)
 
+                if mapping_class is None:
+                    continue
                 for name in resolved:
                     name_mappings[name] = mapping_class
                     missing_names.discard(name)
