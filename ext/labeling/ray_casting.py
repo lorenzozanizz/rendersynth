@@ -75,12 +75,13 @@ def get_visible_objects_from_camera(scene, depsgraph,
     camera_translation = camera.matrix_world.translation
 
     if num_ray:
+        raise ValueError("This feature is no more supported pending updates to the sampling system for point clouds.")
         # We know that the numbers of ray shot is len(x_range)*len(y_range) so we must have
         # assuming resolution_x = resolution_y
         # ( top_right[0]-top_left[0] / resolution_x ) * (bottom_left[1]-top_left[1]) / resolution_x) = num_rays
         # hence we have
-        resolution_x = resolution_y = min(30, int(sqrt(
-            (top_right[0] - top_left[0]) * (bottom_left[1] - top_left[1]) / num_ray)))
+        # resolution_x = resolution_y = min(30, int(sqrt(
+        #    (top_right[0] - top_left[0]) * (bottom_left[1] - top_left[1]) / num_ray)))
 
     # Get iteration range for both the x and y axes, sampled based on the resolution
     x_range = linspace(top_left[0], top_right[0], resolution_x)
