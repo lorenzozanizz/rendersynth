@@ -14,7 +14,8 @@ except ImportError:
         """Simple fallback for np.linspace, using a generator expression to avoid
         constructing a useless large array."""
         step = (stop - start) / (num - 1) if num > 1 else 0
-        return (start + step * i for i in range(num))
+        # make it a tuple so that it does not exhaust after the first inner loop
+        return tuple(start + step * i for i in range(num))
 
 from collections import defaultdict
 from math import sqrt, degrees, atan2
