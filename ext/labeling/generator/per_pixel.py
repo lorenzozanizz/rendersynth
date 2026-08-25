@@ -393,7 +393,7 @@ class PixelMapExtractor(Extractor):
             # produced file to exactly this path once rendering has completed. Keep the ".png"
             # extension in sync with finalize_shot().
             self._pending_map_path = os.path.join(write_dir,
-                f"{filename}.{"exr" if "exr" in self.output_format else "png"}"
+                f"{filename}.{'exr' if 'exr' in self.output_format else 'png'}"
             )
         return
 
