@@ -364,6 +364,9 @@ class PixelMapExtractor(Extractor):
         if "exr" in self.output_format:
             if self.datatype == 'depth':
                 self.active_output_context_node = PixelMapExtractor.EXRDepthContext(self.ctx, config)
+                return self.active_output_context_node
+            else:
+                raise NotImplementedError("Not available yet")
         else:
             if self.datatype == 'depth':
                 self.active_output_context_node = PixelMapExtractor.CompositorDepthContext(self.ctx, config)
@@ -389,7 +392,9 @@ class PixelMapExtractor(Extractor):
             # number appended to filename BUT finalize_shot() strips that suffix by renaming the
             # produced file to exactly this path once rendering has completed. Keep the ".png"
             # extension in sync with finalize_shot().
-            self._pending_map_path = os.path.join(write_dir, f"{filename}.png")
+            self._pending_map_path = os.path.join(write_dir,
+                f"{filename}.{"exr" if "exr" in self.output_format else "png"}"
+            )
         return
 
     def declare_folder_structure(self, folder_strategy: "IOStrategy") -> None:
@@ -422,7 +427,7 @@ class PixelMapExtractor(Extractor):
         prefix = self.declared_strategy.get_filename_for(shot_idx, "map")
         frame = self.ctx.scene.frame_current  # whatever Blender used as suffix for the current frame,
         # which is what is getting appended to the output of the compositor
-        ext = ".png"  # or read from config/format
+        ext = ".exr" if "exr" in self.output_format else ".png"  # or read from config/format
 
         produced = os.path.join(directory, f"{prefix}{frame:04d}{ext}")
         target = os.path.join(directory, f"{prefix}{ext}")

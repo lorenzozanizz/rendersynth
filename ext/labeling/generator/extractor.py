@@ -87,9 +87,6 @@ class Extractor(metaclass=ABCMeta):
 
     def prepare_for_shot(self, shot_idx: int) -> None:
         """
-
-        :param all_objects: All the available objects in the Blender scene
-        :param class_engine: The ClassificationEngine active in the scene
         :param shot_idx:
         :return:
         """

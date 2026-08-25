@@ -32,13 +32,16 @@ class DepthStrategyPNG(IOStrategy):
         return ()
 
     def transform_annotation(self, label: Label, shot_idx: int, shot_config: RenderConfig) -> dict[str, Any]:
+        """ No transformation is required for depth maps"""
         pass
 
     def aggregate_batch(self, annotations: list[dict[str, Any]], batch_metadata: BatchMetadata) -> dict[
         str, list[dict]]:
+        """ No aggregation is required for depth map, each is written at each frame """
         pass
 
     def finalize(self, aggregated: dict[str, Any]) -> Collection[tuple[file_type, extension, str]]:
+        """ No finalization needed for depth maps extraction """
         pass
 
     def get_storage_spec(self) -> StorageSpec:
