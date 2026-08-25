@@ -35,6 +35,7 @@ class PixelMapExtractor(Extractor):
         self.datatype = datatype
         self.normalized_depth = normalize_depth
 
+        self.output_format = None
         self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
         # Path extract() should attach to its Label, computed by prepare_for_shot() once the
@@ -282,17 +283,94 @@ class PixelMapExtractor(Extractor):
             node.base_path = directory
             node.file_slots[0].path = name
 
+    class EXRNormalContext:
+        pass
+
+    class EXRDepthContext:
+
+        name_types_depth = {
+            'render_layer': ('CompositorNodeRLayers', []),
+            'file_output': ('CompositorNodeOutputFile', []),
+        }
+
+        link_mappings_depth = {
+            (('render_layer', 'file_output'), ('Depth', 0)),
+        }
+
+        default_assignments_depth = {
+            'file_output': (
+                ('base_path', ''),
+            )
+        }
+
+
+        def __init__(self, context, config: dict):
+            self.config = config
+            self.ctx = context
+            self.prev_scene_use_nodes = None
+            self.prev_scene_render_layer_z = None
+
+            self.compositor = NodeCompositor(context=self.ctx)
+
+        def __enter__(self):
+            scene = self.ctx.scene
+
+            # Initially extract the current render layer data.
+            self.prev_scene_use_nodes = scene.use_nodes
+            self.prev_scene_render_layer_z = scene.view_layers["ViewLayer"].use_pass_z
+            self.prev_scene_render_layer_normal = scene.view_layers["ViewLayer"].use_pass_normal
+
+            scene.use_nodes = True
+            # We have to instruct the rendering pass to preserve the depth data.
+            scene.view_layers["ViewLayer"].use_pass_z = True
+
+            # Create the composite nodes: first create tbe nodes, then link them together and
+            # finally set the node defaults (e.g. config the nodes)
+            self.compositor.gen_nodes(self.name_types_depth)
+            self.compositor.link_nodes(self.link_mappings_depth)
+            self.compositor.set_node_defaults(self.default_assignments_depth)
+
+            output_node = self.compositor.get_node("file_output")
+            output_node.format.file_format = "OPEN_EXR_MULTILAYER"
+
+            # Register the nodes together so that we can remove them at the same time when exiting
+            self.compositor.register_names_as_group('depth_tree', self.name_types_depth.keys())
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            scene = self.ctx.scene
+
+            # First restore the previous scene render layer data.
+            scene.use_nodes = self.prev_scene_use_nodes
+            scene.view_layers["ViewLayer"].use_pass_z = self.prev_scene_render_layer_z
+
+            # Remove the composite nodes
+            self.compositor.delete_node_group('depth_tree')
+            self.compositor.unregister_group('depth_tree')
+
+        def set_write_path(self, directory: Union[str, Path], name: str) -> None:
+            node = self.compositor.get_node('file_output')
+            if node is None:
+                return
+            node.base_path = directory
+            node.file_slots[0].path = name
+
+
     def get_context(self) -> AbstractContextManager:
         config = {
             'normalize_depth': self.normalized_depth,
             'black_near': self.black_near,
         }
-        if self.datatype == 'depth':
-            self.active_output_context_node = PixelMapExtractor.CompositorDepthContext(self.ctx, config)
-            return self.active_output_context_node
+
+        if "exr" in self.output_format:
+            if self.datatype == 'depth':
+                self.active_output_context_node = PixelMapExtractor.EXRDepthContext(self.ctx, config)
         else:
-            self.active_output_context_node =  PixelMapExtractor.CompositorNormalContext(self.ctx, config)
-            return self.active_output_context_node
+            if self.datatype == 'depth':
+                self.active_output_context_node = PixelMapExtractor.CompositorDepthContext(self.ctx, config)
+                return self.active_output_context_node
+            else:
+                self.active_output_context_node =  PixelMapExtractor.CompositorNormalContext(self.ctx, config)
+                return self.active_output_context_node
 
     def prepare_for_shot(self, shot_idx: int) -> None:
         # For the default implementation, simply ignore the preparation: nothing needs
