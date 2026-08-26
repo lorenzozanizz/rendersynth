@@ -263,7 +263,8 @@ class DepthHandler(LabelConfigHandler):
 
     @staticmethod
     def draw(context, layout) -> None:
-        pass
+        source = context.scene.labeling_config
+        LabelConfigHandler._draw_props(layout, source,'png_or_exr')
 
     @staticmethod
     def extract(context) -> dict:
@@ -295,7 +296,6 @@ class SegmentationPNGHandler(LabelConfigHandler):
         LabelConfigHandler._draw_props(layout, source,
             ('discretize', 'black_and_white')
         )
-        pass
 
     @staticmethod
     def extract(context) -> dict:
@@ -332,7 +332,7 @@ class LabelConfigDataProperty(PropertyGroup):
     # used in [PCD*]
     generate_info: BoolProperty(default=False, name="Generate metadata")            # type: ignore
 
-    # Used in [Segmentation*]
+    # Used in [Segmentation*, Depth]
     split_map_per_class: BoolProperty(default=False, name="Split map per class")    # type: ignore
     png_or_exr: EnumProperty(                                                       # type: ignore
         name="Class map format",
