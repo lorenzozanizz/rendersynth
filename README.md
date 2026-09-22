@@ -71,7 +71,7 @@ You can also find the extension on the ![Blender Extension repository](https://e
 
 The addon will appear in the 3D Viewport sidebar under the **Synthetic** panel.
 
-![Modalities](./resources/rotating_view.gif)
+![Modalities](./resources/rotating_view_corrected.gif)
 ## Quick Start
 
 ### 1. Create classes and entities
