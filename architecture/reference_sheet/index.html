@@ -1,0 +1,1872 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../architecture_overview/">
+      
+      
+        <link rel="next" href="../distributions/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Reference - Rendersynth Documentation & Tutorials</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#quick-reference-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-header__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rendersynth Documentation & Tutorials
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../setup/" class="md-tabs__link">
+        
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../architecture_overview/" class="md-tabs__link">
+          
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/00_landing/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../examples/00_landing/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Rendersynth Documentation &amp; Tutorials" class="md-nav__button md-logo" aria-label="Rendersynth Documentation & Tutorials" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Rendersynth Documentation & Tutorials
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture_overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#file-navigation-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      File Navigation Cheat Sheet
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Navigation Cheat Sheet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-operations-are-stored" class="md-nav__link">
+    <span class="md-ellipsis">
+      How operations are stored
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-operations-are-executed" class="md-nav__link">
+    <span class="md-ellipsis">
+      How operations are executed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-add-a-new-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to add a new operation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-the-ui-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      How the UI works
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-draw-operation-config-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to draw operation config UI
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-validate-a-pipe-after-saving-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to validate a pipe after saving it
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-saveload-operation-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to save/load operation config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-operators-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      How operators work
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-node-distributions-work-work-in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      How (node) distributions work [WORK IN PROGRESS]
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-configuration-constants-live" class="md-nav__link">
+    <span class="md-ellipsis">
+      Where configuration constants live
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-objects-and-entities-are-assigned-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Where objects and entities are assigned labels
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-classes-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Classes at a Glance
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Classes at a Glance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Storage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ui-rendering" class="md-nav__link">
+    <span class="md-ellipsis">
+      UI Rendering
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config-serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Config Serialization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operators
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distribution-work-in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      Distribution [ WORK IN PROGRESS ]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-navigation-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code Navigation Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Code Navigation Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finding-where-a-ui-button-is-created" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finding where a UI button is created
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finding-where-a-property-is-defined" class="md-nav__link">
+    <span class="md-ellipsis">
+      Finding where a property is defined
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-ui-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding a new UI panel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-new-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding a new operator
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-operation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding a New Operation
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding a New Operation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-add-to-pipenames-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Add to PipeNames enum
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-define-execution-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Define execution class
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-define-ui-drawer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Define UI drawer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-define-config-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Define config schema
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-add-to-menu-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5: Add to menu (optional)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-add-scene-properties-if-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6: Add scene properties (if needed)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Tasks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Tasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-get-current-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to get current pipeline
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-get-all-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to get all operations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-parse-operation-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to parse operation config
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../label_gen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Label Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline_serialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Serialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operators/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operators
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline_execution/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pipeline Execution
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    User Interface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../context_restoring/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Non-destructiveness
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/01_classes_entities/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    1 - Classes & Entities
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/02_create_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2 - Create Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/03_labeling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3 - Labeling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/04_distributions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    4 - Distributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/05_new_label_format/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    5 - Create Labeling Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/06_shader_randomize/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    6 - Shader Randomization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/07_common_pitfalls.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    7 - Common Pitfalls
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/08_matching_labeling_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    8 - Matching Labeling and Formats
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/09_batch_generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    9 - Batch Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/10_preview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    10 - Preview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/11_import_export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    11 - Importing and Exporting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/12_labeling_rigs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    12 - Labeling Rigs and Key
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/00_landing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Onboarding
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/01_prod_classification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Product Classification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/02_image_segmentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Image Segmentation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/03_pose_estimation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pose Estimation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="quick-reference-guide">Quick Reference Guide</h1>
+<h2 id="file-navigation-cheat-sheet">File Navigation Cheat Sheet</h2>
+<h4 id="how-operations-are-stored">How operations are stored</h4>
+<p>→ <code>ext/pipeline/data.py</code> — PropertyGroup definitions, using Blender property system</p>
+<h4 id="how-operations-are-executed">How operations are executed</h4>
+<p>→ <code>ext/pipeline/operations.py</code> — Operation classes with execute(), pipes are compiled and then executed in sequence for every frame. </p>
+<h4 id="how-to-add-a-new-operation">How to add a new operation</h4>
+<p>→ See <a href="#adding-a-new-operation-step-by-step">Adding a New Operation</a></p>
+<h4 id="how-the-ui-works">How the UI works</h4>
+<p>→ <code>ext/ui/panels.py</code> (main panels)  side bar panels (except labeling and pipeline editor) 
+→ <code>ext/ui/pipeline_list_viewer.py</code> (operation list and tabs) pipeline editor
+→ <code>ext/ui/labeling_panel.py</code> labeling assignment </p>
+<h4 id="how-to-draw-operation-config-ui">How to draw operation config UI</h4>
+<p>→ <code>ext/ui/pipe_editor.py</code> (registries and drawer classes)<br />
+→ <code>ext/ui/pipe_edit_widgets.py</code> (reusable components)</p>
+<h4 id="how-to-validate-a-pipe-after-saving-it">How to validate a pipe after saving it</h4>
+<p>→ <code>ext/pipeline/integrity.py</code> validation registry and pipe validators</p>
+<h4 id="how-to-saveload-operation-config">How to save/load operation config</h4>
+<p>→ <code>ext/ui/pipe_schema.py</code> (serialization registry) and pipe schema implementations</p>
+<h4 id="how-operators-work">How operators work</h4>
+<p>→ <code>ext/operators/</code> (all operator classes)<br />
+→ <code>ext/operators/names.py</code> (operator identifiers) used as references to avoid dangling references</p>
+<h4 id="how-node-distributions-work-work-in-progress">How (node) distributions work [WORK IN PROGRESS]</h4>
+<p>→ <code>ext/distribution/nodes.py</code> (node definitions)<br />
+→ <code>ext/distribution/__init__.py</code> (node categories/menu)</p>
+<h4 id="where-configuration-constants-live">Where configuration constants live</h4>
+<p>→ <code>ext/constants.py</code> (enums, URLs, versions)</p>
+<h4 id="where-objects-and-entities-are-assigned-labels">Where objects and entities are assigned labels</h4>
+<p>→ <code>ext/labeling/class_engine.py</code> assignment of classes</p>
+<hr />
+<h2 id="key-classes-at-a-glance">Key Classes at a Glance</h2>
+<h3 id="data-storage">Data Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PipelineData</code></td>
+<td><code>pipeline/data.py</code></td>
+<td>Collection container</td>
+</tr>
+<tr>
+<td><code>PipelineOperation</code></td>
+<td><code>pipeline/data.py</code></td>
+<td>Single operation item</td>
+</tr>
+</tbody>
+</table>
+<h3 id="execution">Execution</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PipelineOperation</code> (ABC)</td>
+<td><code>pipeline/operations.py</code></td>
+<td>Base class for executable ops</td>
+</tr>
+<tr>
+<td><code>RandomizeScaleOperation</code></td>
+<td><code>pipeline/operations.py</code></td>
+<td>Concrete scale implementation</td>
+</tr>
+<tr>
+<td><code>OperationRegistry</code></td>
+<td><code>pipeline/registry.py</code></td>
+<td>Lookup table for operations</td>
+</tr>
+<tr>
+<td><code>CompiledPipeline</code></td>
+<td><code>core/executable_pipeline.py</code></td>
+<td>How pipes are compiled and executed in sequence</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ui-rendering">UI Rendering</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RandomizerPanel</code></td>
+<td><code>ui/panels.py</code></td>
+<td>Main panel</td>
+</tr>
+<tr>
+<td><code>RegistrationPanel</code></td>
+<td><code>ui/pipeline_list_viewer.py</code></td>
+<td>Pipeline editor panel</td>
+</tr>
+<tr>
+<td><code>PipelineOperationsList</code></td>
+<td><code>ui/pipeline_list_viewer.py</code></td>
+<td>UIList renderer</td>
+</tr>
+<tr>
+<td><code>PipeDrawer</code> (ABC)</td>
+<td><code>ui/pipe_editor.py</code></td>
+<td>Base for UI drawers</td>
+</tr>
+<tr>
+<td><code>RandomizeScaleOperation</code></td>
+<td><code>ui/pipe_editor.py</code></td>
+<td>UI drawer for scale</td>
+</tr>
+<tr>
+<td><code>OperationDrawerRegistry</code></td>
+<td><code>ui/pipe_editor.py</code></td>
+<td>UI drawer lookup</td>
+</tr>
+</tbody>
+</table>
+<h3 id="config-serialization">Config Serialization</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PipeSchema</code> (ABC)</td>
+<td><code>ui/pipe_schema.py</code></td>
+<td>Base for serialization</td>
+</tr>
+<tr>
+<td><code>VisibilitySchema</code></td>
+<td><code>ui/pipe_schema.py</code></td>
+<td>Concrete schema</td>
+</tr>
+<tr>
+<td><code>PipeSchemaRegistry</code></td>
+<td><code>ui/pipe_schema.py</code></td>
+<td>Schema lookup</td>
+</tr>
+</tbody>
+</table>
+<h3 id="operators">Operators</h3>
+<p>The following are only some pipeline operators to add, remove, edit and save pipes. They follow the standard Blender interface for Operators. 
+| Class | File | Purpose |
+|---|---|---|
+| <code>PipeAddOperator</code> | <code>operators/pipeline_ops.py</code> | Add operation |
+| <code>PipeRemoveOperator</code> | <code>operators/pipeline_ops.py</code> | Remove operation |
+| <code>EditPipeOperator</code> | <code>operators/pipeline_ops.py</code> | Edit operation |
+| <code>SavePipeOperator</code> | <code>operators/pipeline_ops.py</code> | Save operation config |</p>
+<h3 id="distribution-work-in-progress">Distribution [ WORK IN PROGRESS ]</h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DistributionNodeTree</code></td>
+<td><code>distribution/nodes.py</code></td>
+<td>Custom node editor</td>
+</tr>
+<tr>
+<td><code>ConstantSampler</code></td>
+<td><code>distribution/computation.py</code></td>
+<td>Fixed value node, Normal distribution etc...</td>
+</tr>
+<tr>
+<td><code>BezierDistribution</code></td>
+<td><code>distribution/bezier.py</code></td>
+<td>Sampling a point on a curve in space</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="code-navigation-patterns">Code Navigation Patterns</h2>
+<h3 id="finding-where-a-ui-button-is-created">Finding where a UI button is created</h3>
+<ol>
+<li>Find button label in <code>ext/ui/</code> files</li>
+<li>Look for <code>.operator()</code> call</li>
+<li>The operator call uses a name defined in the <code>operators/names.py</code> module which contains the correct file name. </li>
+</ol>
+<p><strong>Example</strong>: "Add" button in pipeline list</p>
+<pre><code class="language-python"># ext/ui/pipeline_list_viewer.py
+col.operator(Labels.ADD_MENU_LIST_.value, ...)
+
+# ext/operators/names.py
+ADD_MENU_LIST_ = &quot;randomizer.add_menu_list&quot;
+
+# ext/operators/graphical_ops.py
+class MenuOperator(Operator):
+    bl_idname = Labels.ADD_MENU_LIST_.value
+</code></pre>
+<h3 id="finding-where-a-property-is-defined">Finding where a property is defined</h3>
+<ol>
+<li>Search property name in UI code</li>
+<li>Find <code>.prop()</code> call referencing it</li>
+<li>Look in <code>ext/ui/properties.py</code> for definition</li>
+<li>Property is attached to <code>bpy.types.Scene</code> in <code>__init__.py</code></li>
+</ol>
+<p><strong>Example</strong>: Finding where randomizer_amount is defined</p>
+<pre><code class="language-python"># In panel
+layout.prop(scene, &quot;randomizer_amount&quot;)
+
+# In properties.py
+ext_ui_properties = {
+    &quot;randomizer_amount&quot;: IntProperty(default=10, min=1),
+    ...
+}
+
+# Attached in __init__.py
+setattr(bpy.types.Scene, &quot;randomizer_amount&quot;, IntProperty(...))
+</code></pre>
+<p>Most UI properties are defined inside <code>ui/properties.py</code>. Certain special properties which handle
+the storage of the pipeline itself are instead defined in <code>pipeline/data.py</code></p>
+<h3 id="adding-a-new-ui-panel">Adding a new UI panel</h3>
+<ol>
+<li>Create Panel subclass in <code>ext/ui/panels.py</code></li>
+<li>Add to <code>classes</code> tuple in <code>ext/ui/__init__.py</code></li>
+<li>It auto-registers in <code>__init__.py</code> during addon registration</li>
+</ol>
+<h3 id="adding-a-new-operator">Adding a new operator</h3>
+<ol>
+<li>Create Operator subclass in appropriate file in <code>ext/operators/</code></li>
+<li>Add to tuple in <code>ext/operators/__init__.py</code></li>
+<li>Add entry to <code>Labels</code> enum in <code>ext/operators/names.py</code></li>
+<li>It auto-registers in <code>__init__.py</code></li>
+</ol>
+<hr />
+<h2 id="adding-a-new-operation">Adding a New Operation</h2>
+<h3 id="step-1-add-to-pipenames-enum">Step 1: Add to PipeNames enum</h3>
+<p>The label will be used around the code to refer to the same pipe in multiple registries. 
+<strong>File</strong>: <code>ext/constants.py</code></p>
+<pre><code class="language-python">class PipeNames(Enum):
+    # ... existing ...
+    MY_NEW_OP = &quot;My New Operation&quot;
+</code></pre>
+<h3 id="step-2-define-execution-class">Step 2: Define execution class</h3>
+<p>This class will be executed in sequence with other pipes, and thus handles and operates on Blender objects. 
+<strong>File</strong>: <code>ext/pipeline/operations.py</code></p>
+<pre><code class="language-python">@OperationRegistry.register(PipeNames.MY_NEW_OP.value)
+class MyNewOperation(PipelineOperation):
+
+    def from_config(self) -&gt; dict:
+        pass
+
+    def execute(self, scene, objects):
+        # Actual implementation of the operator
+        pass
+    ...
+</code></pre>
+<p>This internally registers the operator (a pipe) as executable. Now there is a need to add the pipe to the UI which allows
+ the user to create it. </p>
+<h3 id="step-3-define-ui-drawer">Step 3: Define UI drawer</h3>
+<p>This editor is drawn when the user clicks on "edit pipe" button in the pipe editor. 
+<strong>File</strong>: <code>ext/ui/pipe_editor.py</code></p>
+<pre><code class="language-python"># -----------------------------    Same label as the PipelineOperation implementation
+@OperationDrawerRegistry.register(PipeNames.MY_NEW_OP.value)
+class MyNewOperationDrawer(PipeDrawer):
+
+    @staticmethod
+    def draw_editor(layout, context) -&gt; None:
+        # Draw configuration UI
+        ObjectTargeter.draw(layout, context)  # Use existing widgets
+        layout.separator()
+        # Add custom widgets as needed
+</code></pre>
+<h3 id="step-4-define-config-schema">Step 4: Define config schema</h3>
+<p>Now the pipe is added to the pipeline but needs to be able to be serializable in a human-readable JSON. For 
+this purpose we create a schema which encodes the pipe into a dictionary, or prepares the editor when the pipe 
+is to be edited, reading from the configuration. </p>
+<p><strong>File</strong>: <code>ext/ui/pipe_schema.py</code></p>
+<pre><code class="language-python">@PipeSchemaRegistry.register(PipeNames.MY_NEW_OP.value)
+class MyNewOperationSchema(PipeSchema):
+
+    @staticmethod
+    def extract_config_from_ui(context, operation) -&gt; dict:
+        pass
+
+    @staticmethod
+    def apply_config_to_ui(context, operation, config) -&gt; None:
+        pass
+</code></pre>
+<h3 id="step-5-add-to-menu-optional">Step 5: Add to menu (optional)</h3>
+<p>The pipe now needs to be added to the UI menu to be selected by the user. Either add it to an existing menu section 
+or create a new menu section. </p>
+<p><strong>File</strong>: <code>ext/ui/pipeline_list_viewer.py</code></p>
+<pre><code class="language-python">class AddCustomCategoryPipeMenu(Menu):
+    bl_label = 'Custom'
+    bl_idname = 'AddCustomCategoryPipeMenu'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator(Labels.ADD_PIPE.value, text=&quot;My New Operation&quot;,
+                       icon='MY_ICON').op_name = PipeNames.MY_NEW_OP.value
+</code></pre>
+<h3 id="step-6-add-scene-properties-if-needed">Step 6: Add scene properties (if needed)</h3>
+<p>Properties should be all kept separated into the properties.py module. If a property has a special meaning 
+or structure, it could be put in some other module, as long as its correctly registered to the blender API. 
+<strong>File</strong>: <code>ext/ui/properties.py</code></p>
+<pre><code class="language-python">operation_properties = {
+    &quot;my_param1&quot;: ...
+}
+</code></pre>
+<hr />
+<h2 id="common-tasks">Common Tasks</h2>
+<h3 id="how-to-get-current-pipeline">How to get current pipeline</h3>
+<pre><code class="language-python">scene = bpy.context.scene
+pipeline = scene.pipeline_data
+active_op = pipeline.operations[pipeline.active_operation_index]
+</code></pre>
+<h3 id="how-to-get-all-operations">How to get all operations</h3>
+<pre><code class="language-python">scene = bpy.context.scene
+for operation in scene.pipeline_data.operations:
+    print(f&quot;{operation.name} ({operation.operation_type})&quot;)
+</code></pre>
+<h3 id="how-to-parse-operation-config">How to parse operation config</h3>
+<pre><code class="language-python">import json
+operation = scene.pipeline_data.operations[0]
+config = json.loads(operation.config)
+min_val = config.get('min_value', 0)
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
