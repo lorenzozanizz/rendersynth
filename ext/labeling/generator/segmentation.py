@@ -32,7 +32,8 @@ class SegmentationExtractor(Extractor):
     def __init__(self, context, png_or_exr: Literal["png", "exr"] = "png"):
         self.ctx = context
         self.timings = {}
-        self.png_or_exr = png_or_exr
+        # The UI stores the format in upper case ("PNG"/"EXR"). Use lower case here.
+        self.png_or_exr = png_or_exr.lower()
 
         self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
@@ -88,7 +89,16 @@ class SegmentationExtractor(Extractor):
         self._pending_map_path = os.path.join(write_dir, f"{filename}.{self.png_or_exr}")
 
     def get_context(self) -> AbstractContextManager:
-        config = {"png_or_exr": self.png_or_exr}
+        # Read the user settings from the scene. Before this fix, only "png_or_exr"
+        # was sent, so "split_map_per_class" was None and no builder matched.
+        scene_cfg = self.ctx.scene.labeling_config
+        self.png_or_exr = str(scene_cfg.png_or_exr).lower()
+        config = {
+            "png_or_exr": self.png_or_exr,
+            "split_map_per_class": "per_class" if scene_cfg.split_map_per_class else "single",
+            "discretize": bool(scene_cfg.discretize),
+            "black_and_white": bool(scene_cfg.black_and_white),
+        }
         self.active_output_context_node = SegmentationExtractor.CryptoMatteSegmentationCompositor(self.ctx, config)
         self.active_output_context_node.assign_mappings(self._matte_pending_map)
         return self.active_output_context_node
@@ -156,10 +166,10 @@ class SegmentationExtractor(Extractor):
             self.matte_mappings: Optional[dict] = None
             # Configurations taken from the outer extractor straight out of the
             # blender scene
-            self.png_or_exr: Literal["png", "exr"] = config.get("png_or_exr")
-            self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class")
-            self.discretize = config.get("discretize")
-            self.black_and_white = config.get("black_and_white")
+            self.png_or_exr: Literal["png", "exr"] = str(config.get("png_or_exr", "png")).lower()
+            self.split_map_per_class: Literal["single", "per_class"] = config.get("split_map_per_class", "single")
+            self.discretize = config.get("discretize", True)
+            self.black_and_white = config.get("black_and_white", False)
 
         def __enter__(self):
             scene = self.ctx.scene
@@ -177,7 +187,7 @@ class SegmentationExtractor(Extractor):
 
             for output_node in self.output_nodes:
                 output_node = self.compositor.get_node(output_node)
-                if self.png_or_exr == 'PNG':
+                if self.png_or_exr == 'png':
                     output_node.format.file_format = 'PNG'
                     # Like other extractors we need to disable color management and gamma correction
                     # to get the real colors output.
@@ -298,6 +308,7 @@ class SegmentationExtractor(Extractor):
             prev_color_add_name: Optional[str] = None
 
             node_config["file_output"] =  ('CompositorNodeOutputFile', [])
+            class_node_names.append("file_output")
 
             for cls_id, obj_names in class_to_objects.items():
                 crypto_name = f"cryptomatte_{cls_id}"
@@ -321,6 +332,7 @@ class SegmentationExtractor(Extractor):
                             {"name": "operation", "value": "GREATER_THAN"},
                         ]
                     )
+                    class_node_names.append(thresh_name)
                 node_config[mix_name] = (
                     'ShaderNodeMix',
                     [
@@ -413,6 +425,14 @@ class SegmentationExtractor(Extractor):
                         {"name": "matte_id", "value": ",".join(obj_names)},
                     ]
                 )
+                if self.discretize:
+                    node_config[thresh_name] = (
+                        'CompositorNodeMath',
+                        [
+                            {"name": "operation", "value": "GREATER_THAN"},
+                        ]
+                    )
+                    class_node_names.append(thresh_name)
                 node_config[mix_name] = (
                     'ShaderNodeMix',
                     [
@@ -420,7 +440,7 @@ class SegmentationExtractor(Extractor):
                         {"name": "blend_type", "value": "MIX"},
                     ]
                 )
-                class_node_names.extend([crypto_name, mix_name])
+                class_node_names.extend([crypto_name, mix_name, out_name])
 
                 link_config.add((("render_layer", crypto_name), ('Image', 'Image')))
                 if not self.discretize:
@@ -440,7 +460,7 @@ class SegmentationExtractor(Extractor):
                 node_config[out_name] = (
                     'CompositorNodeOutputFile', []
                 )
-                self.output_nodes.append("file_output")
+                self.output_nodes.append(out_name)
                 link_config.add(((mix_name, out_name), ("Result", "Image")))
 
             return node_config, link_config, default_config, class_node_names, None
@@ -465,6 +485,8 @@ class SegmentationExtractor(Extractor):
             # together as in PNGs.
             out_name = "file_output"
             self.output_nodes = [out_name]
+            node_config[out_name] = ('CompositorNodeOutputFile', [])
+            class_node_names.append(out_name)
 
             # For each class, generate a corresponding socket in the EXR Multilayer compositor node
             # The first socket is already there, so start from 1. (and rename it)
@@ -478,7 +500,7 @@ class SegmentationExtractor(Extractor):
                     else:
                         output_node.layer_slots.new(name)
 
-            for cls_id, obj_names, class_socket in zip(
+            for (cls_id, obj_names), class_socket in zip(
                 class_to_objects.items(),
                 compositor_socket_names
             ):
@@ -497,6 +519,14 @@ class SegmentationExtractor(Extractor):
                         {"name": "matte_id", "value": ",".join(obj_names)},
                     ]
                 )
+                if self.discretize:
+                    node_config[thresh_name] = (
+                        'CompositorNodeMath',
+                        [
+                            {"name": "operation", "value": "GREATER_THAN"},
+                        ]
+                    )
+                    class_node_names.append(thresh_name)
                 node_config[mix_name] = (
                     'ShaderNodeMix',
                     [
@@ -527,4 +557,3 @@ class SegmentationExtractor(Extractor):
                 link_config.add(((mix_name, out_name), ("Result", class_socket)))
 
             return node_config, link_config, default_config, class_node_names, callback_fn
-

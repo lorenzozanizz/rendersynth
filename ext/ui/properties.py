@@ -21,6 +21,13 @@ from ..distribution.computation import ONE_D_DISTRIBUTIONS, UPPER_D_DISTRIBUTION
 from ..distribution.color import ColorDistribution
 from ..core.io.strategies import SupportedFormats
 
+# Stable, static items for the label format enum (see "randomizer_label_format")
+LABEL_FORMAT_ITEMS = [
+    (fmt.value, fmt.value, f"Use {fmt.value} format.", 'NONE', number)
+    for number, fmt in enumerate(SupportedFormats)
+]
+
+
 # UI properties for the main panel, output panel and class panel.
 ext_ui_properties = {
     "pipeline_has_unsaved_changes": BoolProperty(default=False),
@@ -66,10 +73,10 @@ ext_ui_properties = {
     default=True),
     "randomizer_label_format": EnumProperty(
         name="Format",
-        items = lambda self, context: [  # type: ignore
-            (formatting.value, formatting.value, f"Use {formatting.value} format.")
-            for formatting in SupportedFormats
-        ]
+        # A static list with explicit numbers, built once. Blender saves the enum in the
+        # .blend as this number. The number must not change between versions of the extension.
+        # (When you add a new format, add it at the END of SupportedFormats.)
+        items=LABEL_FORMAT_ITEMS
     ),
     "randomizer_logging_path": StringProperty(
         name="Log Path",
