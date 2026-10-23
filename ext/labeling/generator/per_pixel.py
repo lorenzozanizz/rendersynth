@@ -35,7 +35,7 @@ class PixelMapExtractor(Extractor):
         self.datatype = datatype
         self.normalized_depth = normalize_depth
 
-        self.output_format = None
+        self.output_format = "png"
         self.declared_strategy: Optional["IOStrategy"] = None
         self.active_output_context_node = None
         # Path extract() should attach to its Label, computed by prepare_for_shot() once the
