@@ -13,7 +13,7 @@ Additionally, the extensions supports a preview functionality which allows to in
 The extension is intended for low to medium sized computer vision products, which benefit more from ease of generation rather than the efficiency and generality of tools like Blenderproc. 
 
 ## Overview
-  ![Functionality](./resources/banner.png)
+  ![Functionality](./resources/demonstration_zoomed_loop.gif)
 
 The Generator provides a building-block system for defining randomization pipelines within Blender. Users can specify how objects, materials, and lighting conditions should vary across multiple renders, then automatically output images with corresponding metadata suitable for computer vision training datasets.
 User can also specify named classes and assign classes to blender objects. Multiple objects can be grouped together to form multi-object entities which the extension will classify as a single object. 
