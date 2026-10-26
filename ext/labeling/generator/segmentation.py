@@ -199,7 +199,7 @@ class SegmentationExtractor(Extractor):
                         output_node.format.color_mode = "BW"
                 else:
                     # OpenEXR raw numerical formatting.
-                    output_node.format.file_format = "OPENEXR MULTILAYER"
+                    output_node.format.file_format = "OPEN_EXR_MULTILAYER"
                     output_node.format.color_management = "OVERRIDE"
                     # The data we have to store is not a color data, so we instruct openexr to NOt apply any
                     # gamma correction or the sorts.
