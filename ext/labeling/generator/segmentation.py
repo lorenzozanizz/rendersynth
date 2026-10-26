@@ -122,6 +122,8 @@ class SegmentationExtractor(Extractor):
             if os.path.exists(target):
                 os.remove(target)
             os.rename(produced, target)
+        else:
+            raise RuntimeError(f"A required produced map file {produced} is not present in its expected location.")
 
     @staticmethod
     def needs_folder_structure() -> bool:
