@@ -140,8 +140,12 @@ class NodeCompositor:
     def delete_node(self, node_name: str) -> None:
         """ Delete a node and its internal registration. The deletion is unchecked, e.g.
         this can throw an exception. """
-        self.tree.nodes.remove(self.nodes[node_name])
-        self.nodes.pop(node_name, None)
+        try:
+            self.tree.nodes.remove(self.nodes[node_name])
+            self.nodes.pop(node_name, None)
+        except KeyError:
+            raise RuntimeError(f"When attempting to delete node {node_name} for compositing a required "
+                               f"node did not exist and could not be deleted.")
 
     def get_node(self, name: str) -> Optional[Any]:
         """ Retrieve a node by name """

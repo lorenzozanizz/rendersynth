@@ -275,7 +275,7 @@ class LoadPipelineOperator(Operator):
             path = scene.randomizer_config_path
             # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'r') as f:
+            with open(path, 'r', encoding="utf-8") as f:
                 content = json.load(f)
 
             loader = PipelineLoader(scene)

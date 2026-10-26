@@ -116,7 +116,7 @@ class OutputWriter:
             # ^ Previous version of the code, changed after extending the IOStrategy to expose fully
             # writing paths for the given strategy.
 
-            with open(write_dir, 'w') as f:
+            with open(write_dir, 'w', encoding="utf-8") as f:
                 f.write(file_content)
 
     def _flatten_pending(self) -> list[dict]:
