@@ -203,7 +203,7 @@ class SegmentationExtractor(Extractor):
                     output_node.format.color_management = "OVERRIDE"
                     # The data we have to store is not a color data, so we instruct openexr to NOt apply any
                     # gamma correction or the sorts.
-                    output_node.format.linear_colorspace_settings.name = "NON-COLOR"
+                    output_node.format.linear_colorspace_settings.name = "Non-Color"
 
 
             return self
